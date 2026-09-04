@@ -593,7 +593,7 @@ function drawGrid() {
 drawGrid();
 
 // --- 3. Three.js 3D Wireframe with Orbit Drag & Zoom ---
-let scene, camera, renderer, wireframeMesh, outerRing, innerCore;
+let scene, camera, renderer, wireframeMesh, outerRing, innerCore, starField;
 let currentGeoIndex = 0;
 const geometries = [];
 const geometryNames = [
@@ -623,6 +623,25 @@ function initThreeJS() {
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // 1,500 Starfield for Scrollytelling Cosmic Depth
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 1500;
+  const starPositions = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount * 3; i += 3) {
+    starPositions[i] = (Math.random() - 0.5) * 90;
+    starPositions[i + 1] = (Math.random() - 0.5) * 90;
+    starPositions[i + 2] = (Math.random() - 0.5) * 120 - 20;
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  const starMat = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 0.12,
+    transparent: true,
+    opacity: 0.5,
+  });
+  starField = new THREE.Points(starGeo, starMat);
+  scene.add(starField);
 
   // Geometries list
   geometries.push(new THREE.IcosahedronGeometry(2.1, 1));
@@ -735,8 +754,42 @@ function animateThreeJS() {
   const normX = (mouse.x / width) * 2 - 1;
   const normY = -(mouse.y / height) * 2 + 1;
 
-  // Camera smooth zoom
-  camera.position.z += (targetCameraZ - camera.position.z) * 0.1;
+  // --- Scrollytelling 3D Camera Voyage ---
+  const maxScroll = Math.max(1, document.body.scrollHeight - window.innerHeight);
+  const scrollProg = Math.min(1, Math.max(0, scrollY / maxScroll));
+
+  // Multi-chapter camera depth journey through deep space:
+  // Chapter 00 (Hero: 0.0 -> 0.22): Observational distance (Z = 7.0 -> 3.8, plunging toward singularity)
+  // Chapter 01 (Collider Lab: 0.22 -> 0.55): Core inspection inside particle horizon (Z = 3.8 -> 5.2)
+  // Chapter 02 (Stellar Nucleosynthesis: 0.55 -> 0.78): Orbital geometry vantage (Z = 5.2 -> 6.5)
+  // Chapter 03 (Cyclic Big Bounce: 0.78 -> 1.0): Expansive cosmic perspective (Z = 6.5 -> 8.8)
+  let scrollyTargetZ = 7.0;
+  if (scrollProg < 0.22) {
+    const t = scrollProg / 0.22;
+    scrollyTargetZ = 7.0 - t * 3.2; // Plunge forward into the core!
+  } else if (scrollProg < 0.55) {
+    const t = (scrollProg - 0.22) / 0.33;
+    scrollyTargetZ = 3.8 + t * 1.4;
+  } else if (scrollProg < 0.78) {
+    const t = (scrollProg - 0.55) / 0.23;
+    scrollyTargetZ = 5.2 + t * 1.3;
+  } else {
+    const t = (scrollProg - 0.78) / 0.22;
+    scrollyTargetZ = 6.5 + t * 2.3; // Wide expansive cosmology
+  }
+
+  // Combine scrollytelling path with user 2-finger trackpad zoom offset
+  const userZoomOffset = targetCameraZ - 7.0;
+  const effectiveCameraZ = scrollyTargetZ + userZoomOffset;
+  camera.position.z += (effectiveCameraZ - camera.position.z) * 0.08;
+
+  // Starfield gentle drift and dynamic parallax depth
+  if (starField) {
+    starField.rotation.y += 0.0003;
+    starField.rotation.x += 0.00015;
+    starField.position.y = scrollY * 0.002;
+    starField.position.z = (scrollY * 0.008) % 30;
+  }
 
   // Audio-reactive frequency sampling
   let bassFactor = 0;
@@ -759,12 +812,13 @@ function animateThreeJS() {
     wireframeMesh.rotation.y += 0.003;
     wireframeMesh.rotation.x += 0.0015;
 
-    wireframeMesh.rotation.x += (normY * 0.4 - wireframeMesh.rotation.x) * 0.02;
-    wireframeMesh.rotation.y += (normX * 0.5 - wireframeMesh.rotation.y) * 0.02;
+    wireframeMesh.rotation.x += (normY * 0.35 - wireframeMesh.rotation.x) * 0.02;
+    wireframeMesh.rotation.y += (normX * 0.45 - wireframeMesh.rotation.y) * 0.02;
 
-    // Scroll depth translation
-    wireframeMesh.position.z = -scrollY * 0.003;
-    wireframeMesh.position.y = -scrollY * 0.001;
+    // Smooth lateral translation based on chapter journey
+    const lateralShift = Math.sin(scrollProg * Math.PI * 2) * 1.2;
+    wireframeMesh.position.x += (lateralShift - wireframeMesh.position.x) * 0.05;
+    wireframeMesh.position.y = -scrollY * 0.0008;
 
     // Audio Reactive Scale + Mac Force Touch Expansion + Cosmological Epoch Scale
     const epochScale = (typeof cosmicEngine !== 'undefined') ? cosmicEngine.getVisualScale() : 1.0;
@@ -774,7 +828,7 @@ function animateThreeJS() {
     // Outer orbital ring rotation & pulse
     if (outerRing) {
       outerRing.rotation.z += 0.004;
-      outerRing.rotation.y = normX * 0.3;
+      outerRing.rotation.y = normX * 0.3 + scrollProg * 1.5;
       const ringScale = 1 + bassFactor * 0.15 + trackpadForce * 0.25;
       outerRing.scale.set(ringScale, ringScale, ringScale);
     }
@@ -804,9 +858,13 @@ function morphGeometry() {
   const currentName = geometryNames[currentGeoIndex];
   const activeGeoText = document.getElementById('active-geo-text');
   const cardGeoStatus = document.getElementById('card-geo-status');
+  const stellarGeoIndicator = document.getElementById('stellar-geo-indicator');
 
   if (activeGeoText) activeGeoText.textContent = currentName;
   if (cardGeoStatus) cardGeoStatus.textContent = currentName;
+  if (stellarGeoIndicator) {
+    stellarGeoIndicator.textContent = currentName.replace(/^\d\/\d:\s*/, '');
+  }
 
   audio.triggerChime(587.33, 'triangle', 0.6, 0, 0); // D5
 }
