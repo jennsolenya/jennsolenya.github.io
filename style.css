@@ -1549,10 +1549,12 @@ html, body {
   height: 100vh;
   z-index: 1000;
   display: none;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .universe-modal.open {
-  display: block;
+  display: flex;
 }
 
 .universe-backdrop {
@@ -1562,21 +1564,23 @@ html, body {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  z-index: 1;
 }
 
 .universe-drawer {
-  position: absolute;
-  top: 0;
-  right: 0;
+  position: relative;
+  z-index: 2;
   width: 100%;
   max-width: 680px;
-  height: 100%;
-  background: #000000;
-  border-left: 1px solid var(--border-subtle);
+  height: 100vh;
+  background: #050505;
+  border-left: 1px solid var(--border-active);
   padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.9);
+  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.95);
   animation: slideIn 0.3s ease-out;
 }
 
