@@ -979,9 +979,11 @@ function morphGeometry() {
   const activeGeoText = document.getElementById('active-geo-text');
   const cardGeoStatus = document.getElementById('card-geo-status');
   const stellarGeoIndicator = document.getElementById('stellar-geo-indicator');
+  const geoSpecName = document.getElementById('geo-spec-name');
 
   if (activeGeoText) activeGeoText.textContent = currentName;
   if (cardGeoStatus) cardGeoStatus.textContent = currentName;
+  if (geoSpecName) geoSpecName.textContent = currentName;
   if (stellarGeoIndicator) {
     stellarGeoIndicator.textContent = currentName.replace(/^\d\/\d:\s*/, '');
   }
@@ -1148,12 +1150,12 @@ function syncAudioButtons(isPlaying) {
   if (beatTrackBtn) {
     if (isPlaying) {
       beatTrackBtn.classList.add('active');
-      if (beatTrackStatus) beatTrackStatus.textContent = 'PLAY MUSIC: ON';
-      if (beatTrackIcon) beatTrackIcon.innerHTML = '&#9632;';
+      if (beatTrackStatus) beatTrackStatus.textContent = 'GENERATIVE STREAM: ACTIVE';
+      if (beatTrackIcon) beatTrackIcon.textContent = '||';
     } else {
       beatTrackBtn.classList.remove('active');
-      if (beatTrackStatus) beatTrackStatus.textContent = 'PLAY MUSIC: OFF';
-      if (beatTrackIcon) beatTrackIcon.innerHTML = '&#9654;';
+      if (beatTrackStatus) beatTrackStatus.textContent = 'GENERATIVE STREAM: OFF';
+      if (beatTrackIcon) beatTrackIcon.textContent = '>';
     }
   }
 }
@@ -1403,6 +1405,7 @@ class CosmicUniverseEngine {
 
   updateTelemetryHUD() {
     const epoch = this.getCurrentEpoch();
+    this.syncGenrePills(epoch.key);
 
     const epochBadge = document.getElementById('epoch-name-badge');
     if (epochBadge) {
@@ -1550,7 +1553,7 @@ class CosmicUniverseEngine {
       chip.className = `memory-chip ${mem.id === activeId ? 'active' : ''}`;
       chip.setAttribute('aria-label', `Restore ${mem.name}`);
       chip.innerHTML = `
-        <span>✦</span>
+        <span class="chip-index">//</span>
         <span>${mem.name} [${mem.time}]</span>
         <span class="memory-delete-btn" title="Delete memory">&times;</span>
       `;
@@ -1763,13 +1766,40 @@ if (headerMusicToggle) headerMusicToggle.addEventListener('click', () => cosmicE
 const beatTrackBtn = document.getElementById('beat-track-toggle');
 if (beatTrackBtn) beatTrackBtn.addEventListener('click', () => cosmicEngine.togglePlayback());
 
+// Filter Cutoff & Resonance Real-Time Studio Sliders
+const filterCutoffSlider = document.getElementById('filter-cutoff-slider');
+const filterCutoffVal = document.getElementById('filter-cutoff-val');
+const filterResSlider = document.getElementById('filter-res-slider');
+const filterResVal = document.getElementById('filter-res-val');
+
+if (filterCutoffSlider) {
+  filterCutoffSlider.addEventListener('input', (e) => {
+    const freq = parseFloat(e.target.value);
+    if (filterCutoffVal) filterCutoffVal.textContent = `${Math.round(freq)} HZ`;
+    if (audio.filter && audio.ctx) {
+      audio.filter.frequency.setTargetAtTime(freq, audio.ctx.currentTime, 0.02);
+    }
+  });
+}
+
+if (filterResSlider) {
+  filterResSlider.addEventListener('input', (e) => {
+    const q = parseFloat(e.target.value);
+    if (filterResVal) filterResVal.textContent = `Q: ${q.toFixed(1)}`;
+    if (audio.filter && audio.ctx) {
+      audio.filter.Q.setTargetAtTime(q, audio.ctx.currentTime, 0.02);
+    }
+  });
+}
+
 // Genre / Epoch Selector Pills
 document.querySelectorAll('.genre-pill').forEach((pill) => {
   pill.addEventListener('click', () => {
     const genre = pill.getAttribute('data-genre') || 'techno';
     const epochMap = {
+      'ambient': 0,
       'singularity': 0,
-      'ambient': 1,
+      'dnb': 1,
       'inflation': 1,
       'techno': 2,
       'stellar': 2,
