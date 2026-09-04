@@ -114,23 +114,71 @@ class SpatialSoundEngine {
   setGenre(genreName) {
     this.genre = genreName;
     if (this.isMuted || !this.ctx) return;
+    const now = this.ctx.currentTime;
 
-    if (genreName === 'techno') {
-      this.filter.Q.setValueAtTime(5.5, this.ctx.currentTime);
+    if (genreName === 'singularity') {
+      // Epoch 0: Primordial Singularity
+      this.filter.frequency.setTargetAtTime(180, now, 0.2);
+      this.filter.Q.setValueAtTime(1.5, now);
+      this.droneOsc1.type = 'sine';
+      this.droneOsc2.type = 'sine';
+      this.subBassOsc.frequency.setValueAtTime(36.7, now);
+      this.triggerChime(73.4, 'sine', 0.5, 0, 0);
+    } else if (genreName === 'techno' || genreName === 'stellar') {
+      // Epoch 2: Stellar Nucleosynthesis & Techno order
+      this.filter.frequency.setTargetAtTime(1600, now, 0.15);
+      this.filter.Q.setValueAtTime(5.5, now);
       this.droneOsc1.type = 'sawtooth';
       this.droneOsc2.type = 'triangle';
-      this.triggerChime(110, 'sawtooth', 0.4, 0, 0);
-    } else if (genreName === 'dubstep') {
-      this.filter.Q.setValueAtTime(9.5, this.ctx.currentTime);
+      this.triggerChime(110, 'sawtooth', 0.45, 0, 0);
+    } else if (genreName === 'dubstep' || genreName === 'turbulence') {
+      // Epoch 3: Cosmic Turbulence & Chaos
+      this.filter.frequency.setTargetAtTime(950, now, 0.1);
+      this.filter.Q.setValueAtTime(11.0, now);
       this.droneOsc1.type = 'sawtooth';
       this.droneOsc2.type = 'sawtooth';
-      this.triggerChime(55, 'sawtooth', 0.8, 0, 0);
+      this.triggerChime(55, 'sawtooth', 0.85, 0, 0);
+    } else if (genreName === 'bounce') {
+      // Epoch 4: The Big Bounce
+      this.playBigBounceChord();
     } else {
-      this.filter.Q.setValueAtTime(3.5, this.ctx.currentTime);
+      // Epoch 1: Cosmic Inflation / Ambient
+      this.filter.frequency.setTargetAtTime(650, now, 0.2);
+      this.filter.Q.setValueAtTime(3.5, now);
       this.droneOsc1.type = 'sine';
       this.droneOsc2.type = 'triangle';
       this.triggerChime(440, 'sine', 0.6, 0, 0);
     }
+  }
+
+  playBigBounceChord() {
+    if (!this.ctx || this.isMuted) return;
+    const now = this.ctx.currentTime;
+    const chord = [261.63, 329.63, 392.00, 523.25, 659.25]; // C major 9th cosmic rebirth chord
+    chord.forEach((freq, idx) => {
+      const panX = (idx - 2) * 0.4;
+      this.triggerChime(freq, 'sine', 0.75, panX, 0);
+    });
+  }
+
+  playSubDrop() {
+    if (!this.ctx || this.isMuted) return;
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(130, now);
+      osc.frequency.exponentialRampToValueAtTime(32, now + 0.65);
+
+      gain.gain.setValueAtTime(0.7, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+
+      osc.connect(gain);
+      gain.connect(this.bassBoost || this.masterGain);
+      osc.start(now);
+      osc.stop(now + 0.7);
+    } catch (e) {}
   }
 
   toggle() {
