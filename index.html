@@ -121,12 +121,12 @@
   </div>
 
   <main class="page-container">
-    <!-- Hero Section -->
+    <!-- Hero Section: Chapter 00 -->
     <section class="hero-section">
       <div class="pill-row">
         <div class="pill-badge">
           <span class="pill-dot"></span>
-          <span>VOID LAB // SPATIAL ENGINE</span>
+          <span>CHAPTER 00 // PRIMORDIAL SINGULARITY</span>
         </div>
         <div id="active-geo-pill" class="geo-badge">
           <span>&#10022;</span>
@@ -141,11 +141,11 @@
       </h1>
 
       <p class="hero-subtitle">
-        A minimalist interactive art experiment in pure darkness, dimensional 3D wireframe geometry, tactile trackpad dynamics, and spatial audio synthesis.
+        Before space and time unfolded, all existence was compressed into a high-density, silent quantum void. Interact to ignite cosmic inflation or traverse depth through the universe.
       </p>
 
       <div class="hero-actions">
-        <button class="action-btn" onclick="document.getElementById('experiments').scrollIntoView({ behavior: 'smooth' });">
+        <button class="action-btn" onclick="document.getElementById('collider-lab').scrollIntoView({ behavior: 'smooth' });">
           <span>EXPLORE EXPERIMENTS</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -160,99 +160,82 @@
 
       <div class="scroll-hint">
         <div class="scroll-line"></div>
-        <span>DRAG TO ORBIT 3D &bull; SCROLL TO TRAVERSE DEPTH</span>
+        <span>DRAG TO ORBIT 3D &bull; SCROLL TO TRAVERSE COSMIC TIME</span>
       </div>
     </section>
 
-    <!-- Interactive 3D Experiments Section -->
-    <section id="experiments" class="section">
+    <!-- Act I: Cosmic Inflation & Particle Collider Experiment -->
+    <section id="collider-lab" class="section">
       <div class="section-header">
-        <div class="section-tag">ACT I // INTERACTIVE MODULES</div>
-        <h2 class="section-title">KINETIC 3D ENTITIES</h2>
+        <div class="section-tag">CHAPTER 01 // COSMIC INFLATION</div>
+        <h2 class="section-title">THE PARTICLE COLLIDER &amp; QUANTUM FOAM</h2>
+        <p class="section-narrative">
+          At 10⁻³⁵ seconds, the primordial singularity underwent exponential inflation. Subatomic quantum fluctuations were stretched across light-years into cosmic filaments. Touch the field to birth particles, click to detonate a shockwave, or press deep to trigger black hole gravitational collapse.
+        </p>
       </div>
 
-      <div class="cards-grid">
-        <!-- Card 1: Morph Geometry -->
-        <div id="card-morph" class="tilt-card">
-          <div class="card-content">
-            <div class="card-top-row">
-              <span class="card-num">MODULE // 01</span>
-              <span id="card-geo-status" class="card-status-badge">1/4 ICOSAHEDRON</span>
-            </div>
-            <div class="card-icon">
-              <svg viewBox="0 0 24 24" stroke-width="1.8">
-                <polygon points="12 2 2 8.5 12 15 22 8.5 12 2"></polygon>
-                <line x1="2" y1="15.5" x2="12" y2="22"></line>
-                <line x1="22" y1="15.5" x2="12" y2="22"></line>
-              </svg>
-            </div>
-            <h3 class="card-heading">Morph Geometry</h3>
-            <p class="card-desc">
-              Alter the floating 3D wireframe manifold in real-time. Cycles between Icosahedron, Torus Knot, Octahedron, and Dodecahedron forms with audio resonance.
-            </p>
-            <div class="card-action">
-              <span>CYCLE GEOMETRY</span>
-              <span>&rarr;</span>
-            </div>
+      <!-- Live Interactive Particle Collider Sandbox -->
+      <div class="sandbox-container">
+        <div class="sandbox-hud">
+          <div class="sandbox-hud-left">
+            <span class="sandbox-dot"></span>
+            <span id="sandbox-mode-badge" class="sandbox-badge">MODE: INFLATION EXPANSION</span>
+            <span id="sandbox-particles-badge" class="sandbox-badge">PARTICLES: 2,500</span>
+          </div>
+          <div class="sandbox-hud-right">
+            <span id="sandbox-gravity-badge" class="sandbox-stat">GRAVITY: 1.0G</span>
+            <span id="sandbox-velocity-badge" class="sandbox-stat">VELOCITY: MACH 3.2</span>
           </div>
         </div>
 
-        <!-- Card 2: Force Touch Field -->
-        <div id="card-gravity" class="tilt-card">
-          <div class="card-content">
-            <div class="card-top-row">
-              <span class="card-num">MODULE // 02</span>
-              <span class="card-status-badge">FORCE TOUCH READY</span>
-            </div>
-            <div class="card-icon">
-              <svg viewBox="0 0 24 24" stroke-width="1.8">
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-              </svg>
-            </div>
-            <h3 class="card-heading">Tactile Singularity</h3>
-            <p class="card-desc">
-              Press deeper into your Mac Force Touch trackpad. Analog pressure expands your spotlight, swells deep sub-bass (36.7Hz D1), and magnifies wireframe scale.
-            </p>
-            <div class="card-action">
-              <span>EXPLORE FORCE</span>
-              <span>&rarr;</span>
-            </div>
+        <div class="sandbox-canvas-wrap">
+          <canvas id="particle-sandbox-canvas"></canvas>
+          <div class="sandbox-hint-overlay">
+            <span>TOUCH / DRAG: GRAVITY WELL &bull; CLICK: SHOCKWAVE &bull; FORCE TOUCH: SINGULARITY COLLAPSE</span>
           </div>
         </div>
 
-        <!-- Card 3: Spatial Audio Resonance -->
-        <div id="card-space" class="tilt-card">
-          <div class="card-content">
-            <div class="card-top-row">
-              <span class="card-num">MODULE // 03</span>
-              <span class="card-status-badge">BINAURAL HRTF</span>
-            </div>
-            <div class="card-icon">
-              <svg viewBox="0 0 24 24" stroke-width="1.8">
-                <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
-                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
-              </svg>
-            </div>
-            <h3 class="card-heading">3D Audio Orbit</h3>
-            <p class="card-desc">
-              Rotational spatialization calibrated for AirPods Pro 3 &amp; stereo headphones. Sound coordinates orbit your head in true 3D space as you spin the geometry.
-            </p>
-            <div class="card-action">
-              <span>LISTEN IN 3D</span>
-              <span>&rarr;</span>
-            </div>
+        <div class="sandbox-controls-bar">
+          <div class="sandbox-mode-pills" role="tablist" aria-label="Collider Physical Modes">
+            <button class="sandbox-pill active" data-mode="inflation">💥 INFLATION</button>
+            <button class="sandbox-pill" data-mode="vortex">🕳 VORTEX COLLAPSE</button>
+            <button class="sandbox-pill" data-mode="accretion">🪐 ORBITAL FORGE</button>
+            <button class="sandbox-pill" data-mode="quantum">✦ QUANTUM FOAM</button>
+          </div>
+
+          <div class="sandbox-actions">
+            <button id="btn-collider-pulse" class="sandbox-btn">
+              <span>PULSE SHOCKWAVE</span>
+            </button>
+            <button id="btn-collider-collapse" class="sandbox-btn">
+              <span>COLLAPSE MATTER</span>
+            </button>
+            <button id="btn-collider-reset" class="sandbox-btn sandbox-btn-ghost">
+              <span>RESET FIELD</span>
+            </button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Audio Synthesis Chamber Section -->
-    <section class="section">
+    <!-- Act II: Stellar Forge & Harmonic Resonance -->
+    <section id="stellar-forge" class="section">
       <div class="section-header">
-        <div class="section-tag">ACT II // ACOUSTIC CHAMBER</div>
-        <h2 class="section-title">REACTIVE SYNTHESIS</h2>
+        <div class="section-tag">CHAPTER 02 // STELLAR NUCLEOSYNTHESIS</div>
+        <h2 class="section-title">THE CELESTIAL FORGE &amp; GEOMETRIC MANIFOLDS</h2>
+        <p class="section-narrative">
+          Gravity condensed the scattered hydrogen into stars, crystalline geometric orbital manifolds, and atomic harmony. Alter the rotating manifold or synthesize binaural notes across AZERTY &amp; QWERTY layouts.
+        </p>
+      </div>
+
+      <div class="stellar-tools-bar">
+        <button id="card-morph-action" class="stellar-action-btn">
+          <span>CYCLE 3D GEOMETRY</span>
+          <span id="stellar-geo-indicator" class="stellar-geo-badge">1/4 ICOSAHEDRON</span>
+        </button>
+        <div class="stellar-hint">
+          Click to morph the core 3D manifold: Icosahedron &rarr; Torus Knot &rarr; Octahedron &rarr; Dodecahedron
+        </div>
       </div>
 
       <div class="audio-playground-box">
@@ -340,62 +323,73 @@
         <div class="visualizer-canvas-wrap">
           <canvas id="audio-visualizer"></canvas>
         </div>
+      </div>
+    </section>
 
-        <!-- Cosmic Universe Telemetry & Genesis Deck -->
-        <div class="cosmic-deck">
-          <div class="cosmic-deck-header">
-            <div class="cosmic-epoch-tag">
-              <span class="pulsing-cosmic-dot"></span>
-              <span id="epoch-name-badge">EPOCH 02 // STELLAR TECHNO [AEON 1]</span>
-            </div>
-            <div class="cosmic-stats">
-              <span id="cosmic-time-badge" class="stat-pill">4.50 GYR</span>
-              <span id="cosmic-status-badge" class="stat-pill status-active">EVOLVING</span>
-            </div>
+    <!-- Act III: The Acoustic Chamber & Cyclic Rebirth -->
+    <section id="genesis-deck" class="section">
+      <div class="section-header">
+        <div class="section-tag">CHAPTER 03 // THE CYCLIC BIG BOUNCE</div>
+        <h2 class="section-title">THE COSMIC GENESIS DECK &amp; REBIRTH</h2>
+        <p class="section-narrative">
+          The cosmos is governed by thermodynamic entropy. Every interaction drives time forward through cosmic turbulence toward the Big Crunch and celestial rebirth.
+        </p>
+      </div>
+
+      <!-- Cosmic Universe Telemetry & Genesis Deck -->
+      <div class="cosmic-deck">
+        <div class="cosmic-deck-header">
+          <div class="cosmic-epoch-tag">
+            <span class="pulsing-cosmic-dot"></span>
+            <span id="epoch-name-badge">EPOCH 02 // STELLAR TECHNO [AEON 1]</span>
           </div>
-
-          <div class="entropy-track-wrap">
-            <div class="entropy-info">
-              <span>COSMIC ENTROPY // EVOLUTION PRESSURE</span>
-              <span id="entropy-text-val">15.0%</span>
-            </div>
-            <div class="entropy-progress-bar">
-              <div id="entropy-bar-fill" class="entropy-bar-fill" style="width: 15%;"></div>
-            </div>
-            <div class="entropy-subhint">INTERACTION DRIVES TIME &bull; MOVE, DRAG, PRESS, TYPE OR SCROLL TO EVOLVE THE UNIVERSE</div>
+          <div class="cosmic-stats">
+            <span id="cosmic-time-badge" class="stat-pill">4.50 GYR</span>
+            <span id="cosmic-status-badge" class="stat-pill status-active">EVOLVING</span>
           </div>
+        </div>
 
-          <div class="cosmic-deck-actions">
-            <button id="cosmic-music-btn" class="cosmic-btn cosmic-btn-primary" aria-label="Toggle Universe Music Engine">
-              <span class="btn-icon">&#9654;</span>
-              <span id="cosmic-music-label">START COSMIC MUSIC</span>
-            </button>
-
-            <button id="cosmic-pause-btn" class="cosmic-btn" aria-label="Pause or Resume Cosmic Evolution">
-              <span class="btn-icon">&#10074;&#10074;</span>
-              <span id="cosmic-pause-label">FREEZE EVOLUTION</span>
-            </button>
-
-            <button id="cosmic-memory-btn" class="cosmic-btn" aria-label="Capture Cosmic Memory">
-              <span class="btn-icon">&#10022;</span>
-              <span>CAPTURE MEMORY</span>
-            </button>
-
-            <button id="cosmic-story-btn" class="cosmic-btn cosmic-btn-ghost" aria-label="Open Cosmic Story Guide">
-              <span class="btn-icon">🌌</span>
-              <span>UNIVERSE STORY</span>
-            </button>
+        <div class="entropy-track-wrap">
+          <div class="entropy-info">
+            <span>COSMIC ENTROPY // EVOLUTION PRESSURE</span>
+            <span id="entropy-text-val">15.0%</span>
           </div>
+          <div class="entropy-progress-bar">
+            <div id="entropy-bar-fill" class="entropy-bar-fill" style="width: 15%;"></div>
+          </div>
+          <div class="entropy-subhint">INTERACTION DRIVES TIME &bull; MOVE, DRAG, PRESS, TYPE OR SCROLL TO EVOLVE THE UNIVERSE</div>
+        </div>
 
-          <!-- Cosmic Memories Bank / Shelf -->
-          <div class="memory-bank-wrap">
-            <div class="memory-bank-title">
-              <span>SAVED COSMIC MEMORIES (TIME TRAVEL):</span>
-              <span id="memory-count-badge">3 MEMORIES</span>
-            </div>
-            <div id="memory-shelf" class="memory-shelf">
-              <!-- Populated dynamically by JS -->
-            </div>
+        <div class="cosmic-deck-actions">
+          <button id="cosmic-music-btn" class="cosmic-btn cosmic-btn-primary" aria-label="Toggle Universe Music Engine">
+            <span class="btn-icon">&#9654;</span>
+            <span id="cosmic-music-label">START COSMIC MUSIC</span>
+          </button>
+
+          <button id="cosmic-pause-btn" class="cosmic-btn" aria-label="Pause or Resume Cosmic Evolution">
+            <span class="btn-icon">&#10074;&#10074;</span>
+            <span id="cosmic-pause-label">FREEZE EVOLUTION</span>
+          </button>
+
+          <button id="cosmic-memory-btn" class="cosmic-btn" aria-label="Capture Cosmic Memory">
+            <span class="btn-icon">&#10022;</span>
+            <span>CAPTURE MEMORY</span>
+          </button>
+
+          <button id="cosmic-story-btn" class="cosmic-btn cosmic-btn-ghost" aria-label="Open Cosmic Story Guide">
+            <span class="btn-icon">🌌</span>
+            <span>UNIVERSE STORY</span>
+          </button>
+        </div>
+
+        <!-- Cosmic Memories Bank / Shelf -->
+        <div class="memory-bank-wrap">
+          <div class="memory-bank-title">
+            <span>SAVED COSMIC MEMORIES (TIME TRAVEL):</span>
+            <span id="memory-count-badge">3 MEMORIES</span>
+          </div>
+          <div id="memory-shelf" class="memory-shelf">
+            <!-- Populated dynamically by JS -->
           </div>
         </div>
       </div>
