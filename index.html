@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VOID // Creative Playground & Art Experiment</title>
-  <meta name="description" content="A minimalist, pitch-black interactive art experiment exploring 3D wireframe geometry, cursor spotlight reveals, and generative sound synthesis.">
+  <title>VOID // Creative Playground &amp; Sound Lab</title>
+  <meta name="description" content="A minimalist, pitch-black interactive studio exploring 3D wireframe geometry, Force Touch trackpad dynamics, particle kinetics, and evolving electronic sound design.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22black%22 stroke=%22white%22 stroke-width=%228%22/></svg>">
   <link rel="stylesheet" href="style.css">
   <!-- Three.js Library -->
@@ -19,11 +19,11 @@
   <canvas id="grid-canvas"></canvas>
   <canvas id="webgl-canvas"></canvas>
 
-  <!-- Top Minimalist HUD -->
+  <!-- Top Minimalist HUD Navigation -->
   <header class="hud-header">
     <div class="hud-left">
       <span class="brand-title">VOID // 001</span>
-      <span class="hud-tag">SPATIAL LAB</span>
+      <span class="hud-tag">[ AUDIO-KINETIC LAB ]</span>
     </div>
 
     <div class="hud-center">
@@ -32,17 +32,17 @@
     </div>
 
     <div class="hud-right">
-      <button id="universe-story-toggle" class="hud-btn" aria-label="Open Universe Story & Theories">
-        <span>🌌</span>
-        <span>UNIVERSE STORY</span>
+      <button id="universe-story-toggle" class="hud-btn" aria-label="Open Cosmological Theories and Audio Essay">
+        <span class="hud-btn-prefix">//</span>
+        <span>THEORIES</span>
       </button>
 
       <button id="controls-toggle" class="hud-btn" aria-label="Open Mechanics Guide">
-        <span>?</span>
+        <span class="hud-btn-prefix">[ ? ]</span>
         <span>CONTROLS</span>
       </button>
 
-      <button id="sound-toggle" class="hud-btn" aria-label="Toggle Master Audio & Cosmic Music">
+      <button id="sound-toggle" class="hud-btn" aria-label="Toggle Master Audio Engine">
         <div class="sound-bars">
           <span></span>
           <span></span>
@@ -58,62 +58,65 @@
     <div id="controls-backdrop" class="controls-backdrop"></div>
     <div class="controls-drawer">
       <div class="controls-header">
-        <h2>MECHANICS &amp; CONTROLS</h2>
+        <div class="controls-header-text">
+          <h2>STUDIO CONTROLS // MANUAL</h2>
+          <span>INTERACTION SPECIFICATIONS</span>
+        </div>
         <button id="close-controls" class="close-btn" aria-label="Close Guide">&times;</button>
       </div>
 
       <div class="mechanics-list">
         <!-- Item 1 -->
         <div class="mechanic-item">
-          <div class="mechanic-icon">&#128433;</div>
+          <div class="mechanic-index">[ 01 ]</div>
           <div class="mechanic-details">
-            <h4>DIRECT 3D ORBIT &amp; INERTIA</h4>
-            <p>Click &amp; drag anywhere on the void or 2-finger swipe to rotate the 3D wireframe manifold. Momentum carries your spin with fluid deceleration.</p>
+            <h4>DIRECT 3D ORBIT &amp; MOMENTUM</h4>
+            <p>Click and drag anywhere on the void or perform a 2-finger swipe on your trackpad to rotate the 3D wireframe manifold. Momentum carries rotation with fluid inertia.</p>
           </div>
         </div>
 
         <!-- Item 2 -->
         <div class="mechanic-item">
-          <div class="mechanic-icon">&#128269;</div>
+          <div class="mechanic-index">[ 02 ]</div>
           <div class="mechanic-details">
-            <h4>DEPTH TRAVERSAL &amp; ZOOM</h4>
-            <p>Pinch trackpad or use mouse scroll wheel to dive into the core vertices or zoom back into the abyss.</p>
+            <h4>DEPTH TRAVERSAL &amp; PINCH ZOOM</h4>
+            <p>Pinch the trackpad or scroll to zoom through coordinates (z: 3.8 to z: 11.5). Page scroll drives a continuous 3D camera voyage through the starfield.</p>
           </div>
         </div>
 
         <!-- Item 3 -->
         <div class="mechanic-item">
-          <div class="mechanic-icon">&#128165;</div>
+          <div class="mechanic-index">[ 03 ]</div>
           <div class="mechanic-details">
-            <h4>MAC FORCE TOUCH SENSITIVITY</h4>
-            <p>Press deeper into your Mac Force Touch trackpad. Analog pressure expands your spotlight, swells deep sub-bass (36.7Hz D1), and magnifies wireframe scale.</p>
+            <h4>MAC FORCE TOUCH ANALOG PRESSURE</h4>
+            <p>Apply deeper pressure to your Mac Force Touch trackpad. Analog pressure curves dynamically swell spotlight radius, drive 303 acid resonance, and collapse the particle collider into a black hole.</p>
           </div>
         </div>
 
         <!-- Item 4 -->
         <div class="mechanic-item">
-          <div class="mechanic-icon">&#127911;</div>
+          <div class="mechanic-index">[ 04 ]</div>
           <div class="mechanic-details">
-            <h4>BINAURAL HRTF SPATIAL AUDIO</h4>
-            <p>Optimized for AirPods Pro 3 and high-end stereo headphones. Sound positions orbit 3D around your head dynamically matching geometry orientation.</p>
+            <h4>BINAURAL HRTF 3D SPATIAL AUDIO</h4>
+            <p>Calibrated for AirPods Pro 3 and high-end stereo headphones. Sounds dynamically rotate around your head in true 3D space matching the visual orientation of the geometric manifold.</p>
           </div>
         </div>
 
         <!-- Item 5 -->
         <div class="mechanic-item">
-          <div class="mechanic-icon">&#127929;</div>
+          <div class="mechanic-index">[ 05 ]</div>
           <div class="mechanic-details">
-            <h4>PLAYABLE KEYBOARD MATRIX</h4>
-            <p>Play musical tones on your keyboard. Full support for AZERTY (BE/FR) and QWERTY (US/INT). Press Space for a deep sub-bass drop!</p>
+            <h4>PLAYABLE KEYBOARD SYNTHESIS</h4>
+            <p>Play musical notes directly on keys [A – Z] and [0 – 9]. Full hardware layout detection for Belgian/French AZERTY and International QWERTY. Press Space for an 808 sub drop.</p>
           </div>
         </div>
 
         <!-- Item 6 -->
         <div class="mechanic-item">
-          <div class="mechanic-icon">🌌</div>
+          <div class="mechanic-index">[ 06 ]</div>
           <div class="mechanic-details">
-            <h4>COSMIC UNIVERSE EVOLUTION</h4>
-            <p>Every browser movement, keystroke, and click injects entropy, driving cosmic time through 5 cosmological epochs from Singularity to The Big Bounce. Press P to freeze time, S to save a memory, U for the universe essay.</p>
+            <h4>EVOLVING GENERATIVE SOUNDSCAPES</h4>
+            <p>The audio engine never loops statically. Every interaction injects entropy, driving 8-bar musical evolutions across Acid Warehouse, DnB Breakbeats, Skrillex Dubstep, and Ambient Void.</p>
           </div>
         </div>
       </div>
@@ -126,10 +129,10 @@
       <div class="pill-row">
         <div class="pill-badge">
           <span class="pill-dot"></span>
-          <span>CHAPTER 00 // PRIMORDIAL SINGULARITY</span>
+          <span>MODULE 00 // THE VOID HORIZON</span>
         </div>
         <div id="active-geo-pill" class="geo-badge">
-          <span>&#10022;</span>
+          <span>//</span>
           <span id="active-geo-text">1/4: ICOSAHEDRON</span>
         </div>
       </div>
@@ -141,158 +144,114 @@
       </h1>
 
       <p class="hero-subtitle">
-        Before space and time unfolded, all existence was compressed into a high-density, silent quantum void. Interact to ignite cosmic inflation or traverse depth through the universe.
+        An interactive laboratory of dimensional wireframe geometry, Force Touch trackpad dynamics, real-time particle kinetics, and evolving electronic sound synthesis.
       </p>
 
       <div class="hero-actions">
-        <button class="action-btn" onclick="document.getElementById('collider-lab').scrollIntoView({ behavior: 'smooth' });">
-          <span>EXPLORE EXPERIMENTS</span>
+        <button class="action-btn" onclick="document.getElementById('sound-architect').scrollIntoView({ behavior: 'smooth' });">
+          <span>[ 01 // SOUND ARCHITECT ]</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <polyline points="19 12 12 19 5 12"></polyline>
           </svg>
         </button>
 
+        <button class="action-btn-ghost" onclick="document.getElementById('collider-lab').scrollIntoView({ behavior: 'smooth' });">
+          <span>[ 02 // PARTICLE COLLIDER ]</span>
+        </button>
+
         <button id="hero-sound-toggle" class="action-btn-ghost">
-          ACTIVATE AUDIO
+          <span>INITIALIZE AUDIO</span>
         </button>
       </div>
 
       <div class="scroll-hint">
         <div class="scroll-line"></div>
-        <span>DRAG TO ORBIT 3D &bull; SCROLL TO TRAVERSE COSMIC TIME</span>
+        <span>DRAG TO ORBIT 3D // SCROLL TO NAVIGATE STUDIO</span>
       </div>
     </section>
 
-    <!-- Act I: Cosmic Inflation & Particle Collider Experiment -->
-    <section id="collider-lab" class="section">
+    <!-- Section 01: Sound Architect & Generative Audio Console -->
+    <section id="sound-architect" class="section">
       <div class="section-header">
-        <div class="section-tag">CHAPTER 01 // COSMIC INFLATION</div>
-        <h2 class="section-title">THE PARTICLE COLLIDER &amp; QUANTUM FOAM</h2>
+        <div class="section-tag">[ SECTION 01 // SOUND ARCHITECT ]</div>
+        <h2 class="section-title">GENERATIVE ELECTRONIC AUDIO MATRIX</h2>
         <p class="section-narrative">
-          At 10⁻³⁵ seconds, the primordial singularity underwent exponential inflation. Subatomic quantum fluctuations were stretched across light-years into cosmic filaments. Touch the field to birth particles, click to detonate a shockwave, or press deep to trigger black hole gravitational collapse.
+          Authentic electronic music synthesis inspired by raw warehouse acid techno, neurofunk breakbeats, and heavy bass design. Select a genre engine or play live voices across your keyboard.
         </p>
-      </div>
-
-      <!-- Live Interactive Particle Collider Sandbox -->
-      <div class="sandbox-container">
-        <div class="sandbox-hud">
-          <div class="sandbox-hud-left">
-            <span class="sandbox-dot"></span>
-            <span id="sandbox-mode-badge" class="sandbox-badge">MODE: INFLATION EXPANSION</span>
-            <span id="sandbox-particles-badge" class="sandbox-badge">PARTICLES: 2,500</span>
-          </div>
-          <div class="sandbox-hud-right">
-            <span id="sandbox-gravity-badge" class="sandbox-stat">GRAVITY: 1.0G</span>
-            <span id="sandbox-velocity-badge" class="sandbox-stat">VELOCITY: MACH 3.2</span>
-          </div>
-        </div>
-
-        <div class="sandbox-canvas-wrap">
-          <canvas id="particle-sandbox-canvas"></canvas>
-          <div class="sandbox-hint-overlay">
-            <span>TOUCH / DRAG: GRAVITY WELL &bull; CLICK: SHOCKWAVE &bull; FORCE TOUCH: SINGULARITY COLLAPSE</span>
-          </div>
-        </div>
-
-        <div class="sandbox-controls-bar">
-          <div class="sandbox-mode-pills" role="tablist" aria-label="Collider Physical Modes">
-            <button class="sandbox-pill active" data-mode="inflation">💥 INFLATION</button>
-            <button class="sandbox-pill" data-mode="vortex">🕳 VORTEX COLLAPSE</button>
-            <button class="sandbox-pill" data-mode="accretion">🪐 ORBITAL FORGE</button>
-            <button class="sandbox-pill" data-mode="quantum">✦ QUANTUM FOAM</button>
-          </div>
-
-          <div class="sandbox-actions">
-            <button id="btn-collider-pulse" class="sandbox-btn">
-              <span>PULSE SHOCKWAVE</span>
-            </button>
-            <button id="btn-collider-collapse" class="sandbox-btn">
-              <span>COLLAPSE MATTER</span>
-            </button>
-            <button id="btn-collider-reset" class="sandbox-btn sandbox-btn-ghost">
-              <span>RESET FIELD</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Act II: Stellar Forge & Harmonic Resonance -->
-    <section id="stellar-forge" class="section">
-      <div class="section-header">
-        <div class="section-tag">CHAPTER 02 // STELLAR NUCLEOSYNTHESIS</div>
-        <h2 class="section-title">THE CELESTIAL FORGE &amp; GEOMETRIC MANIFOLDS</h2>
-        <p class="section-narrative">
-          Gravity condensed the scattered hydrogen into stars, crystalline geometric orbital manifolds, and atomic harmony. Alter the rotating manifold or synthesize binaural notes across AZERTY &amp; QWERTY layouts.
-        </p>
-      </div>
-
-      <div class="stellar-tools-bar">
-        <button id="card-morph-action" class="stellar-action-btn">
-          <span>CYCLE 3D GEOMETRY</span>
-          <span id="stellar-geo-indicator" class="stellar-geo-badge">1/4 ICOSAHEDRON</span>
-        </button>
-        <div class="stellar-hint">
-          Click to morph the core 3D manifold: Icosahedron &rarr; Torus Knot &rarr; Octahedron &rarr; Dodecahedron
-        </div>
       </div>
 
       <div class="audio-playground-box">
-        <div class="audio-controls-row">
-          <div class="audio-info">
-            <h3>Binaural Tone Matrix</h3>
-            <p>Every key is musically mapped. Select your keyboard layout below.</p>
+        <!-- Sound Profile / Genre Selector -->
+        <div class="genre-selector-row">
+          <div class="genre-header-wrap">
+            <span class="genre-label">SONIC DISCIPLINE // STYLE ENGINE:</span>
+            <span class="genre-hint-text">Select sound design profile:</span>
           </div>
-          <div class="audio-bar-actions">
-            <div id="last-key-hud" class="key-hud-display">KEY: READY</div>
-            <button id="beat-track-toggle" class="beat-track-btn" aria-label="Toggle Generative Music Track">
-              <span id="beat-track-icon">&#9654;</span>
-              <span id="beat-track-status">PLAY MUSIC: OFF</span>
+          <div class="genre-pills">
+            <button class="genre-pill active" data-genre="techno" title="135 BPM Warehouse Acid Techno (999999999 / Charlotte de Witte / Amelie Lens)">[ 01 // ACID WAREHOUSE &bull; 135 BPM ]</button>
+            <button class="genre-pill" data-genre="dnb" title="174 BPM Neurofunk &amp; Amen Breakbeats (Chase &amp; Status / Noisia)">[ 02 // DNB NEUROFUNK &bull; 174 BPM ]</button>
+            <button class="genre-pill" data-genre="dubstep" title="145 BPM Heavy Bass &amp; Vocal Growls (Skrillex / Space Laces)">[ 03 // SKRILLEX BASS &bull; 145 BPM ]</button>
+            <button class="genre-pill" data-genre="ambient" title="70 BPM Deep Sub-Frequency Meditation &amp; Spatial Chimes">[ 04 // AMBIENT VOID &bull; 70 BPM ]</button>
+          </div>
+        </div>
+
+        <!-- Master Sound Transport & Live Parameter Console -->
+        <div class="sound-console-bar">
+          <div class="console-left">
+            <button id="beat-track-toggle" class="beat-track-btn" aria-label="Toggle Generative Beat Engine">
+              <span id="beat-track-icon">&gt;</span>
+              <span id="beat-track-status">PLAY GENERATIVE ENGINE</span>
             </button>
+            <div id="live-bar-tracker" class="live-param-badge">BAR: 1/8 // EVOLVING</div>
           </div>
+
+          <div class="console-params">
+            <div class="param-unit">
+              <label for="filter-cutoff-slider">CUTOFF</label>
+              <input type="range" id="filter-cutoff-slider" min="150" max="6500" value="1800" class="param-slider">
+              <span id="filter-cutoff-val" class="param-val">1.8 kHz</span>
+            </div>
+
+            <div class="param-unit">
+              <label for="filter-res-slider">RESONANCE</label>
+              <input type="range" id="filter-res-slider" min="1" max="18" value="8" step="0.5" class="param-slider">
+              <span id="filter-res-val" class="param-val">8.0 Q</span>
+            </div>
+
+            <div id="last-key-hud" class="key-hud-display">KEY: READY</div>
+          </div>
+        </div>
+
+        <!-- Real-Time Frequency Waveform Visualizer -->
+        <div class="visualizer-canvas-wrap">
+          <canvas id="audio-visualizer"></canvas>
         </div>
 
         <!-- Dedicated Keyboard Matrix Hub -->
         <div class="layout-hub-box">
           <div class="layout-hub-header">
-            <span class="layout-hub-title">KEYBOARD MATRIX LAYOUT:</span>
+            <span class="layout-hub-title">PHYSICAL KEYBOARD LAYOUT:</span>
             <span id="layout-hub-active-desc" class="layout-hub-desc">CURRENT: AZERTY (BELGIAN / FRENCH)</span>
           </div>
           <div class="layout-hub-toggle-row">
             <div class="layout-segmented-control" role="tablist" aria-label="Keyboard Layout Selector">
               <button id="btn-layout-azerty" class="layout-seg-btn active" role="tab" aria-selected="true">
-                <span class="seg-icon">⌨</span>
-                <span class="seg-label">AZERTY</span>
+                <span class="seg-label">[ AZERTY ]</span>
                 <span class="seg-note">BE / FR</span>
               </button>
               <button id="btn-layout-qwerty" class="layout-seg-btn" role="tab" aria-selected="false">
-                <span class="seg-icon">⌨</span>
-                <span class="seg-label">QWERTY</span>
+                <span class="seg-label">[ QWERTY ]</span>
                 <span class="seg-note">US / INT</span>
               </button>
             </div>
             <div id="layout-hint-message" class="layout-hint-box">
-              Melody row mapped to <strong>[A Z E R T Y]</strong> &bull; Core bass to <strong>[Q S D F G H J K L M]</strong> &bull; Sub-bass to <strong>[W X C V B N]</strong> &bull; Space: Sub-Drop
+              Melody row: <strong>[A Z E R T Y]</strong> &bull; Bassline: <strong>[Q S D F G H J K L M]</strong> &bull; Sub: <strong>[W X C V B N]</strong> &bull; Space: Sub-Drop
             </div>
           </div>
         </div>
 
-        <!-- Sound Profile / Genre Selector -->
-        <div class="genre-selector-row">
-          <div class="genre-header-wrap">
-            <span class="genre-label">EPOCH // COSMIC GENRE:</span>
-            <span class="genre-hint-text">Click any epoch to warp musical tempo, synthesis layers, and 3D geometry:</span>
-          </div>
-          <div class="genre-pills">
-            <button class="genre-pill" data-genre="singularity" title="Epoch 0: Pure sub-bass quantum void (65 BPM)">00 // SINGULARITY</button>
-            <button class="genre-pill" data-genre="ambient" title="Epoch 1: Big Bang expansion & sub-drop (85 BPM)">01 // INFLATION</button>
-            <button class="genre-pill active" data-genre="techno" title="Epoch 2: 4-on-the-floor Cyber Techno & acid bass (128 BPM)">02 // STELLAR TECHNO</button>
-            <button class="genre-pill" data-genre="dubstep" title="Epoch 3: Half-time wobble bass turbulence (140 BPM)">03 // COSMIC WOBBLE</button>
-            <button class="genre-pill" data-genre="bounce" title="Epoch 4: Cyclic crunch glissando & celestial rebirth (120 BPM)">04 // THE BIG BOUNCE</button>
-          </div>
-        </div>
-
+        <!-- Synth Trigger Buttons -->
         <div class="synth-buttons" id="dynamic-synth-buttons">
           <button class="synth-key" data-key="1" data-key-alt="a" data-freq="130.81" data-type="triangle">
             <span class="key-badge" id="key-badge-1">1 / A</span>
@@ -319,20 +278,109 @@
             <span>HIGH A4</span>
           </button>
         </div>
+      </div>
+    </section>
 
-        <div class="visualizer-canvas-wrap">
-          <canvas id="audio-visualizer"></canvas>
+    <!-- Section 02: Particle Collider & Kinetic Physics Lab -->
+    <section id="collider-lab" class="section">
+      <div class="section-header">
+        <div class="section-tag">[ SECTION 02 // PARTICLE COLLIDER ]</div>
+        <h2 class="section-title">KINETIC ACCELERATOR &amp; QUANTUM FOAM</h2>
+        <p class="section-narrative">
+          2,500 interactive vectors suspended in gravitational equilibrium. Touch or drag to sculpt gravitational attractor wells, click to detonate shockwaves, or press deep with Force Touch to collapse matter into a black hole.
+        </p>
+      </div>
+
+      <!-- Live Interactive Particle Collider Sandbox -->
+      <div class="sandbox-container">
+        <div class="sandbox-hud">
+          <div class="sandbox-hud-left">
+            <span class="sandbox-dot"></span>
+            <span id="sandbox-mode-badge" class="sandbox-badge">DYNAMICS: INFLATION EXPANSION</span>
+            <span id="sandbox-particles-badge" class="sandbox-badge">VECTORS: 2,500</span>
+          </div>
+          <div class="sandbox-hud-right">
+            <span id="sandbox-gravity-badge" class="sandbox-stat">GRAV CONST: 1.00x</span>
+            <span id="sandbox-velocity-badge" class="sandbox-stat">RMS VELOCITY: 0.42 c</span>
+          </div>
+        </div>
+
+        <div class="sandbox-canvas-wrap">
+          <canvas id="particle-sandbox-canvas"></canvas>
+          <div class="sandbox-hint-overlay">
+            <span>TOUCH / DRAG: GRAVITY WELL // CLICK: SHOCKWAVE // FORCE TOUCH: SINGULARITY COLLAPSE</span>
+          </div>
+        </div>
+
+        <div class="sandbox-controls-bar">
+          <div class="sandbox-mode-pills" role="tablist" aria-label="Collider Physical Modes">
+            <button class="sandbox-pill active" data-mode="inflation">[ INFLATION ]</button>
+            <button class="sandbox-pill" data-mode="vortex">[ GRAVITATIONAL VORTEX ]</button>
+            <button class="sandbox-pill" data-mode="accretion">[ ACCRETION DISK ]</button>
+            <button class="sandbox-pill" data-mode="quantum">[ QUANTUM FOAM ]</button>
+          </div>
+
+          <div class="sandbox-actions">
+            <button id="btn-collider-pulse" class="sandbox-btn">
+              <span>PULSE SHOCKWAVE</span>
+            </button>
+            <button id="btn-collider-collapse" class="sandbox-btn">
+              <span>COLLAPSE SINGULARITY</span>
+            </button>
+            <button id="btn-collider-reset" class="sandbox-btn sandbox-btn-ghost">
+              <span>RESET FIELD</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Act III: The Acoustic Chamber & Cyclic Rebirth -->
+    <!-- Section 03: The Manifold Forge (3D Geometry) -->
+    <section id="manifold-forge" class="section">
+      <div class="section-header">
+        <div class="section-tag">[ SECTION 03 // MANIFOLD FORGE ]</div>
+        <h2 class="section-title">3D TOPOLOGICAL GEOMETRY</h2>
+        <p class="section-narrative">
+          The central wireframe manifold exists in vector space, reacting in real time to audio frequencies, cursor drag velocity, and trackpad pressure.
+        </p>
+      </div>
+
+      <div class="stellar-tools-bar">
+        <button id="card-morph-action" class="stellar-action-btn">
+          <span>CYCLE 3D MANIFOLD</span>
+          <span id="stellar-geo-indicator" class="stellar-geo-badge">1/4 ICOSAHEDRON</span>
+        </button>
+        <div class="stellar-hint">
+          Click to cycle the core manifold: Icosahedron &rarr; Torus Knot &rarr; Octahedron &rarr; Dodecahedron
+        </div>
+      </div>
+
+      <div class="geometry-specs-grid">
+        <div class="spec-card">
+          <span class="spec-label">ACTIVE MANIFOLD</span>
+          <h3 id="geo-spec-name">ICOSAHEDRON</h3>
+          <p>20 triangular faces, 12 vertices, 30 edges. Optimal isotropic geodesic distribution.</p>
+        </div>
+        <div class="spec-card">
+          <span class="spec-label">AUDIO-REACTIVE RESPONSE</span>
+          <h3>SUB-BASS &bull; MID-FREQ</h3>
+          <p>Vertices expand to FFT bass energy (0–120Hz) and rotate proportionally to orbital panner coordinates.</p>
+        </div>
+        <div class="spec-card">
+          <span class="spec-label">HARDWARE DYNAMICS</span>
+          <h3>ANALOG FORCE EXPANSION</h3>
+          <p>Mac Force Touch pressure scales outer ring radii and increases geometric tension.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 04: The Cosmic Ledger & Memories -->
     <section id="genesis-deck" class="section">
       <div class="section-header">
-        <div class="section-tag">CHAPTER 03 // THE CYCLIC BIG BOUNCE</div>
-        <h2 class="section-title">THE COSMIC GENESIS DECK &amp; REBIRTH</h2>
+        <div class="section-tag">[ SECTION 04 // ARCHIVAL LEDGER ]</div>
+        <h2 class="section-title">COSMIC TIME &amp; OBSERVER MEMORIES</h2>
         <p class="section-narrative">
-          The cosmos is governed by thermodynamic entropy. Every interaction drives time forward through cosmic turbulence toward the Big Crunch and celestial rebirth.
+          Thermodynamic evolution driven by observer interaction. Save snapshots of musical parameters and entropy states to travel through time.
         </p>
       </div>
 
@@ -351,34 +399,34 @@
 
         <div class="entropy-track-wrap">
           <div class="entropy-info">
-            <span>COSMIC ENTROPY // EVOLUTION PRESSURE</span>
+            <span>ENTROPY PRESSURE // EVOLUTION FACTOR</span>
             <span id="entropy-text-val">15.0%</span>
           </div>
           <div class="entropy-progress-bar">
             <div id="entropy-bar-fill" class="entropy-bar-fill" style="width: 15%;"></div>
           </div>
-          <div class="entropy-subhint">INTERACTION DRIVES TIME &bull; MOVE, DRAG, PRESS, TYPE OR SCROLL TO EVOLVE THE UNIVERSE</div>
+          <div class="entropy-subhint">INTERACTION DRIVES TIME // MOVE, DRAG, PRESS, TYPE OR SCROLL TO ADVANCE EVOLUTION</div>
         </div>
 
         <div class="cosmic-deck-actions">
           <button id="cosmic-music-btn" class="cosmic-btn cosmic-btn-primary" aria-label="Toggle Universe Music Engine">
-            <span class="btn-icon">&#9654;</span>
+            <span class="btn-icon">&gt;</span>
             <span id="cosmic-music-label">START COSMIC MUSIC</span>
           </button>
 
           <button id="cosmic-pause-btn" class="cosmic-btn" aria-label="Pause or Resume Cosmic Evolution">
-            <span class="btn-icon">&#10074;&#10074;</span>
+            <span class="btn-icon">||</span>
             <span id="cosmic-pause-label">FREEZE EVOLUTION</span>
           </button>
 
           <button id="cosmic-memory-btn" class="cosmic-btn" aria-label="Capture Cosmic Memory">
-            <span class="btn-icon">&#10022;</span>
+            <span class="btn-icon">[ + ]</span>
             <span>CAPTURE MEMORY</span>
           </button>
 
           <button id="cosmic-story-btn" class="cosmic-btn cosmic-btn-ghost" aria-label="Open Cosmic Story Guide">
-            <span class="btn-icon">🌌</span>
-            <span>UNIVERSE STORY</span>
+            <span class="btn-icon">//</span>
+            <span>UNIVERSE THEORIES</span>
           </button>
         </div>
 
@@ -402,8 +450,8 @@
       </div>
       <div class="footer-links">
         <button id="timeline-toggle" class="timeline-btn" aria-label="Open Chronicles Timeline">
-          <span>&#9672;</span>
-          <span>CHRONICLES // TIMELINE</span>
+          <span>//</span>
+          <span>SYSTEM LOG // CHRONICLES</span>
         </button>
         <a href="https://github.com/jennsolenya/jennsolenya.github.io" target="_blank" rel="noopener noreferrer">GITHUB REPO</a>
         <a href="#top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">BACK TO TOP &uarr;</a>
@@ -448,11 +496,10 @@
           <div class="timeline-desc">
             Pitch-black void aesthetic and core audiovisual interactive framework:
             <ul>
-              <li>100% pure black (#000000) canvas & background.</li>
+              <li>100% pure black (#000000) canvas &amp; background.</li>
               <li>Spotlight flashlight cursor revealing coordinate matrix.</li>
               <li>Floating Three.js 3D wireframe geometric sculpture.</li>
               <li>Ambient drone synthesizer with Web Audio API.</li>
-              <li>Interactive 3D perspective tilt cards.</li>
             </ul>
           </div>
         </div>
@@ -469,11 +516,10 @@
             Deep tactile hardware integration and binaural acoustic spatialization:
             <ul>
               <li>Mac Force Touch trackpad pressure integration.</li>
-              <li>Direct 3D orbit drag manipulation with fluid inertia & zoom.</li>
+              <li>Direct 3D orbit drag manipulation with fluid inertia &amp; zoom.</li>
               <li>Binaural HRTF 3D spatial audio (calibrated for AirPods Pro 3).</li>
-              <li>Audio-reactive geometry vibration & pulsing core.</li>
-              <li>Playable computer keyboard synthesis [1-5] / [A-G].</li>
-              <li>Accessible [ ? CONTROLS ] slide-out guide.</li>
+              <li>Audio-reactive geometry vibration &amp; pulsing core.</li>
+              <li>Playable computer keyboard synthesis.</li>
             </ul>
           </div>
         </div>
@@ -487,10 +533,9 @@
           </div>
           <div class="timeline-date">2026-09-04 &bull; TAG v0.2.3-beat-engine</div>
           <div class="timeline-desc">
-            16-step generative beat sequencer and calibrated force curves:
+            Generative beat sequencer and calibrated force curves:
             <ul>
               <li>Procedural drum synthesizer (Kick, Snare, Hi-Hats, Wobble Bass).</li>
-              <li>3 Genre profiles (Techno, Dubstep, Ambient).</li>
               <li>Calibrated analog Force Touch curve (touch, click, deep force).</li>
               <li>Two-finger trackpad swipe orbit momentum.</li>
             </ul>
@@ -498,22 +543,20 @@
         </div>
 
         <!-- Node 03 -->
-        <div class="timeline-node active-node">
+        <div class="timeline-node">
           <div class="timeline-bullet"></div>
           <div class="timeline-meta">
-            <span class="timeline-phase">PHASE 03 // EVER-EVOLVING COSMIC ENGINE</span>
-            <a href="https://github.com/jennsolenya/jennsolenya.github.io/releases/tag/v0.3.0-cosmic-evolution" target="_blank" class="timeline-tag">v0.3.0 ACTIVE</a>
+            <span class="timeline-phase">PHASE 03 // COSMIC EVOLUTION</span>
+            <a href="https://github.com/jennsolenya/jennsolenya.github.io/releases/tag/v0.3.0-cosmic-evolution" target="_blank" class="timeline-tag">v0.3.0</a>
           </div>
           <div class="timeline-date">2026-09-04 &bull; TAG v0.3.0-cosmic-evolution</div>
           <div class="timeline-desc">
-            Ever-evolving musical universe driven by browser interactions, cosmological creation parallels, and cosmic memories:
+            Ever-evolving musical universe driven by browser interactions and cosmic memories:
             <ul>
-              <li><strong>Interactive Cosmic Entropy</strong>: Every movement, drag, force press, keystroke, and scroll dynamically evolves the sound and visual geometry.</li>
-              <li><strong>5 Cosmological Epochs</strong>: Primordial Singularity (36Hz drone) &rarr; Cosmic Inflation &rarr; Stellar Techno &rarr; Cosmic Wobble Turbulence &rarr; The Big Bounce (cyclic collapse &amp; rebirth).</li>
-              <li><strong>Evolution Freeze &amp; Pause</strong>: Freeze cosmic time with [Key P] or HUD button while audio keeps looping.</li>
-              <li><strong>Cosmic Memories System</strong>: Capture states into localStorage and warp back in time through the interactive memory shelf.</li>
-              <li><strong>Dedicated Keyboard Matrix Hub</strong>: Segmented AZERTY / QWERTY selector with dynamic on-screen key labels and physical Mac AZERTY mapping.</li>
-              <li><strong>Universe Story Modal</strong>: In-depth multimodal essay comparing astrophysics and loop quantum cosmology to musical synthesis.</li>
+              <li>Interactive Cosmic Entropy engine.</li>
+              <li>Evolution Freeze &amp; Pause [Shift + P].</li>
+              <li>Cosmic Memories System [Shift + S].</li>
+              <li>Dedicated Keyboard Matrix Hub (AZERTY / QWERTY).</li>
             </ul>
           </div>
         </div>
@@ -522,17 +565,30 @@
         <div class="timeline-node">
           <div class="timeline-bullet"></div>
           <div class="timeline-meta">
-            <span class="timeline-phase">PHASE 04 // UPCOMING HORIZON</span>
-            <span class="timeline-tag">v0.4.0 ROADMAP</span>
+            <span class="timeline-phase">PHASE 04 // PARTICLE COLLIDER &amp; VOYAGE</span>
+            <a href="https://github.com/jennsolenya/jennsolenya.github.io/releases/tag/v0.4.0-cosmic-odyssey" target="_blank" class="timeline-tag">v0.4.0</a>
           </div>
-          <div class="timeline-date">ACTIVE EXPLORATION</div>
+          <div class="timeline-date">2026-09-04 &bull; TAG v0.4.0-cosmic-odyssey</div>
           <div class="timeline-desc">
-            Future experimental expansions:
+            Interactive 2,500-particle collider sandbox and Scrollytelling 3D Camera Voyage through deep space.
+          </div>
+        </div>
+
+        <!-- Node 05 -->
+        <div class="timeline-node active-node">
+          <div class="timeline-bullet"></div>
+          <div class="timeline-meta">
+            <span class="timeline-phase">PHASE 05 // SOUND ARCHITECT &amp; HUMAN LOGIC</span>
+            <span class="timeline-tag">v0.5.0 ACTIVE</span>
+          </div>
+          <div class="timeline-date">2026-09-04 &bull; CURRENT RELEASE</div>
+          <div class="timeline-desc">
+            Brutalist redesign eliminating all emojis in favor of modern lines and club-grade sound design:
             <ul>
-              <li>360° Radar scanning beam matrix reveal mode.</li>
-              <li>GPGPU quantum gravitational particle fields.</li>
-              <li>Vertex wave shader gravitational lensing.</li>
-              <li>MIDI hardware controller support &amp; audio stem export.</li>
+              <li>135 BPM Warehouse Acid Techno (999999999 / Charlotte de Witte).</li>
+              <li>174 BPM Neurofunk &amp; Amen Breakbeats (Chase &amp; Status).</li>
+              <li>145 BPM Formant Bass &amp; Dubstep (Skrillex).</li>
+              <li>Generative 8-bar evolution with live filter modulation.</li>
             </ul>
           </div>
         </div>
@@ -555,7 +611,7 @@
       <div class="universe-essay-content">
         <div class="essay-callout">
           <p>
-            <em>"The universe is not static. It is a vibrating, expanding symphony of matter, energy, and spacetime. In this project, you are not merely a listener; your presence and kinetic interactions act as cosmic entropy, driving the evolution of sound and light across cosmological epochs."</em>
+            <em>"The universe is not static. It is a vibrating, expanding symphony of matter, energy, and spacetime. In this project, your kinetic interactions act as cosmic entropy, driving the evolution of sound and light across cosmological epochs."</em>
           </p>
         </div>
 
@@ -564,10 +620,10 @@
           <div class="chapter-number">EPOCH 00 // T = 0</div>
           <h3>The Primordial Singularity &amp; The Quantum Void</h3>
           <p>
-            According to the Penrose-Hawking singularity theorems, general relativity predicts that our observable universe began in an infinitely dense, hot gravitational singularity. Spacetime curvature was infinite, and classical time did not yet tick. In this state, only quantum vacuum fluctuations existed—virtual particles flickering in and out of the absolute dark.
+            According to the Penrose-Hawking singularity theorems, general relativity predicts that our observable universe began in an infinitely dense, hot gravitational singularity. Spacetime curvature was infinite, and classical time did not yet tick.
           </p>
           <div class="chapter-meta-box">
-            <strong>ACOUSTIC PARALLEL:</strong> Minimum musical entropy. A single sub-bass quantum hum (36Hz – 43Hz D1) in pure pitch-black space. No percussion, no high frequencies. The 3D wireframe exists as a microscopic, hyper-dense nucleus awaiting the spark of observer interaction.
+            <strong>ACOUSTIC PARALLEL:</strong> Minimum musical entropy. A single sub-bass quantum hum (36Hz – 43Hz D1) in pure pitch-black space. The 3D wireframe exists as a microscopic, hyper-dense nucleus awaiting observer interaction.
           </div>
         </div>
 
@@ -576,34 +632,34 @@
           <div class="chapter-number">EPOCH 01 // T + 10⁻³⁵ SECONDS</div>
           <h3>Cosmic Inflation &amp; The Big Bang</h3>
           <p>
-            Proposed by Alan Guth and Andrei Linde, cosmic inflation posits an ultra-rapid exponential expansion of spacetime driven by an inflaton scalar field. As inflation ended, reheating populated the cosmos with hot quark-gluon plasma. When matter and radiation decoupled 380,000 years later, the first light broke free, immortalized today as the Cosmic Microwave Background (CMB).
+            Cosmic inflation posits an ultra-rapid exponential expansion of spacetime driven by an inflaton scalar field. As inflation ended, reheating populated the cosmos with hot quark-gluon plasma.
           </p>
           <div class="chapter-meta-box">
-            <strong>ACOUSTIC PARALLEL:</strong> Acoustic detonation. An explosive sub-drop sweeps frequencies open as the kick drum ignites. Rising arpeggiated frequency debris mimics photons escaping the primordial fog, as user clicks send radial shockwaves across the coordinate matrix.
+            <strong>ACOUSTIC PARALLEL:</strong> Acoustic detonation. An explosive sub-drop sweeps frequencies open as the kick drum ignites, and user clicks send radial shockwaves across the coordinate matrix.
           </div>
         </div>
 
         <!-- Chapter 3 -->
         <div class="essay-chapter">
           <div class="chapter-number">EPOCH 02 // T + 100 MILLION – 13.8 BILLION YEARS</div>
-          <h3>Stellar Nucleosynthesis &amp; Galactic Harmony</h3>
+          <h3>Stellar Nucleosynthesis &amp; Warehouse Acid</h3>
           <p>
-            Gravitational accretion collapses primordial hydrogen and helium into first-generation stars. Stellar cores fuse light elements into carbon, oxygen, and iron, seeding the cosmos for complex structures. Spiral galaxies spin into Keplerian orbital harmony, establishing predictable celestial rhythms across cosmic time.
+            Gravitational accretion collapses primordial hydrogen into stars. Spiral galaxies spin into Keplerian orbital harmony, establishing rhythmic celestial cycles.
           </p>
           <div class="chapter-meta-box">
-            <strong>ACOUSTIC PARALLEL:</strong> Driving 128 BPM Cyber Techno rhythm. 4-on-the-floor gravitational kick pulses, 16th-note rolling acid basslines, and crystalline arpeggios that orbit in binaural HRTF 3D space around the listener's head.
+            <strong>ACOUSTIC PARALLEL:</strong> Driving 135 BPM Warehouse Acid Techno. Roland 909 kicks, TB-303 acid bassline squelches, and crystalline arpeggios orbiting in binaural HRTF 3D space.
           </div>
         </div>
 
         <!-- Chapter 4 -->
         <div class="essay-chapter">
           <div class="chapter-number">EPOCH 03 // MAXIMUM ENTROPY</div>
-          <h3>Cosmic Turbulence &amp; Gravitational Wave Collisions</h3>
+          <h3>Cosmic Turbulence &amp; Gravitational Waves</h3>
           <p>
-            Supermassive black holes merge in colossal cataclysms, distorting the fabric of spacetime and radiating gravitational waves detected billions of light-years away by LIGO. As dark energy accelerates cosmic expansion, entropy mounts and gravitational turbulence ripples violently across the cosmos.
+            Supermassive black holes merge in colossal cataclysms, distorting spacetime and radiating gravitational waves detected by LIGO.
           </p>
           <div class="chapter-meta-box">
-            <strong>ACOUSTIC PARALLEL:</strong> 140 BPM Half-Time Dubstep. Aggressive LFO frequency-modulation wobble basslines, resonant filter sweeps, and chaotic vertex distortion. Mac trackpad force touch induces extreme gravitational density, increasing wobble velocity.
+            <strong>ACOUSTIC PARALLEL:</strong> 145 BPM Half-Time Bass &amp; Dubstep. Resonant vocal formant throat growls and sub-drops. Mac trackpad force touch induces extreme gravitational density.
           </div>
         </div>
 
@@ -612,27 +668,12 @@
           <div class="chapter-number">EPOCH 04 // THE CYCLIC UNIVERSE</div>
           <h3>The Big Bounce &amp; Conformal Cyclic Cosmology</h3>
           <p>
-            Rather than a cold, lonely Heat Death, alternative cosmological models such as <em>Loop Quantum Cosmology (Martin Bojowald &amp; Abhay Ashtekar)</em> and <em>Conformal Cyclic Cosmology (Sir Roger Penrose)</em> propose that repulsive quantum geometric forces halt gravitational collapse, triggering a <strong>BIG BOUNCE</strong>. The universe collapses, rebounds, and detonates anew in an eternal cycle of rebirths.
+            Loop Quantum Cosmology and Conformal Cyclic Cosmology propose that repulsive quantum geometric forces halt gravitational collapse, triggering a <strong>BIG BOUNCE</strong>.
           </p>
           <div class="chapter-meta-box">
-            <strong>ACOUSTIC PARALLEL:</strong> Contraction Glissando. Musical pitch descends rapidly as tempo accelerates into an acoustic crunch, followed by a stark 1-beat vacuum of total silence, then an ecstatic 5-tone celestial harmonic rebirth chord transitioning the cosmos into the next harmonic octave!
+            <strong>ACOUSTIC PARALLEL:</strong> Contraction Glissando into a 1-beat vacuum of total silence, followed by an ecstatic celestial rebirth chord transitioning the cosmos into the next harmonic octave.
           </div>
         </div>
-
-        <!-- Chapter 6 -->
-        <div class="essay-chapter">
-          <div class="chapter-number">COSMIC MEMORIES // MANY-WORLDS</div>
-          <h3>Observer-Created Memories &amp; Quantum Branching</h3>
-          <p>
-            In Hugh Everett III's Many-Worlds Interpretation of quantum mechanics, every measurement or interaction creates a branch in the universal wave function. The <strong>Cosmic Memories</strong> feature in this project lets you capture exact snapshots of cosmic time, entropy, and harmonic frequency, preserving them in a memory bank so you can travel back to prior states at will.
-          </p>
-          <div class="chapter-meta-box">
-            <strong>CONTROLS:</strong> Click <strong>[ CAPTURE MEMORY ]</strong> or press <strong>[S]</strong> to save the universe's state. Click any memory chip in the shelf to warp time immediately. Press <strong>[P]</strong> to freeze evolution in place.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
       </div>
     </div>
   </div>
