@@ -1,1 +1,202 @@
-Hello World!
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VOID // Creative Playground & Art Experiment</title>
+  <meta name="description" content="A minimalist, pitch-black interactive art experiment exploring 3D wireframe geometry, cursor spotlight reveals, and generative sound synthesis.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22black%22 stroke=%22white%22 stroke-width=%228%22/></svg>">
+  <link rel="stylesheet" href="style.css">
+  <!-- Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <!-- Custom Interactive Cursor -->
+  <div id="cursor-dot" class="cursor-dot"></div>
+  <div id="cursor-ring" class="cursor-ring"></div>
+
+  <!-- Background Canvas Layers -->
+  <canvas id="grid-canvas"></canvas>
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Top Minimalist HUD -->
+  <header class="hud-header">
+    <div class="hud-left">
+      <span class="brand-title">VOID // 001</span>
+      <span class="hud-tag">ART EXPERIMENT</span>
+    </div>
+
+    <div class="hud-center">
+      <div id="coords" class="coords-tracker">X: 000 | Y: 000</div>
+    </div>
+
+    <div class="hud-right">
+      <button id="sound-toggle" class="hud-btn" aria-label="Toggle Sound Engine">
+        <div class="sound-bars">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <span class="sound-state">SOUND: OFF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="page-container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="pill-badge">
+        <span class="pill-dot"></span>
+        <span>DIMENSIONAL LAB // EXPERIMENTAL</span>
+      </div>
+
+      <h1 class="hero-title">
+        PITCH<br>
+        <span>BLACK</span>
+        VOID.
+      </h1>
+
+      <p class="hero-subtitle">
+        An interactive aesthetic playground in total absence of color. Explore the coordinate matrix with your cursor, modulate geometry in 3D space, and awaken generative sound synthesis.
+      </p>
+
+      <div class="hero-actions">
+        <button class="action-btn" onclick="document.getElementById('experiments').scrollIntoView({ behavior: 'smooth' });">
+          <span>EXPLORE EXPERIMENTS</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+        </button>
+
+        <button class="action-btn-ghost" onclick="audio.init(); audio.toggle(); document.getElementById('sound-toggle').classList.toggle('active');">
+          AUDIO ENGINE
+        </button>
+      </div>
+
+      <div class="scroll-hint">
+        <div class="scroll-line"></div>
+        <span>SCROLL TO TRAVERSE DEPTH</span>
+      </div>
+    </section>
+
+    <!-- Interactive 3D Experiments Section -->
+    <section id="experiments" class="section">
+      <div class="section-header">
+        <div class="section-tag">ACT I // INTERACTIVE MODULES</div>
+        <h2 class="section-title">KINETIC 3D ENTITIES</h2>
+      </div>
+
+      <div class="cards-grid">
+        <!-- Card 1: Morph Geometry -->
+        <div id="card-morph" class="tilt-card">
+          <div class="card-content">
+            <span class="card-num">MODULE // 01</span>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" stroke-width="1.8">
+                <polygon points="12 2 2 8.5 12 15 22 8.5 12 2"></polygon>
+                <line x1="2" y1="15.5" x2="12" y2="22"></line>
+                <line x1="22" y1="15.5" x2="12" y2="22"></line>
+              </svg>
+            </div>
+            <h3 class="card-heading">Morph Geometry</h3>
+            <p class="card-desc">
+              Alter the floating 3D wireframe manifold in real-time. Cycles between Icosahedron, Torus Knot, Octahedron, and Dodecahedron forms.
+            </p>
+            <div class="card-action">
+              <span>TRIGGER MUTATION</span>
+              <span>&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Shockwave Matrix -->
+        <div id="card-ripple" class="tilt-card">
+          <div class="card-content">
+            <span class="card-num">MODULE // 02</span>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" stroke-width="1.8">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg>
+            </div>
+            <h3 class="card-heading">Matrix Shockwave</h3>
+            <p class="card-desc">
+              Emits a high-velocity radial ripple across the hidden dark matter coordinate grid, illuminating grid intersections with resonant force.
+            </p>
+            <div class="card-action">
+              <span>DISPERSE PULSE</span>
+              <span>&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Harmonic Chords -->
+        <div id="card-resonance" class="tilt-card">
+          <div class="card-content">
+            <span class="card-num">MODULE // 03</span>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" stroke-width="1.8">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+              </svg>
+            </div>
+            <h3 class="card-heading">Harmonic Resonance</h3>
+            <p class="card-desc">
+              Synthesizes an ethereal arpeggiated frequency cascade using pure mathematical sine oscillations, tuned to harmonic intervals.
+            </p>
+            <div class="card-action">
+              <span>ACTIVATE ARPEGGIO</span>
+              <span>&rarr;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Audio Synthesis Chamber Section -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-tag">ACT II // ACOUSTIC CHAMBER</div>
+        <h2 class="section-title">REACTIVE SYNTHESIS</h2>
+      </div>
+
+      <div class="audio-playground-box">
+        <div class="audio-controls-row">
+          <div class="audio-info">
+            <h3>Harmonic Tone Generator</h3>
+            <p>Move your cursor horizontally and vertically to sweep the master cutoff filter.</p>
+          </div>
+          <div class="synth-buttons">
+            <button class="synth-key" data-freq="220" data-type="triangle">TONE 220Hz (A3)</button>
+            <button class="synth-key" data-freq="277.18" data-type="sine">TONE 277Hz (C#4)</button>
+            <button class="synth-key" data-freq="329.63" data-type="sine">TONE 330Hz (E4)</button>
+            <button class="synth-key" data-freq="440" data-type="triangle">TONE 440Hz (A4)</button>
+            <button class="synth-key" data-freq="554.37" data-type="sine">TONE 554Hz (C#5)</button>
+          </div>
+        </div>
+
+        <div class="visualizer-canvas-wrap">
+          <canvas id="audio-visualizer"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div>
+        <span>VOID LAB &copy; 2026</span> &mdash; <span>JENNSOLENYA</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/jennsolenya/jennsolenya.github.io" target="_blank" rel="noopener noreferrer">SOURCE CODE</a>
+        <a href="#top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">BACK TO TOP &uarr;</a>
+      </div>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
