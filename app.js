@@ -1578,66 +1578,131 @@ class CosmicUniverseEngine {
 
     const getStepInterval = () => {
       const ep = this.getCurrentEpoch();
-      if (ep.bpm === 140) return 107; // Dubstep
-      if (ep.bpm === 128) return 117; // Techno
-      if (ep.bpm === 85) return 175;  // Inflation
-      if (ep.bpm === 65) return 230;  // Singularity
-      return 125;
+      if (ep.bpm === 174) return 86;   // 174 BPM 16th notes (DnB)
+      if (ep.bpm === 145) return 103;  // 145 BPM 16th notes (Dubstep)
+      if (ep.bpm === 135) return 111;  // 135 BPM 16th notes (Acid Techno)
+      if (ep.bpm === 128) return 117;  // 128 BPM (Bounce)
+      if (ep.bpm === 70) return 214;   // 70 BPM (Ambient Void)
+      return 115;
     };
 
     const stepRoutine = () => {
       if (!this.isMusicPlaying) return;
       const s = this.beatStep % 16;
+      const measure = Math.floor(this.beatStep / 16) % 8;
       const now = audio.ctx.currentTime;
       const ep = this.getCurrentEpoch();
 
-      // Subtle interaction-free baseline cosmic drift (+0.02 entropy per beat)
+      // Subtle interaction-free baseline cosmic drift (+0.04 entropy per beat)
       if (!this.isPaused) {
         this.addEntropy(0.04, 'auto-drift');
       }
 
-      if (ep.key === 'techno' || ep.key === 'stellar') {
-        // 4-on-the-floor warehouse techno kick
-        if (s === 0 || s === 4 || s === 8 || s === 12) audio.playKick(now);
-        // Offbeat open hat & rolling 16ths
+      // Update live parameter & bar tracker
+      const barTracker = document.getElementById('live-bar-tracker');
+      if (barTracker && s === 0) {
+        if (measure === 3) {
+          barTracker.textContent = 'BAR: 4/8 // 303 SWEEP & FILL';
+          barTracker.style.color = '#ffffff';
+        } else if (measure === 7) {
+          barTracker.textContent = 'BAR: 8/8 // CLIMAX TURNAROUND';
+          barTracker.style.color = '#ffffff';
+        } else {
+          barTracker.textContent = `BAR: ${measure + 1}/8 // EVOLVING GROOVE`;
+          barTracker.style.color = 'var(--text-secondary)';
+        }
+      }
+
+      if (ep.key === 'techno' || ep.key === 'acid') {
+        // --- 135 BPM ACID WAREHOUSE (Charlotte de Witte / Amelie Lens / 999999999) ---
+        // 4-on-the-floor driving 909 punch kick
+        if (s === 0 || s === 4 || s === 8 || s === 12) {
+          audio.playKick(now);
+        }
+
+        // Driving 909 Open Hat on offbeats
         if (s === 2 || s === 6 || s === 10 || s === 14) {
           audio.playHiHat(true, now);
         } else {
+          // Rolling 16th ghost hats
           audio.playHiHat(false, now);
         }
-        // Rolling acid bass sequence
-        const technoNotes = [55, 55, 110, 55, 82.4, 55, 110, 73.4];
-        audio.triggerChime(technoNotes[s % 8], 'sawtooth', 0.14, (s % 4 - 1.5) * 0.45, 0);
-      } else if (ep.key === 'dubstep' || ep.key === 'turbulence') {
-        // Half-time Skrillex dubstep break
-        if (s === 0 || s === 10) audio.playKick(now);
-        if (s === 8) audio.playSnare(now);
-        if (s % 2 === 0) audio.playHiHat(s === 4 || s === 12, now);
-        // Syncopated heavy wobble bass
-        if (s === 2 || s === 4 || s === 6 || s === 12 || s === 14) {
-          const wobbleFreqs = [55, 73.4, 82.4, 55, 65.4];
-          audio.playWobble(wobbleFreqs[(s / 2) % wobbleFreqs.length], now);
+
+        // Roland TB-303 Acid Bassline (16-step sequence with accent & slide)
+        const acidNotes = [55, 55, 110, 55, 73.4, 55, 110, 82.4, 55, 55, 130.8, 110, 55, 82.4, 110, 55];
+        let noteFreq = acidNotes[s];
+        // Dynamic measure variation: on Bar 4 & Bar 8 transpose and modulate
+        if (measure === 3 || measure === 7) {
+          noteFreq *= 1.5; // Harmonic 5th shift
         }
-      } else if (ep.key === 'singularity') {
-        // Epoch 0: Primordial Singularity (quiet 36Hz pulse and dark chimes)
-        if (s === 0) audio.playKick(now);
-        if (s === 8) audio.triggerChime(73.42, 'sine', 0.4, 0, 0);
+        const isAccent = (s === 2 || s === 6 || s === 10 || s === 14);
+        const isSlide = (s === 7 || s === 14);
+        const targetSlideFreq = isSlide ? noteFreq * 1.33 : null;
+
+        audio.play303Acid(noteFreq, now, isAccent, isSlide, targetSlideFreq);
+
+        // Climax turnaround snare roll on bar 8
+        if (measure === 7 && s >= 12) {
+          audio.playSnare(now, true);
+        }
+
+      } else if (ep.key === 'dnb') {
+        // --- 174 BPM DNB NEUROFUNK (Chase & Status / Noisia) ---
+        // Syncopated Amen breakbeat rhythm
+        if (s === 0 || s === 7 || s === 10) {
+          audio.playKick(now);
+        }
+        if (s === 4 || s === 12) {
+          audio.playSnare(now, false);
+        }
+        // Rapid 16th shuffled hats
+        audio.playHiHat(s % 4 === 2, now);
+
+        // Detuned Reese Sub-Bass on primary beats
+        if (s === 0 || s === 8) {
+          const reeseNotes = [55, 65.4, 73.4, 49.0];
+          audio.playReese(reeseNotes[measure % reeseNotes.length], now, 0.35);
+        }
+
+        // Snare rush turnaround on bar 8
+        if (measure === 7 && s >= 12) {
+          audio.playSnare(now, true);
+        }
+
+      } else if (ep.key === 'dubstep') {
+        // --- 145 BPM SKRILLEX BASS & GROWL ---
+        // Half-time beat: Heavy kick on 0, massive snare on 8
+        if (s === 0 || s === 10) audio.playKick(now);
+        if (s === 8) audio.playSnare(now, false);
+
+        // Ghost hats
+        if (s % 2 === 0) audio.playHiHat(s === 4 || s === 12, now);
+
+        // Skrillex Formant Throat Growl Bass
+        if (s === 2 || s === 4 || s === 6 || s === 12 || s === 14) {
+          const growlNotes = [55, 73.4, 82.4, 55, 65.4];
+          audio.playSkrillexGrowl(growlNotes[(s / 2) % growlNotes.length], now, 0.25);
+        }
+
+        // Sub-drop on bar 8
+        if (measure === 7 && s === 0) {
+          audio.playSubDrop();
+        }
+
       } else if (ep.key === 'bounce') {
-        // Epoch 4: The Big Bounce (crunch into rebirth)
+        // The Big Bounce crunch into celestial rebirth
         if (s < 8) {
-          // Acoustic crunch downsweep
           const crunchFreqs = [440, 392, 329.63, 261.63, 196, 164.8, 130.8, 82.4];
           audio.triggerChime(crunchFreqs[s], 'sawtooth', 0.15, 0, 0);
           if (s % 2 === 0) audio.playKick(now);
         } else if (s === 8 || s === 9 || s === 10 || s === 11) {
-          // Silence vacuum (Zero gravity crunch)
+          // Silence vacuum
         } else if (s === 12) {
-          // Celestial Rebirth chord explosion
           audio.playBigBounceChord();
           audio.playKick(now);
         }
       } else {
-        // Epoch 1: Cosmic Inflation / Ambient
+        // Ambient Void (70 BPM)
         if (s === 0 || s === 8) audio.playKick(now);
         if (s % 4 === 0) audio.playHiHat(true, now);
         const ambNotes = [130.81, 164.81, 196.0, 261.63];
