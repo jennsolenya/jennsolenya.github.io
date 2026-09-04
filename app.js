@@ -355,20 +355,36 @@ class SpatialSoundEngine {
     if (this.isMuted || !this.ctx) return;
     const t = time || this.ctx.currentTime;
     try {
+      // 1. Sub boom (38Hz body)
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(160, t);
-      osc.frequency.exponentialRampToValueAtTime(34, t + 0.18);
+      osc.frequency.setValueAtTime(175, t);
+      osc.frequency.exponentialRampToValueAtTime(42, t + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(28, t + 0.24);
 
-      gain.gain.setValueAtTime(0.6, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      gain.gain.setValueAtTime(0.75, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
 
       osc.connect(gain);
       gain.connect(this.bassBoost || this.masterGain);
       osc.start(t);
-      osc.stop(t + 0.28);
+      osc.stop(t + 0.32);
+
+      // 2. High transient click for 909 club punch
+      const click = this.ctx.createOscillator();
+      const clickGain = this.ctx.createGain();
+      click.type = 'triangle';
+      click.frequency.setValueAtTime(1200, t);
+      click.frequency.exponentialRampToValueAtTime(120, t + 0.015);
+
+      clickGain.gain.setValueAtTime(0.35, t);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+
+      click.connect(clickGain);
+      clickGain.connect(this.masterGain);
+      click.start(t);
+      click.stop(t + 0.025);
 
       // Pulse 3D wireframe mesh on kick
       if (typeof wireframeMesh !== 'undefined' && wireframeMesh) {
@@ -377,12 +393,13 @@ class SpatialSoundEngine {
     } catch (e) {}
   }
 
-  playSnare(time) {
+  playSnare(time, snappy = false) {
     if (this.isMuted || !this.ctx) return;
     const t = time || this.ctx.currentTime;
     try {
       // Noise burst
-      const bufferSize = Math.floor(this.ctx.sampleRate * 0.12);
+      const duration = snappy ? 0.08 : 0.14;
+      const bufferSize = Math.floor(this.ctx.sampleRate * duration);
       const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
@@ -393,24 +410,24 @@ class SpatialSoundEngine {
 
       const noiseFilter = this.ctx.createBiquadFilter();
       noiseFilter.type = 'highpass';
-      noiseFilter.frequency.setValueAtTime(900, t);
+      noiseFilter.frequency.setValueAtTime(snappy ? 1400 : 900, t);
 
       const noiseGain = this.ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.35, t);
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+      noiseGain.gain.setValueAtTime(0.4, t);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, t + duration);
 
       noise.connect(noiseFilter);
       noiseFilter.connect(noiseGain);
-      noiseGain.connect(this.masterGain);
+      noiseGain.connect(this.distortion || this.masterGain);
 
       // Tonal punch
       const osc = this.ctx.createOscillator();
       const oscGain = this.ctx.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(200, t);
-      osc.frequency.exponentialRampToValueAtTime(70, t + 0.08);
+      osc.frequency.setValueAtTime(snappy ? 240 : 190, t);
+      osc.frequency.exponentialRampToValueAtTime(80, t + 0.08);
 
-      oscGain.gain.setValueAtTime(0.3, t);
+      oscGain.gain.setValueAtTime(0.35, t);
       oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
 
       osc.connect(oscGain);
@@ -418,7 +435,7 @@ class SpatialSoundEngine {
 
       noise.start(t);
       osc.start(t);
-      osc.stop(t + 0.12);
+      osc.stop(t + duration);
     } catch (e) {}
   }
 
@@ -426,7 +443,7 @@ class SpatialSoundEngine {
     if (this.isMuted || !this.ctx) return;
     const t = time || this.ctx.currentTime;
     try {
-      const duration = open ? 0.2 : 0.04;
+      const duration = open ? 0.22 : 0.038;
       const bufferSize = Math.floor(this.ctx.sampleRate * duration);
       const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
       const data = buffer.getChannelData(0);
@@ -438,10 +455,10 @@ class SpatialSoundEngine {
 
       const filter = this.ctx.createBiquadFilter();
       filter.type = 'highpass';
-      filter.frequency.setValueAtTime(7000, t);
+      filter.frequency.setValueAtTime(open ? 6500 : 8000, t);
 
       const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(open ? 0.22 : 0.15, t);
+      gain.gain.setValueAtTime(open ? 0.26 : 0.16, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
 
       noise.connect(filter);
@@ -452,33 +469,115 @@ class SpatialSoundEngine {
     } catch (e) {}
   }
 
-  playWobble(freq = 55, time) {
+  // Roland TB-303 Acid Bassline Synthesizer (Amelie Lens / 999999999 / Charlotte de Witte)
+  play303Acid(freq, time, accent = false, slide = false, targetFreq = null) {
     if (this.isMuted || !this.ctx) return;
     const t = time || this.ctx.currentTime;
     try {
       const osc = this.ctx.createOscillator();
-      const filter = this.ctx.createBiquadFilter();
-      const gain = this.ctx.createGain();
+      const noteFilter = this.ctx.createBiquadFilter();
+      const noteGain = this.ctx.createGain();
 
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(freq, t);
+      if (slide && targetFreq) {
+        osc.frequency.exponentialRampToValueAtTime(targetFreq, t + 0.12);
+      }
+
+      noteFilter.type = 'lowpass';
+      const baseQ = accent ? 13.5 : 9.0;
+      noteFilter.Q.setValueAtTime(baseQ, t);
+
+      const baseCutoff = accent ? 4200 : 1800;
+      noteFilter.frequency.setValueAtTime(baseCutoff, t);
+      noteFilter.frequency.exponentialRampToValueAtTime(140, t + (accent ? 0.16 : 0.11));
+
+      const gainLvl = accent ? 0.45 : 0.28;
+      noteGain.gain.setValueAtTime(gainLvl, t);
+      noteGain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+
+      osc.connect(noteFilter);
+      noteFilter.connect(noteGain);
+      noteGain.connect(this.distortion || this.masterGain);
+
+      osc.start(t);
+      osc.stop(t + 0.18);
+    } catch (e) {}
+  }
+
+  // Neurofunk Reese Bass (Chase & Status / Noisia)
+  playReese(freq, time, duration = 0.32) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+
+      osc1.type = 'sawtooth';
+      osc2.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(freq, t);
+      osc2.frequency.setValueAtTime(freq * 1.014, t); // Detuned saw pair for beating
 
       filter.type = 'lowpass';
-      filter.Q.setValueAtTime(10.5, t);
-      filter.frequency.setValueAtTime(180, t);
-      filter.frequency.exponentialRampToValueAtTime(1900, t + 0.11);
-      filter.frequency.exponentialRampToValueAtTime(220, t + 0.24);
+      filter.Q.setValueAtTime(6.0, t);
+      filter.frequency.setValueAtTime(850, t);
+      filter.frequency.exponentialRampToValueAtTime(160, t + duration);
 
       gain.gain.setValueAtTime(0.42, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.26);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
 
-      osc.connect(filter);
+      osc1.connect(filter);
+      osc2.connect(filter);
       filter.connect(gain);
       gain.connect(this.bassBoost || this.masterGain);
 
-      osc.start(t);
-      osc.stop(t + 0.26);
+      osc1.start(t);
+      osc2.start(t);
+      osc1.stop(t + duration);
+      osc2.stop(t + duration);
     } catch (e) {}
+  }
+
+  // Skrillex Formant Throat Growl Bass
+  playSkrillexGrowl(freq, time, duration = 0.28) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const formantFilter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+
+      osc1.type = 'sawtooth';
+      osc2.type = 'square';
+      osc1.frequency.setValueAtTime(freq, t);
+      osc2.frequency.setValueAtTime(freq * 0.5, t); // Sub-octave grit
+
+      formantFilter.type = 'bandpass';
+      formantFilter.Q.setValueAtTime(7.5, t);
+      formantFilter.frequency.setValueAtTime(450, t);
+      formantFilter.frequency.exponentialRampToValueAtTime(2600, t + duration * 0.4);
+      formantFilter.frequency.exponentialRampToValueAtTime(320, t + duration);
+
+      gain.gain.setValueAtTime(0.55, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+      osc1.connect(formantFilter);
+      osc2.connect(formantFilter);
+      formantFilter.connect(gain);
+      gain.connect(this.distortion || this.masterGain);
+
+      osc1.start(t);
+      osc2.start(t);
+      osc1.stop(t + duration);
+      osc2.stop(t + duration);
+    } catch (e) {}
+  }
+
+  playWobble(freq = 55, time) {
+    this.playSkrillexGrowl(freq, time, 0.26);
   }
 }
 
