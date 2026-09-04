@@ -575,7 +575,7 @@ class SpatialSoundEngine {
 
       osc.connect(noteFilter);
       noteFilter.connect(noteGain);
-      noteGain.connect(this.distortion || this.masterGain);
+      noteGain.connect(this.sidechainGain || this.distortion || this.masterGain);
 
       osc.start(t);
       osc.stop(t + 0.18);
@@ -607,9 +607,7 @@ class SpatialSoundEngine {
 
       osc1.connect(filter);
       osc2.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.bassBoost || this.masterGain);
-
+      filter.connect(gain);      gain.connect(this.sidechainGain || this.bassBoost || this.masterGain);
       osc1.start(t);
       osc2.start(t);
       osc1.stop(t + duration);
@@ -643,9 +641,7 @@ class SpatialSoundEngine {
 
       osc1.connect(formantFilter);
       osc2.connect(formantFilter);
-      formantFilter.connect(gain);
-      gain.connect(this.distortion || this.masterGain);
-
+      formantFilter.connect(gain);      gain.connect(this.sidechainGain || this.distortion || this.masterGain);
       osc1.start(t);
       osc2.start(t);
       osc1.stop(t + duration);
@@ -2005,7 +2001,9 @@ class CosmicUniverseEngine {
     const stepRoutine = () => {
       if (!this.isMusicPlaying) return;
       const s = this.beatStep % 16;
-      const measure = Math.floor(this.beatStep / 16) % 8;
+      const measure = Math.floor(this.beatStep / 16) % 32; // 32-bar macro cycle
+      const section = Math.floor(measure / 8); // 0: Intro, 1: Build, 2: Peak, 3: Breakdown
+      const localBar = measure % 8;
       const now = audio.ctx.currentTime;
       const ep = this.getCurrentEpoch();
 
@@ -2014,95 +2012,207 @@ class CosmicUniverseEngine {
         this.addEntropy(0.04, 'auto-drift');
       }
 
-      // Update live parameter & bar tracker
+      // Update live parameter & bar tracker with 32-bar section awareness
       const barTracker = document.getElementById('live-bar-tracker');
       if (barTracker && s === 0) {
-        if (measure === 3) {
-          barTracker.textContent = 'BAR: 4/8 // 303 SWEEP & FILL';
+        const sectionNames = ['INTRO GROOVE', 'BUILD TENSION', 'PEAK ENERGY', 'BREAKDOWN'];
+        const sectionName = sectionNames[section] || 'EVOLVING';
+        if (localBar === 7) {
+          barTracker.textContent = `BAR: ${measure + 1}/32 // ${sectionName} TURNAROUND`;
           barTracker.style.color = '#ffffff';
-        } else if (measure === 7) {
-          barTracker.textContent = 'BAR: 8/8 // CLIMAX TURNAROUND';
+        } else if (section === 2) {
+          barTracker.textContent = `BAR: ${measure + 1}/32 // ${sectionName}`;
           barTracker.style.color = '#ffffff';
         } else {
-          barTracker.textContent = `BAR: ${measure + 1}/8 // EVOLVING GROOVE`;
+          barTracker.textContent = `BAR: ${measure + 1}/32 // ${sectionName}`;
           barTracker.style.color = 'var(--text-secondary)';
         }
       }
 
       if (ep.key === 'techno' || ep.key === 'acid') {
-        // --- 135 BPM ACID WAREHOUSE (Charlotte de Witte / Amelie Lens / 999999999) ---
-        // 4-on-the-floor driving 909 punch kick
+        // --- 135 BPM ACID WAREHOUSE ---
+        // Charlotte de Witte / Amelie Lens / 999999999 / Ben Klock / Kobosil / FJAAK / Dax J
+
+        // Kick: rumble kick on peak section, standard on others
         if (s === 0 || s === 4 || s === 8 || s === 12) {
-          audio.playKick(now);
+          if (section >= 1) {
+            audio.playRumbleKick(now); // Ben Klock rumble tail + sidechain duck
+          } else {
+            audio.playKick(now);
+            audio.triggerSidechain(now);
+          }
         }
 
-        // Driving 909 Open Hat on offbeats
+        // Hats: velocity-varied rolling 16ths with open offbeats (Amelie Lens)
         if (s === 2 || s === 6 || s === 10 || s === 14) {
           audio.playHiHat(true, now);
         } else {
-          // Rolling 16th ghost hats
           audio.playHiHat(false, now);
         }
 
-        // Roland TB-303 Acid Bassline (16-step sequence with accent & slide)
+        // Ride cymbal: introduced in Build section and beyond (Amelie Lens rolling energy)
+        if (section >= 1 && (s === 0 || s === 4 || s === 8 || s === 12)) {
+          audio.playRideCymbal(now);
+        }
+
+        // Metallic percussion clank on offbeats during Peak (Kobosil industrial texture)
+        if (section === 2 && (s === 3 || s === 11)) {
+          audio.playMetalClank(now);
+        }
+
+        // Ghost snares on random steps during Build and Peak (Paula Temple chaos)
+        if (section >= 1 && Math.random() < 0.15 && s % 2 === 1) {
+          audio.playGhostSnare(now);
+        }
+
+        // TB-303 Acid Bassline: dual stacking on Peak section (999999999)
         const acidNotes = [55, 55, 110, 55, 73.4, 55, 110, 82.4, 55, 55, 130.8, 110, 55, 82.4, 110, 55];
         let noteFreq = acidNotes[s];
-        // Dynamic measure variation: on Bar 4 & Bar 8 transpose and modulate
-        if (measure === 3 || measure === 7) {
-          noteFreq *= 1.5; // Harmonic 5th shift
+        // FJAAK melodic variation: wider note range on Build section
+        if (section === 1) {
+          const buildNotes = [55, 65.4, 110, 82.4, 73.4, 98, 110, 130.8, 55, 73.4, 130.8, 110, 65.4, 82.4, 110, 55];
+          noteFreq = buildNotes[s];
         }
+        // Harmonic shift on bars 4 and 8 of each section
+        if (localBar === 3 || localBar === 7) {
+          noteFreq *= 1.5; // Perfect 5th
+        }
+        // Transpose up on Peak for maximum energy
+        if (section === 2) noteFreq *= 1.25;
+
         const isAccent = (s === 2 || s === 6 || s === 10 || s === 14);
         const isSlide = (s === 7 || s === 14);
         const targetSlideFreq = isSlide ? noteFreq * 1.33 : null;
 
-        audio.play303Acid(noteFreq, now, isAccent, isSlide, targetSlideFreq);
+        if (section === 2) {
+          // PEAK: dual 303 stacking (999999999 double acid voices)
+          audio.playDual303Acid(noteFreq, now, isAccent, isSlide, targetSlideFreq);
+        } else if (section === 3 && localBar >= 4) {
+          // Breakdown: strip acid on last 4 bars, let rumble breathe
+          if (s % 4 === 0) {
+            audio.play303Acid(noteFreq * 0.5, now, false, false, null);
+          }
+        } else {
+          audio.play303Acid(noteFreq, now, isAccent, isSlide, targetSlideFreq);
+        }
 
-        // Climax turnaround snare roll on bar 8
-        if (measure === 7 && s >= 12) {
+        // Climax turnaround snare roll on last bar of each section
+        if (localBar === 7 && s >= 12) {
           audio.playSnare(now, true);
         }
 
+        // Breakdown noise sweep riser on section 3 bars 6-7
+        if (section === 3 && localBar >= 6 && s === 0) {
+          audio.playSubDrop();
+        }
+
       } else if (ep.key === 'dnb') {
-        // --- 174 BPM DNB NEUROFUNK (Chase & Status / Noisia) ---
-        // Syncopated Amen breakbeat rhythm
+        // --- 174 BPM DNB NEUROFUNK ---
+        // Chase & Status / Noisia / Mefjus / Camo & Krooked / Current Value
+
+        // Syncopated Amen breakbeat
         if (s === 0 || s === 7 || s === 10) {
           audio.playKick(now);
+          audio.triggerSidechain(now);
         }
         if (s === 4 || s === 12) {
           audio.playSnare(now, false);
         }
-        // Rapid 16th shuffled hats
-        audio.playHiHat(s % 4 === 2, now);
 
-        // Detuned Reese Sub-Bass on primary beats
-        if (s === 0 || s === 8) {
-          const reeseNotes = [55, 65.4, 73.4, 49.0];
-          audio.playReese(reeseNotes[measure % reeseNotes.length], now, 0.35);
+        // Rapid 16th hats with velocity variation
+        const hatOpen = s % 4 === 2;
+        audio.playHiHat(hatOpen, now);
+
+        // Ghost snare hits on random offbeats for controlled chaos (Current Value)
+        if (section >= 1 && Math.random() < 0.2 && s % 2 === 1) {
+          audio.playGhostSnare(now);
         }
 
-        // Snare rush turnaround on bar 8
-        if (measure === 7 && s >= 12) {
+        // Bass: alternate between Reese (classic) and FM bass (Mefjus) by section
+        if (s === 0 || s === 8) {
+          const bassNotes = [55, 65.4, 73.4, 49.0, 61.7, 55, 82.4, 49.0];
+          const bassFreq = bassNotes[measure % bassNotes.length];
+
+          if (section === 0 || section === 3) {
+            // Intro & Breakdown: classic Reese (Chase & Status)
+            audio.playReese(bassFreq, now, 0.38);
+          } else {
+            // Build & Peak: FM bass (Mefjus / Noisia metallic wobble)
+            const modFreq = bassFreq * (2 + Math.random() * 3);
+            const modDepth = 200 + section * 150;
+            audio.playFMBass(bassFreq, modFreq, modDepth, now, 0.4);
+          }
+        }
+
+        // Reese pad layer underneath on Peak (Camo & Krooked warmth)
+        if (section === 2 && s === 0 && localBar % 2 === 0) {
+          audio.playReese(110, now, 0.6); // Long pad-like Reese
+        }
+
+        // Ride on build and peak sections
+        if (section >= 1 && section <= 2 && s % 4 === 0) {
+          audio.playRideCymbal(now);
+        }
+
+        // Snare rush turnaround
+        if (localBar === 7 && s >= 12) {
           audio.playSnare(now, true);
+        }
+
+        // Sub drop on breakdown transition
+        if (section === 3 && localBar === 7 && s === 0) {
+          audio.playSubDrop();
         }
 
       } else if (ep.key === 'dubstep') {
         // --- 145 BPM SKRILLEX BASS & GROWL ---
-        // Half-time beat: Heavy kick on 0, massive snare on 8
-        if (s === 0 || s === 10) audio.playKick(now);
+        // Skrillex / Space Laces / Virtual Riot / Must Die! / Trampa
+
+        // Half-time beat
+        if (s === 0 || s === 10) {
+          audio.playKick(now);
+          audio.triggerSidechain(now);
+        }
         if (s === 8) audio.playSnare(now, false);
 
-        // Ghost hats
-        if (s % 2 === 0) audio.playHiHat(s === 4 || s === 12, now);
-
-        // Skrillex Formant Throat Growl Bass
-        if (s === 2 || s === 4 || s === 6 || s === 12 || s === 14) {
-          const growlNotes = [55, 73.4, 82.4, 55, 65.4];
-          audio.playSkrillexGrowl(growlNotes[(s / 2) % growlNotes.length], now, 0.25);
+        // Ghost hats with velocity variation
+        if (s % 2 === 0) {
+          audio.playHiHat(s === 4 || s === 12, now);
         }
 
-        // Sub-drop on bar 8
-        if (measure === 7 && s === 0) {
+        // Bass design varies by 32-bar section
+        if (s === 2 || s === 4 || s === 6 || s === 12 || s === 14) {
+          const growlNotes = [55, 73.4, 82.4, 55, 65.4, 49.0, 73.4, 82.4];
+          const growlFreq = growlNotes[(s / 2 + measure) % growlNotes.length];
+
+          if (section === 2) {
+            // PEAK: Advanced growl with LFO chop + ring mod (Virtual Riot / Must Die!)
+            audio.playSkrillexGrowlAdvanced(growlFreq, now, 0.28);
+          } else {
+            // Standard Skrillex formant growl
+            audio.playSkrillexGrowl(growlFreq, now, 0.25);
+          }
+        }
+
+        // 808 sub layer underneath growls on all sections (Trampa devastating sub)
+        if (s === 0 && localBar % 2 === 0) {
+          const subNotes = [36.7, 41.2, 32.7, 36.7];
+          audio.play808Sub(subNotes[section], now, 0.55);
+        }
+
+        // Metallic clank on peak section (Must Die! industrial texture)
+        if (section === 2 && (s === 5 || s === 13)) {
+          audio.playMetalClank(now);
+        }
+
+        // Sub-drop on bar transitions
+        if (localBar === 7 && s === 0) {
           audio.playSubDrop();
+        }
+
+        // Ghost snares during build and peak
+        if (section >= 1 && Math.random() < 0.12 && s % 2 === 1) {
+          audio.playGhostSnare(now);
         }
 
       } else if (ep.key === 'bounce') {
@@ -2121,9 +2231,9 @@ class CosmicUniverseEngine {
         // Ambient Void (70 BPM)
         if (s === 0 || s === 8) audio.playKick(now);
         if (s % 4 === 0) audio.playHiHat(true, now);
-        const ambNotes = [130.81, 164.81, 196.0, 261.63];
+        const ambNotes = [130.81, 164.81, 196.0, 261.63, 220.0, 293.66, 174.61, 246.94];
         if (s % 4 === 2) {
-          audio.triggerChime(ambNotes[(s / 4) % ambNotes.length], 'sine', 0.7, (s - 8) / 8, 0);
+          audio.triggerChime(ambNotes[(s / 4 + measure) % ambNotes.length], 'sine', 0.7, (s - 8) / 8, 0);
         }
       }
 
