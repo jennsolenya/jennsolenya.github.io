@@ -61,9 +61,15 @@ class SpatialSoundEngine {
       this.bassBoost.frequency.setValueAtTime(80, this.ctx.currentTime);
       this.bassBoost.gain.setValueAtTime(8.5, this.ctx.currentTime);
 
-      // Routing: MasterGain -> BassBoost -> Filter -> SpatialPanner -> Analyser -> Destination
+      // Waveshaper Overdrive & Distortion for Analog Warmth and Acid Bite
+      this.distortion = this.ctx.createWaveShaper();
+      this.distortion.curve = this.makeDistortionCurve(22);
+      this.distortion.oversample = '2x';
+
+      // Routing: MasterGain -> BassBoost -> Distortion -> Filter -> SpatialPanner -> Analyser -> Destination
       this.masterGain.connect(this.bassBoost);
-      this.bassBoost.connect(this.filter);
+      this.bassBoost.connect(this.distortion);
+      this.distortion.connect(this.filter);
 
       if (this.spatialPanner) {
         this.filter.connect(this.spatialPanner);
@@ -104,11 +110,23 @@ class SpatialSoundEngine {
       this.droneOsc2.start();
       this.subBassOsc.start();
 
-      this.genre = 'ambient'; // 'ambient' | 'techno' | 'dubstep'
+      this.genre = 'techno'; // 'techno' (Acid) | 'dnb' | 'dubstep' | 'ambient'
       this.initialized = true;
     } catch (e) {
       console.warn('Web Audio initialization:', e);
     }
+  }
+
+  makeDistortionCurve(amount = 20) {
+    const k = typeof amount === 'number' ? amount : 20;
+    const n_samples = 44100;
+    const curve = new Float32Array(n_samples);
+    const deg = Math.PI / 180;
+    for (let i = 0; i < n_samples; ++i) {
+      const x = (i * 2) / n_samples - 1;
+      curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+    }
+    return curve;
   }
 
   setGenre(genreName) {
@@ -116,37 +134,40 @@ class SpatialSoundEngine {
     if (this.isMuted || !this.ctx) return;
     const now = this.ctx.currentTime;
 
-    if (genreName === 'singularity') {
-      // Epoch 0: Primordial Singularity
-      this.filter.frequency.setTargetAtTime(180, now, 0.2);
-      this.filter.Q.setValueAtTime(1.5, now);
-      this.droneOsc1.type = 'sine';
-      this.droneOsc2.type = 'sine';
-      this.subBassOsc.frequency.setValueAtTime(36.7, now);
-      this.triggerChime(73.4, 'sine', 0.5, 0, 0);
-    } else if (genreName === 'techno' || genreName === 'stellar') {
-      // Epoch 2: Stellar Nucleosynthesis & Techno order
-      this.filter.frequency.setTargetAtTime(1600, now, 0.15);
-      this.filter.Q.setValueAtTime(5.5, now);
+    if (genreName === 'techno' || genreName === 'acid') {
+      // 135 BPM Warehouse Acid Techno (Charlotte de Witte / Amelie Lens / 999999999)
+      this.filter.frequency.setTargetAtTime(2200, now, 0.15);
+      this.filter.Q.setValueAtTime(8.5, now);
       this.droneOsc1.type = 'sawtooth';
       this.droneOsc2.type = 'triangle';
-      this.triggerChime(110, 'sawtooth', 0.45, 0, 0);
-    } else if (genreName === 'dubstep' || genreName === 'turbulence') {
-      // Epoch 3: Cosmic Turbulence & Chaos
-      this.filter.frequency.setTargetAtTime(950, now, 0.1);
-      this.filter.Q.setValueAtTime(11.0, now);
+      this.subBassOsc.frequency.setValueAtTime(43.65, now); // F1
+      this.triggerChime(110, 'sawtooth', 0.4, 0, 0);
+    } else if (genreName === 'dnb') {
+      // 174 BPM Neurofunk & Amen Breaks (Chase & Status / Noisia)
+      this.filter.frequency.setTargetAtTime(1400, now, 0.12);
+      this.filter.Q.setValueAtTime(6.0, now);
       this.droneOsc1.type = 'sawtooth';
       this.droneOsc2.type = 'sawtooth';
-      this.triggerChime(55, 'sawtooth', 0.85, 0, 0);
+      this.subBassOsc.frequency.setValueAtTime(41.2, now); // E1
+      this.triggerChime(164.81, 'sawtooth', 0.35, 0, 0);
+    } else if (genreName === 'dubstep' || genreName === 'bass') {
+      // 145 BPM Heavy Bass & Vocal Formant Growls (Skrillex / Space Laces)
+      this.filter.frequency.setTargetAtTime(1200, now, 0.1);
+      this.filter.Q.setValueAtTime(10.0, now);
+      this.droneOsc1.type = 'sawtooth';
+      this.droneOsc2.type = 'square';
+      this.subBassOsc.frequency.setValueAtTime(36.7, now); // D1
+      this.triggerChime(55, 'sawtooth', 0.7, 0, 0);
     } else if (genreName === 'bounce') {
-      // Epoch 4: The Big Bounce
+      // The Big Bounce
       this.playBigBounceChord();
     } else {
-      // Epoch 1: Cosmic Inflation / Ambient
-      this.filter.frequency.setTargetAtTime(650, now, 0.2);
-      this.filter.Q.setValueAtTime(3.5, now);
+      // Ambient Void
+      this.filter.frequency.setTargetAtTime(480, now, 0.2);
+      this.filter.Q.setValueAtTime(2.5, now);
       this.droneOsc1.type = 'sine';
       this.droneOsc2.type = 'triangle';
+      this.subBassOsc.frequency.setValueAtTime(36.7, now);
       this.triggerChime(440, 'sine', 0.6, 0, 0);
     }
   }
