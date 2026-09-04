@@ -677,6 +677,10 @@ function setupOrbitControls(canvas) {
     rotationVelocity.x += deltaY * 0.005;
 
     previousPointerPos = { x: e.clientX, y: e.clientY };
+
+    if (typeof cosmicEngine !== 'undefined') {
+      cosmicEngine.addEntropy(0.08, 'drag');
+    }
   });
 
   window.addEventListener('pointerup', () => {
@@ -694,6 +698,10 @@ function setupOrbitControls(canvas) {
       rotationVelocity.y += e.deltaX * 0.0016;
       rotationVelocity.x += e.deltaY * 0.0016;
     }
+
+    if (typeof cosmicEngine !== 'undefined') {
+      cosmicEngine.addEntropy(0.04, 'wheel');
+    }
   }, { passive: true });
 }
 
@@ -706,6 +714,10 @@ window.addEventListener('scroll', () => {
   const coordTracker = document.getElementById('coords');
   if (coordTracker) {
     coordTracker.textContent = `X: ${Math.round(mouse.targetX)} | Y: ${Math.round(mouse.targetY)} | DEPTH: ${(progress * 100).toFixed(0)}%`;
+  }
+
+  if (typeof cosmicEngine !== 'undefined') {
+    cosmicEngine.addEntropy(0.03, 'scroll');
   }
 });
 
@@ -748,8 +760,9 @@ function animateThreeJS() {
     wireframeMesh.position.z = -scrollY * 0.003;
     wireframeMesh.position.y = -scrollY * 0.001;
 
-    // Audio Reactive Scale + Mac Force Touch Expansion
-    const scale = 1 + bassFactor * 0.22 + trackpadForce * 0.38;
+    // Audio Reactive Scale + Mac Force Touch Expansion + Cosmological Epoch Scale
+    const epochScale = (typeof cosmicEngine !== 'undefined') ? cosmicEngine.getVisualScale() : 1.0;
+    const scale = (1 + bassFactor * 0.22 + trackpadForce * 0.38) * epochScale;
     wireframeMesh.scale.set(scale, scale, scale);
 
     // Outer orbital ring rotation & pulse
@@ -834,6 +847,9 @@ function updateForce(rawForce) {
   }
 
   audio.modulateWithCursor(mouse.targetX / width, mouse.targetY / height, trackpadForce);
+  if (typeof cosmicEngine !== 'undefined' && trackpadForce > 0.05) {
+    cosmicEngine.addEntropy(trackpadForce * 0.15, 'force');
+  }
 }
 
 // Safari / WebKit Apple Force Touch Events
@@ -844,6 +860,7 @@ window.addEventListener('webkitmouseforcechanged', (e) => {
 window.addEventListener('webkitmouseforcedown', () => {
   ripples.push(new Ripple(mouse.x, mouse.y, 1.8));
   audio.triggerChime(329.63, 'triangle', 0.9, 0, 0); // E4
+  if (typeof cosmicEngine !== 'undefined') cosmicEngine.addEntropy(0.5, 'forcedown');
 });
 
 window.addEventListener('webkitmouseforceup', () => {
@@ -881,13 +898,19 @@ window.addEventListener('mousemove', (e) => {
   }
 
   audio.modulateWithCursor(e.clientX / width, e.clientY / height, trackpadForce);
+  if (typeof cosmicEngine !== 'undefined') {
+    cosmicEngine.addEntropy(0.025, 'move');
+  }
 });
 
 // Click shockwave ripple
 window.addEventListener('click', (e) => {
-  if (e.target.closest('button, a, .controls-drawer')) return;
+  if (e.target.closest('button, a, .controls-drawer, .universe-drawer, .timeline-drawer')) return;
   ripples.push(new Ripple(e.clientX, e.clientY, 1.2));
   audio.triggerChime(523.25, 'sine', 0.7, (e.clientX / width) * 2 - 1, (e.clientY / height) * 2 - 1);
+  if (typeof cosmicEngine !== 'undefined') {
+    cosmicEngine.addEntropy(0.65, 'click');
+  }
 });
 
 // --- 6. Sound Toggle, Hero Button Sync & Auto-Arpeggiator ---
@@ -936,24 +959,6 @@ if (heroSoundToggle) {
   });
 }
 
-// Genre Profile Selector Pills
-document.querySelectorAll('.genre-pill').forEach((pill) => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('.genre-pill').forEach((p) => p.classList.remove('active'));
-    pill.classList.add('active');
-    const genre = pill.getAttribute('data-genre') || 'ambient';
-    audio.init();
-    if (audio.isMuted) audio.toggle();
-    audio.setGenre(genre);
-
-    const lastKeyHud = document.getElementById('last-key-hud');
-    if (lastKeyHud) {
-      lastKeyHud.textContent = `PROFILE: ${genre.toUpperCase()}`;
-      lastKeyHud.classList.add('flash');
-      setTimeout(() => lastKeyHud.classList.remove('flash'), 250);
-    }
-  });
-});
 
 // Auto-Arpeggiator loop
 let arpTimer = null;
@@ -1521,6 +1526,35 @@ if (headerMusicToggle) headerMusicToggle.addEventListener('click', () => cosmicE
 const beatTrackBtn = document.getElementById('beat-track-toggle');
 if (beatTrackBtn) beatTrackBtn.addEventListener('click', () => cosmicEngine.togglePlayback());
 
+// Genre / Epoch Selector Pills
+document.querySelectorAll('.genre-pill').forEach((pill) => {
+  pill.addEventListener('click', () => {
+    const genre = pill.getAttribute('data-genre') || 'techno';
+    const epochMap = {
+      'singularity': 0,
+      'ambient': 1,
+      'inflation': 1,
+      'techno': 2,
+      'stellar': 2,
+      'dubstep': 3,
+      'turbulence': 3,
+      'bounce': 4
+    };
+    const targetEpoch = epochMap[genre] !== undefined ? epochMap[genre] : 2;
+    cosmicEngine.setEpoch(targetEpoch);
+    if (!cosmicEngine.isMusicPlaying) {
+      cosmicEngine.startPlayback();
+    }
+    const epoch = cosmicEngine.getCurrentEpoch();
+    const lastKeyHud = document.getElementById('last-key-hud');
+    if (lastKeyHud) {
+      lastKeyHud.textContent = `EPOCH: [ ${epoch.name} ] (${epoch.bpm} BPM)`;
+      lastKeyHud.classList.add('flash');
+      setTimeout(() => lastKeyHud.classList.remove('flash'), 350);
+    }
+  });
+});
+
 // --- 7. Full Keyboard Synthesis (AZERTY & QWERTY Universal Layout Hub) ---
 let currentLayout = localStorage.getItem('void_keyboard_layout') || 'AZERTY';
 
@@ -1945,6 +1979,7 @@ const controlsBackdrop = document.getElementById('controls-backdrop');
 
 function openControlsModal() {
   closeTimelineModal();
+  closeUniverseModal();
   if (controlsModal) controlsModal.classList.add('open');
   audio.triggerChime(554.37, 'sine', 0.3, 0, 0);
 }
@@ -1973,6 +2008,7 @@ const timelineBackdrop = document.getElementById('timeline-backdrop');
 
 function openTimelineModal() {
   closeControlsModal();
+  closeUniverseModal();
   if (timelineModal) timelineModal.classList.add('open');
   audio.triggerChime(659.25, 'triangle', 0.4, 0, 0); // E5
 }
@@ -1992,6 +2028,37 @@ function toggleTimelineModal() {
 if (timelineToggle) timelineToggle.addEventListener('click', toggleTimelineModal);
 if (closeTimeline) closeTimeline.addEventListener('click', closeTimelineModal);
 if (timelineBackdrop) timelineBackdrop.addEventListener('click', closeTimelineModal);
+
+// --- 12. Universe Creation & Theories Modal Logic ---
+const universeModal = document.getElementById('universe-modal');
+const universeStoryToggle = document.getElementById('universe-story-toggle');
+const cosmicStoryBtn = document.getElementById('cosmic-story-btn');
+const closeUniverse = document.getElementById('close-universe');
+const universeBackdrop = document.getElementById('universe-backdrop');
+
+function openUniverseModal() {
+  closeControlsModal();
+  closeTimelineModal();
+  if (universeModal) universeModal.classList.add('open');
+  audio.triggerChime(783.99, 'sine', 0.45, 0, 0); // G5
+}
+
+function closeUniverseModal() {
+  if (universeModal) universeModal.classList.remove('open');
+}
+
+function toggleUniverseModal() {
+  if (universeModal && universeModal.classList.contains('open')) {
+    closeUniverseModal();
+  } else {
+    openUniverseModal();
+  }
+}
+
+if (universeStoryToggle) universeStoryToggle.addEventListener('click', toggleUniverseModal);
+if (cosmicStoryBtn) cosmicStoryBtn.addEventListener('click', toggleUniverseModal);
+if (closeUniverse) closeUniverse.addEventListener('click', closeUniverseModal);
+if (universeBackdrop) universeBackdrop.addEventListener('click', closeUniverseModal);
 
 // Sound effects on timeline nodes
 document.querySelectorAll('.timeline-node').forEach((node, i) => {
