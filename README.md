@@ -9,29 +9,29 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 ## Project Evolution Timeline
 
 ```
-  v0.0.0 [Genesis]             v0.1.0 [Void Foundation]              v0.2.0 [Spatial & Tactile Leap]          v0.3.0+ [Roadmap]
-  Hello World init             Pitch-black matrix                    Mac Force Touch & 3D Orbit               Radar Mode
-        │                              │                                           │                                │
-  [2026-09-04]                   [2026-09-04]                                [2026-09-04]                        [Upcoming]
-        ├──────────────────────────────┼───────────────────────────────────────────┼────────────────────────────────┤
-   • Repo created                • Pure #000000 void palette                • Apple Force Touch trackpad pressure • Radar scan mode
-   • GitHub Pages initialized    • Canvas cursor spotlight grid             • Direct 3D orbit drag & zoom inertia • Multi-touch particles
-                                 • Three.js wireframe sculpture             • Binaural HRTF Spatial Audio (AirPods) • Shader wave ripples
-                                 • Web Audio ambient drone synth            • Audio-reactive wireframe pulsing   • Custom preset saves
-                                 • 3D perspective tilt cards                • Physical keyboard synth (1-5 / A-G)
-                                 • Google Fonts typography                  • Auto-arpeggiator generative loop
-                                                                            • Slide-out Controls guide drawer
+  v0.0.0 [Genesis]             v0.1.0 [Void Foundation]              v0.2.0 [Spatial Leap]                 v0.2.3 [Beat Sequencer]             v0.3.0 [Cosmic Evolution]           v0.4.0+ [Roadmap]
+  Hello World init             Pitch-black matrix                    Mac Force Touch & 3D Orbit            Generative Drum Machine             Universe Genesis & 5 Epochs          Radar & Audio Export
+        │                              │                                           │                                   │                                    │                                 │
+  [2026-09-04]                   [2026-09-04]                                [2026-09-04]                        [2026-09-04]                         [2026-09-04]                       [Upcoming]
+        ├──────────────────────────────┼───────────────────────────────────────────┼───────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────┤
+   • Repo created                • Pure #000000 void palette                • Apple Force Touch trackpad pressure • 16-step drum sequencer (Kick/Snr/Hat) • 5 Cosmological Epochs            • 360° Radar Scan matrix
+   • GitHub Pages initialized    • Canvas cursor spotlight grid             • Direct 3D orbit drag & zoom inertia • Procedural wobble bass synth        • Browser interaction entropy engine  • Audio recording / WAV export
+                                 • Three.js wireframe sculpture             • Binaural HRTF Spatial Audio         • 3 Genre sound profiles              • Pause / Freeze time (Key P)         • MIDI controller integration
+                                 • Web Audio ambient drone synth            • Audio-reactive wireframe pulsing    • Calibrated force curves             • Cosmic Memories Bank (Key S)        • WebGL particle collapse
+                                 • 3D perspective tilt cards                • Physical keyboard synth (1-5 / A-G) • 2-Finger trackpad inertia           • AZERTY / QWERTY Matrix Hub
+                                 • Google Fonts typography                  • Slide-out Controls guide drawer                                           • Universe Theories Modal (Key U)
 ```
 
 ### Visual Milestone Breakdown
 
-| Milestone | Release Tag | Date | Key Capabilities Added |
-| :--- | :--- | :--- | :--- |
-| **Phase 0: Genesis** | [`init`](https://github.com/jennsolenya/jennsolenya.github.io/commit/ed61790) | 2026-09-04 | Clean repository initialization and GitHub Pages baseline. |
-| **Phase 1: Void Foundation** | [`v0.1.0`](https://github.com/jennsolenya/jennsolenya.github.io/commit/fefbb25) | 2026-09-04 | • 100% pitch-black background (`#000000`) with zero bleed.<br>• Interactive cursor spotlight revealing hidden coordinate matrix & dust.<br>• Floating 3D wireframe geometric sculpture with Three.js.<br>• Web Audio API ambient drone and interactive sine chimes.<br>• 3D perspective card tilt on hover. |
-| **Phase 2: Tactile & Spatial Leap** | [`v0.2.0-spatial-orbit`](https://github.com/jennsolenya.github.io/releases/tag/v0.2.0-spatial-orbit) | 2026-09-04 | • **Mac Force Touch Trackpad**: pressure sensitivity expands spotlight, triggers sub-bass (`36.7Hz D1`), and grows 3D shape.<br>• **Direct 3D Orbit & Zoom**: click-and-drag rotation with momentum + pinch/wheel zoom.<br>• **Active Geometry HUD**: real-time `[ 1/4: ICOSAHEDRON ]` badge.<br>• **Binaural HRTF Spatial Audio**: calibrated for AirPods Pro 3 & stereo headphones; sound rotates in 3D around head.<br>• **Audio-Reactive Mesh**: wireframe pulses to live audio frequencies.<br>• **Physical Keyboard Synthesis**: play keys `1-5` or `A-G` directly.<br>• **Auto-Arpeggiator**: generative ambient loop.<br>• **Mechanics Guide**: accessible `[ ? CONTROLS ]` drawer overlay. |
-| **Phase 2.3: Generative Beat Engine** | [`v0.2.3-beat-engine`](https://github.com/jennsolenya.github.io/releases/tag/v0.2.3-beat-engine) | 2026-09-04 | • **Generative Electronic Beat Sequencer**: procedural 16-step drum machine with Kick, Snare, Hi-Hats, and Wobble Bass.<br>• **Genre Modes**: 130 BPM Industrial Techno, 140 BPM Skrillex-style Wobble Dubstep, and 85 BPM Ambient.<br>• **AZERTY / QWERTY Toggle**: physical layout switcher + auto-detection heuristic on keystroke.<br>• **Calibrated Force Touch**: smooth analog pressure curve (0-50% touch/click, 50-100% deep force).<br>• **Trackpad 2-Finger Orbit**: two-finger swipe spins 3D models with momentum. |
-| **Phase 3: Upcoming Horizons** | `v0.3.0` | In Progress | • 360° Radar Scan mode for matrix exploration.<br>• Vertex wave shader distortion.<br>• Mobile multi-touch gravitational particles.<br>• Tone customization & recording export. |
+| Milestone | Release Tag | Date | Status | Key Capabilities Added |
+| :--- | :--- | :--- | :--- | :--- |
+| **Phase 0: Genesis** | [`init`](https://github.com/jennsolenya/jennsolenya.github.io/commit/ed61790) | 2026-09-04 | Completed | Clean repository initialization and GitHub Pages baseline. |
+| **Phase 1: Void Foundation** | [`v0.1.0`](https://github.com/jennsolenya/jennsolenya.github.io/commit/fefbb25) | 2026-09-04 | Completed | • 100% pitch-black background (`#000000`) with zero bleed.<br>• Interactive cursor spotlight revealing hidden coordinate matrix & dust.<br>• Floating 3D wireframe geometric sculpture with Three.js.<br>• Web Audio API ambient drone and interactive sine chimes.<br>• 3D perspective card tilt on hover. |
+| **Phase 2: Tactile & Spatial Leap** | [`v0.2.0-spatial-orbit`](https://github.com/jennsolenya.github.io/releases/tag/v0.2.0-spatial-orbit) | 2026-09-04 | Completed | • **Mac Force Touch Trackpad**: pressure sensitivity expands spotlight, triggers sub-bass (`36.7Hz D1`), and grows 3D shape.<br>• **Direct 3D Orbit & Zoom**: click-and-drag rotation with momentum + pinch/wheel zoom.<br>• **Active Geometry HUD**: real-time `[ 1/4: ICOSAHEDRON ]` badge.<br>• **Binaural HRTF Spatial Audio**: calibrated for AirPods Pro 3 & stereo headphones; sound rotates in 3D around head.<br>• **Audio-Reactive Mesh**: wireframe pulses to live audio frequencies.<br>• **Physical Keyboard Synthesis**: play keys `1-5` or `A-G` directly.<br>• **Auto-Arpeggiator**: generative ambient loop.<br>• **Mechanics Guide**: accessible `[ ? CONTROLS ]` drawer overlay. |
+| **Phase 2.3: Generative Beat Engine** | [`v0.2.3-beat-engine`](https://github.com/jennsolenya.github.io/releases/tag/v0.2.3-beat-engine) | 2026-09-04 | Completed | • **Generative Electronic Beat Sequencer**: procedural 16-step drum machine with Kick, Snare, Hi-Hats, and Wobble Bass.<br>• **Sound Profiles**: Industrial Techno, Wobble Dubstep, and Ambient modes.<br>• **Calibrated Force Touch**: smooth analog pressure curve (0-50% touch/click, 50-100% deep force).<br>• **Trackpad 2-Finger Orbit**: two-finger swipe spins 3D models with momentum. |
+| **Phase 3: Cosmic Evolution Engine** | [`v0.3.0-cosmic-evolution`](https://github.com/jennsolenya.github.io/releases/tag/v0.3.0-cosmic-evolution) | 2026-09-04 | **Active** | • **Ever-Evolving Universe Engine**: every browser interaction (cursor movements, trackpad pressure, drag rotation, scroll, key taps) injects entropy, accelerating cosmic time across 5 cosmological epochs.<br>• **5 Cosmological Epochs**: Singularity (36Hz drone) &rarr; Cosmic Inflation (Sub drop) &rarr; Stellar Nucleosynthesis (128 BPM Techno) &rarr; Cosmic Turbulence (140 BPM Dubstep wobble) &rarr; The Big Bounce (Acoustic crunch glissando into celestial rebirth chord).<br>• **Pause / Freeze Evolution**: freeze the cosmic clock at any state (`Key P`).<br>• **Cosmic Memories Bank**: save custom universe snapshots to `localStorage` and warp back through time (`Key S`).<br>• **Dedicated Keyboard Matrix Hub**: interactive AZERTY (BE/FR) vs QWERTY segmented toggle with dynamic on-screen key re-labeling (`A Z E R T Y` vs `Q W E R T Y`).<br>• **Universe Creation Modal**: comprehensive slide-out guide documenting cosmological models, entropy physics, and acoustic mapping (`Key U`). |
+| **Phase 4: Sensory Expansions** | `v0.4.0` | Upcoming | Planned | • **360° Radar Scan Matrix**: sweep-line pulse revealing deep spatial coordinates across the void.<br>• **Audio Recording & Export**: record live generative jam sessions and download as uncompressed WAV stems.<br>• **WebGL Gravitational Particles**: multi-touch cosmic dust clouds collapsing into orbiting gravitational singularities.<br>• **Web MIDI Support**: plug-and-play external hardware synthesizers, drum pads, and MIDI keyboards. |
 
 ---
 
@@ -39,18 +39,45 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 
 | Input | Target | Action |
 | :--- | :--- | :--- |
-| **Cursor Move** | Viewport | Casts a radial spotlight revealing hidden grid coordinates and cosmic dust. Modulates audio filter cutoff frequency. |
-| **Click & Drag / 2-Finger Swipe** | 3D WebGL Canvas | Rotates the 3D wireframe manifold freely in 3D space with fluid inertia. |
-| **Pinch / Scroll** | 3D WebGL Canvas | Zooms camera closer (`z: 3.8`) or further into the deep void (`z: 11.5`). |
+| **Cursor Move** | Viewport | Casts a radial spotlight revealing hidden grid coordinates and cosmic dust. Modulates audio filter cutoff frequency and adds +0.025 entropy. |
+| **Click & Drag / 2-Finger Swipe** | 3D WebGL Canvas | Rotates the 3D wireframe manifold freely in 3D space with fluid inertia (+0.08 entropy). |
+| **Pinch / Scroll** | 3D WebGL Canvas | Zooms camera closer (`z: 3.8`) or further into the deep void (`z: 11.5`) (+0.03 entropy). |
 | **Trackpad Force** | Mac Trackpad | Calibrated analog pressure: light touch (0-49%), click (50%), deep press (50-100%). Surges spotlight radius, sub-bass, and wireframe scale. |
-| **Click** | Canvas / Background | Sends expanding kinetic shockwave rings across the coordinate grid. |
-| **Keys `A – Z` / `0 – 9`** | Keyboard Synth | Musically mapped 3-octave keyboard across AZERTY or QWERTY layouts with real-time HUD tracker. |
+| **Click** | Canvas / Background | Sends expanding kinetic shockwave rings across the coordinate grid (+0.65 entropy). |
+| **Keys `A – Z` / `0 – 9`** | Keyboard Synth | Musically mapped 3-octave keyboard across AZERTY or QWERTY layouts with real-time HUD tracker (+0.45 entropy). |
 | **Spacebar** | Sound Engine | Drops a massive sub-bass 808 hit (`43.65Hz F1`) and sends a high-power shockwave across the void. |
-| **Key `B` or Button** | Music Engine | Toggles the 16-step generative electronic beat sequencer (Techno, Dubstep, or Ambient). |
+| **Key `B` or Button** | Music Engine | Toggles the 16-step generative electronic beat engine. |
+| **Key `P` or Button** | Cosmic Engine | Freezes / resumes the evolution of cosmic time and entropy. |
+| **Key `S` or Button** | Memories Shelf | Captures the current cosmic state into the permanent Cosmic Memories bank. |
+| **Key `U` or Button** | Universe Guide | Opens / closes the slide-out **Universe Creation & Cosmological Theories** modal. |
 | **Key `M`** | Sound Engine | Toggles global audio mute / unmute with synchronized power-up/down transitions. |
 | **Key `T` or Button** | System Log | Opens / closes the in-app **SYSTEM LOG // CHRONICLES** evolution timeline drawer. |
 | **Key `?` or Button** | HUD Guide | Opens / closes the slide-out Mechanics & Controls drawer. |
 | **Key `Esc`** | Modals | Closes open drawers or overlays. |
+
+---
+
+## Sound Profiles & Epoch Selectors
+
+The **EPOCH // COSMIC GENRE** selector allows manual time-warping between the 5 cosmological states of the audio engine:
+
+1. **`00 // SINGULARITY` (Epoch 0 - 65 BPM)**:
+   - *Acoustics*: Primordial darkness, heavy low-pass filtered sub-drone (36.7Hz) with minimal percussion.
+   - *Visuals*: Compressed, high-density wireframe core.
+2. **`01 // INFLATION` (Epoch 1 - 85 BPM)**:
+   - *Acoustics*: Rapid cosmic expansion, sweeping low-frequency sub drop, open atmospheric pads, and sparse ambient breakbeats.
+   - *Visuals*: Sudden geometry scale burst, radiating coordinate shockwaves.
+3. **`02 // STELLAR TECHNO` (Epoch 2 - 128 BPM)**:
+   - *Acoustics*: Heavy 4-on-the-floor driving kick, structured 16th-note acid basslines, crisp closed hi-hats, and rhythmic stability.
+   - *Visuals*: Steadily spinning crystalline geometric structures.
+4. **`03 // COSMIC WOBBLE` (Epoch 3 - 140 BPM)**:
+   - *Acoustics*: Half-time dubstep drum beat with heavy snare on beat 3, dynamic LFO-modulated wobble bass simulating gravitational turbulence.
+   - *Visuals*: High-frequency audio-reactive geometric vibration and erratic orbit perturbations.
+5. **`04 // THE BIG BOUNCE` (Epoch 4 - 120 BPM)**:
+   - *Acoustics*: A descending pitch glissando simulating cosmic crunch, followed by a dramatic 1-beat vacuum of total silence, culminating in a lush 5-voice celestial rebirth chord.
+   - *Visuals*: Complete contraction and rebound pulsation.
+
+Clicking any profile pill immediately activates the audio engine, sets the tempo, alters oscillator waveforms, and warps the 3D visual scale to match the selected cosmic era.
 
 ---
 
@@ -61,6 +88,7 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 - **Force Touch Sub-Bass**: Dedicated `36.7Hz (D1)` sub-bass oscillator activated proportionally by trackpad pressure.
 - **Dynamic Biquad Filter**: Real-time cutoff modulation sweeping between `260Hz` and `6000Hz`.
 - **Audio Analyser FFT**: 64-band frequency analyzer driving real-time 3D geometry vibration and canvas visualizer waveforms.
+- **Synthesizer Voice Matrix**: Three-octave polyphonic voice allocator with selectable waveforms (Sine, Triangle, Sawtooth, Square) and envelope modulation.
 
 ---
 
@@ -97,7 +125,7 @@ Every major evolution milestone is tagged in git for instant rollback:
 git tag -l
 
 # Roll back / inspect a specific checkpoint
-git checkout v0.2.0-spatial-orbit
+git checkout v0.3.0-cosmic-evolution
 ```
 
 License: MIT
