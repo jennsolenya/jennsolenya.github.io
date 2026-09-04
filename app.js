@@ -607,7 +607,9 @@ class SpatialSoundEngine {
 
       osc1.connect(filter);
       osc2.connect(filter);
-      filter.connect(gain);      gain.connect(this.sidechainGain || this.bassBoost || this.masterGain);
+      filter.connect(gain);
+      gain.connect(this.sidechainGain || this.bassBoost || this.masterGain);
+
       osc1.start(t);
       osc2.start(t);
       osc1.stop(t + duration);
@@ -641,7 +643,9 @@ class SpatialSoundEngine {
 
       osc1.connect(formantFilter);
       osc2.connect(formantFilter);
-      formantFilter.connect(gain);      gain.connect(this.sidechainGain || this.distortion || this.masterGain);
+      formantFilter.connect(gain);
+      gain.connect(this.sidechainGain || this.distortion || this.masterGain);
+
       osc1.start(t);
       osc2.start(t);
       osc1.stop(t + duration);
