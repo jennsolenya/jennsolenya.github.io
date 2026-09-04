@@ -694,11 +694,12 @@ window.addEventListener('click', (e) => {
   audio.triggerChime(523.25, 'sine', 0.7, (e.clientX / width) * 2 - 1, (e.clientY / height) * 2 - 1);
 });
 
-// --- 6. Sound Toggle & Auto-Arpeggiator ---
-const soundToggle = document.getElementById('sound-toggle');
-if (soundToggle) {
-  soundToggle.addEventListener('click', () => {
-    const isPlaying = audio.toggle();
+// --- 6. Sound Toggle, Hero Button Sync & Auto-Arpeggiator ---
+function syncAudioButtons(isPlaying) {
+  const soundToggle = document.getElementById('sound-toggle');
+  const heroSoundToggle = document.getElementById('hero-sound-toggle');
+
+  if (soundToggle) {
     if (isPlaying) {
       soundToggle.classList.add('active');
       soundToggle.querySelector('.sound-state').textContent = 'SOUND: ON';
@@ -706,13 +707,62 @@ if (soundToggle) {
       soundToggle.classList.remove('active');
       soundToggle.querySelector('.sound-state').textContent = 'SOUND: OFF';
     }
+  }
+
+  if (heroSoundToggle) {
+    if (isPlaying) {
+      heroSoundToggle.classList.add('active');
+      heroSoundToggle.textContent = 'DEACTIVATE AUDIO';
+      heroSoundToggle.style.borderColor = '#ffffff';
+      heroSoundToggle.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
+      heroSoundToggle.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.2)';
+    } else {
+      heroSoundToggle.classList.remove('active');
+      heroSoundToggle.textContent = 'ACTIVATE AUDIO';
+      heroSoundToggle.style.borderColor = 'var(--border-subtle)';
+      heroSoundToggle.style.backgroundColor = 'transparent';
+      heroSoundToggle.style.boxShadow = 'none';
+    }
+  }
+}
+
+const soundToggle = document.getElementById('sound-toggle');
+if (soundToggle) {
+  soundToggle.addEventListener('click', () => {
+    audio.toggle();
   });
 }
+
+const heroSoundToggle = document.getElementById('hero-sound-toggle');
+if (heroSoundToggle) {
+  heroSoundToggle.addEventListener('click', () => {
+    audio.toggle();
+  });
+}
+
+// Genre Profile Selector Pills
+document.querySelectorAll('.genre-pill').forEach((pill) => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.genre-pill').forEach((p) => p.classList.remove('active'));
+    pill.classList.add('active');
+    const genre = pill.getAttribute('data-genre') || 'ambient';
+    audio.init();
+    if (audio.isMuted) audio.toggle();
+    audio.setGenre(genre);
+
+    const lastKeyHud = document.getElementById('last-key-hud');
+    if (lastKeyHud) {
+      lastKeyHud.textContent = `PROFILE: ${genre.toUpperCase()}`;
+      lastKeyHud.classList.add('flash');
+      setTimeout(() => lastKeyHud.classList.remove('flash'), 250);
+    }
+  });
+});
 
 // Auto-Arpeggiator loop
 let arpTimer = null;
 let isArpActive = false;
-const arpNotes = [220, 277.18, 329.63, 440, 554.37, 440, 329.63, 277.18];
+const arpNotes = [130.81, 164.81, 220, 277.18, 329.63, 440, 329.63, 220];
 let arpIndex = 0;
 
 function toggleArpeggiator() {
@@ -730,7 +780,7 @@ function toggleArpeggiator() {
     arpTimer = setInterval(() => {
       const freq = arpNotes[arpIndex % arpNotes.length];
       const panX = Math.sin((arpIndex / arpNotes.length) * Math.PI * 2);
-      audio.triggerChime(freq, 'sine', 0.5, panX, 0);
+      audio.triggerChime(freq, 'sine', 0.45, panX, 0);
 
       // Flash corresponding button visually
       const matchingKey = document.querySelector(`.synth-key[data-freq="${freq}"]`);
@@ -740,7 +790,7 @@ function toggleArpeggiator() {
       }
 
       arpIndex++;
-    }, 280);
+    }, 240);
   } else {
     if (arpBtn) arpBtn.classList.remove('active');
     if (arpStatus) arpStatus.textContent = 'ARPEGGIATOR: OFF';
@@ -754,71 +804,148 @@ if (arpBtn) {
   arpBtn.addEventListener('click', toggleArpeggiator);
 }
 
-// --- 7. Playable Computer Keyboard Synthesis ---
-const keyNoteMap = {
-  '1': { freq: 220, type: 'triangle' },
-  'a': { freq: 220, type: 'triangle' },
-  '2': { freq: 277.18, type: 'sine' },
-  's': { freq: 277.18, type: 'sine' },
-  '3': { freq: 329.63, type: 'sine' },
-  'd': { freq: 329.63, type: 'sine' },
-  '4': { freq: 440, type: 'triangle' },
-  'f': { freq: 440, type: 'triangle' },
-  '5': { freq: 554.37, type: 'sine' },
-  'g': { freq: 554.37, type: 'sine' },
+// --- 7. Full Keyboard Synthesis (AZERTY & QWERTY Universal Layout) ---
+let detectedLayout = 'QWERTY';
+
+async function initKeyboardLayout() {
+  const layoutBadge = document.getElementById('detected-layout-badge');
+  if (navigator.keyboard && navigator.keyboard.getLayoutMap) {
+    try {
+      const map = await navigator.keyboard.getLayoutMap();
+      if (map.get('KeyQ') === 'a' || map.get('KeyA') === 'q') {
+        detectedLayout = 'AZERTY';
+      }
+    } catch (e) {}
+  }
+  if (detectedLayout === 'QWERTY') {
+    const lang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+    if (lang.startsWith('fr') || lang.includes('be')) {
+      detectedLayout = 'AZERTY';
+    }
+  }
+  if (layoutBadge) {
+    layoutBadge.textContent = `${detectedLayout} OPTIMIZED`;
+  }
+}
+initKeyboardLayout();
+
+// Full 3-octave musical scale mapping for all alphanumeric keys
+const universalNoteMap = {
+  // Numbers row: High crystalline octaves
+  '1': { freq: 523.25, note: 'C5', type: 'sine' },
+  '2': { freq: 587.33, note: 'D5', type: 'sine' },
+  '3': { freq: 659.25, note: 'E5', type: 'sine' },
+  '4': { freq: 698.46, note: 'F5', type: 'sine' },
+  '5': { freq: 783.99, note: 'G5', type: 'sine' },
+  '6': { freq: 880.00, note: 'A5', type: 'sine' },
+  '7': { freq: 987.77, note: 'B5', type: 'sine' },
+  '8': { freq: 1046.50, note: 'C6', type: 'sine' },
+  '9': { freq: 1174.66, note: 'D6', type: 'sine' },
+  '0': { freq: 1318.51, note: 'E6', type: 'sine' },
+
+  // Lead / Mid register
+  'q': { freq: 261.63, note: 'C4', type: 'sawtooth' },
+  'w': { freq: 293.66, note: 'D4', type: 'sawtooth' },
+  'e': { freq: 329.63, note: 'E4', type: 'sawtooth' },
+  'r': { freq: 349.23, note: 'F4', type: 'sawtooth' },
+  't': { freq: 392.00, note: 'G4', type: 'sawtooth' },
+  'y': { freq: 440.00, note: 'A4', type: 'triangle' },
+  'u': { freq: 493.88, note: 'B4', type: 'triangle' },
+  'i': { freq: 523.25, note: 'C5', type: 'sine' },
+  'o': { freq: 587.33, note: 'D5', type: 'sine' },
+  'p': { freq: 659.25, note: 'E5', type: 'sine' },
+
+  // Harmonic Core / Body chords
+  'a': { freq: 174.61, note: 'F3', type: 'triangle' },
+  's': { freq: 196.00, note: 'G3', type: 'triangle' },
+  'd': { freq: 220.00, note: 'A3', type: 'sawtooth' },
+  'f': { freq: 246.94, note: 'B3', type: 'sawtooth' },
+  'g': { freq: 261.63, note: 'C4', type: 'square' },
+  'h': { freq: 293.66, note: 'D4', type: 'square' },
+  'j': { freq: 329.63, note: 'E4', type: 'sawtooth' },
+  'k': { freq: 349.23, note: 'F4', type: 'triangle' },
+  'l': { freq: 392.00, note: 'G4', type: 'sine' },
+
+  // Deep Sub-Bass & 808
+  'z': { freq: 55.00,  note: 'SUB A1', type: 'sine' },
+  'x': { freq: 65.41,  note: 'SUB C2', type: 'sine' },
+  'c': { freq: 73.42,  note: 'SUB D2', type: 'sine' },
+  'v': { freq: 82.41,  note: 'SUB E2', type: 'triangle' },
+  'b': { freq: 98.00,  note: 'BASS G2', type: 'triangle' },
+  'n': { freq: 110.00, note: 'BASS A2', type: 'sawtooth' },
+  'm': { freq: 123.47, note: 'BASS B2', type: 'sawtooth' },
+
+  // Spacebar: Massive Sub-Bass Drop & Shockwave
+  ' ': { freq: 43.65, note: 'DROP F1', type: 'sine' }
 };
 
 function triggerNoteByKey(keyChar) {
-  const noteData = keyNoteMap[keyChar.toLowerCase()];
+  const noteData = universalNoteMap[keyChar.toLowerCase()];
   if (!noteData) return;
 
   audio.init();
   if (audio.isMuted) audio.toggle();
 
-  audio.triggerChime(noteData.freq, noteData.type, 0.75, 0, 0);
+  const panX = (Math.random() - 0.5) * 2;
+  audio.triggerChime(noteData.freq, noteData.type, 0.7, panX, 0);
 
-  // Find and flash key button
-  const button = document.querySelector(`.synth-key[data-key="${keyChar}"]`) ||
+  // Update HUD Display with note details
+  const lastKeyHud = document.getElementById('last-key-hud');
+  if (lastKeyHud) {
+    const displayKey = keyChar === ' ' ? 'SPACE' : keyChar.toUpperCase();
+    lastKeyHud.textContent = `KEY: [ ${displayKey} ] → ${noteData.note} (${noteData.freq.toFixed(0)}Hz)`;
+    lastKeyHud.classList.add('flash');
+    setTimeout(() => lastKeyHud.classList.remove('flash'), 180);
+  }
+
+  // Find and flash matching key button on screen if present
+  const button = document.querySelector(`.synth-key[data-key="${keyChar.toLowerCase()}"]`) ||
                  document.querySelector(`.synth-key[data-key-alt="${keyChar.toLowerCase()}"]`);
   if (button) {
     button.classList.add('active-key');
     setTimeout(() => button.classList.remove('active-key'), 180);
   }
 
-  // Small visual ripple
-  ripples.push(new Ripple(mouse.x, mouse.y, 0.8));
+  // Visual shockwave ripple
+  const power = keyChar === ' ' ? 2.2 : 0.8;
+  ripples.push(new Ripple(mouse.x, mouse.y, power));
 }
 
 window.addEventListener('keydown', (e) => {
+  // Prevent spacebar from scrolling page when interacting with synth
+  if (e.key === ' ' && !e.target.closest('input, textarea')) {
+    e.preventDefault();
+  }
+
   if (e.repeat) return;
   const key = e.key.toLowerCase();
 
-  // Escape key closes open modals
+  // Escape closes open modals
   if (key === 'escape') {
     closeControlsModal();
     closeTimelineModal();
     return;
   }
 
-  // Question mark toggles controls
+  // '?' toggles controls
   if (key === '?') {
     toggleControlsModal();
     return;
   }
 
-  // 't' key toggles Chronicles Timeline
+  // 't' toggles Chronicles Timeline
   if (key === 't') {
     toggleTimelineModal();
     return;
   }
 
-  // 'm' key toggles mute
+  // 'm' toggles global sound
   if (key === 'm') {
-    if (soundToggle) soundToggle.click();
+    audio.toggle();
     return;
   }
 
-  if (keyNoteMap[key]) {
+  if (universalNoteMap[key]) {
     triggerNoteByKey(key);
   }
 });
