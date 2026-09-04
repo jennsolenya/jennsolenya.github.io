@@ -297,11 +297,105 @@
         <span>VOID LAB &copy; 2026</span> &mdash; <span>JENNSOLENYA</span>
       </div>
       <div class="footer-links">
+        <button id="timeline-toggle" class="timeline-btn" aria-label="Open Chronicles Timeline">
+          <span>&#9672;</span>
+          <span>CHRONICLES // TIMELINE</span>
+        </button>
         <a href="https://github.com/jennsolenya/jennsolenya.github.io" target="_blank" rel="noopener noreferrer">GITHUB REPO</a>
         <a href="#top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">BACK TO TOP &uarr;</a>
       </div>
     </footer>
   </main>
+
+  <!-- Sliding Chronicles // Timeline Modal -->
+  <div id="timeline-modal" class="timeline-modal" role="dialog" aria-modal="true">
+    <div id="timeline-backdrop" class="timeline-backdrop"></div>
+    <div class="timeline-drawer">
+      <div class="timeline-header">
+        <div class="timeline-header-title">
+          <h2>SYSTEM LOG // CHRONICLES</h2>
+          <span>EVOLUTION MATRIX</span>
+        </div>
+        <button id="close-timeline" class="close-btn" aria-label="Close Chronicles">&times;</button>
+      </div>
+
+      <div class="timeline-track">
+        <!-- Node 00 -->
+        <div class="timeline-node">
+          <div class="timeline-bullet"></div>
+          <div class="timeline-meta">
+            <span class="timeline-phase">PHASE 00 // GENESIS</span>
+            <a href="https://github.com/jennsolenya/jennsolenya.github.io/commit/ed61790" target="_blank" class="timeline-tag">INIT</a>
+          </div>
+          <div class="timeline-date">2026-09-04 &bull; COMMIT ed61790</div>
+          <div class="timeline-desc">
+            Repository initialized and configured for GitHub Pages static hosting.
+          </div>
+        </div>
+
+        <!-- Node 01 -->
+        <div class="timeline-node">
+          <div class="timeline-bullet"></div>
+          <div class="timeline-meta">
+            <span class="timeline-phase">PHASE 01 // VOID FOUNDATION</span>
+            <a href="https://github.com/jennsolenya/jennsolenya.github.io/commit/fefbb25" target="_blank" class="timeline-tag">v0.1.0</a>
+          </div>
+          <div class="timeline-date">2026-09-04 &bull; COMMIT fefbb25</div>
+          <div class="timeline-desc">
+            Pitch-black void aesthetic and core audiovisual interactive framework:
+            <ul>
+              <li>100% pure black (#000000) canvas & background.</li>
+              <li>Spotlight flashlight cursor revealing coordinate matrix.</li>
+              <li>Floating Three.js 3D wireframe geometric sculpture.</li>
+              <li>Ambient drone synthesizer with Web Audio API.</li>
+              <li>Interactive 3D perspective tilt cards.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Node 02 -->
+        <div class="timeline-node active-node">
+          <div class="timeline-bullet"></div>
+          <div class="timeline-meta">
+            <span class="timeline-phase">PHASE 02 // TACTILE &amp; SPATIAL LEAP</span>
+            <a href="https://github.com/jennsolenya/jennsolenya.github.io/releases/tag/v0.2.0-spatial-orbit" target="_blank" class="timeline-tag">v0.2.0 ACTIVE</a>
+          </div>
+          <div class="timeline-date">2026-09-04 &bull; TAG v0.2.0-spatial-orbit</div>
+          <div class="timeline-desc">
+            Deep tactile hardware integration and binaural acoustic spatialization:
+            <ul>
+              <li>Mac Force Touch trackpad pressure integration.</li>
+              <li>Direct 3D orbit drag manipulation with fluid inertia & zoom.</li>
+              <li>Binaural HRTF 3D spatial audio (calibrated for AirPods Pro 3).</li>
+              <li>Audio-reactive geometry vibration & pulsing core.</li>
+              <li>Playable computer keyboard synthesis [1-5] / [A-G].</li>
+              <li>Generative Auto-Arpeggiator loop.</li>
+              <li>Accessible [ ? CONTROLS ] slide-out guide.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Node 03 -->
+        <div class="timeline-node">
+          <div class="timeline-bullet"></div>
+          <div class="timeline-meta">
+            <span class="timeline-phase">PHASE 03 // UPCOMING HORIZON</span>
+            <span class="timeline-tag">v0.3.0 ROADMAP</span>
+          </div>
+          <div class="timeline-date">ACTIVE EXPLORATION</div>
+          <div class="timeline-desc">
+            Planned experimental expansions:
+            <ul>
+              <li>360° Radar scanning beam matrix reveal.</li>
+              <li>Quantum gravitational cursor particle field.</li>
+              <li>Vertex wave shader ripple distortions.</li>
+              <li>Harmonic tone preset scales & export.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
