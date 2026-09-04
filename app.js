@@ -186,25 +186,50 @@ class SpatialSoundEngine {
       this.droneOsc1.type = 'sawtooth';
       this.droneOsc2.type = 'triangle';
       this.subBassOsc.frequency.setValueAtTime(43.65, now); // F1
+      // Atmosphere: dark rumble texture (lowpass 200Hz)
+      if (this.atmosphereGain) this.atmosphereGain.gain.setTargetAtTime(0.035, now, 0.3);
+      if (this.atmosphereFilter) {
+        this.atmosphereFilter.type = 'lowpass';
+        this.atmosphereFilter.frequency.setTargetAtTime(200, now, 0.2);
+      }
+      // Harder distortion for acid
+      if (this.distortion) this.distortion.curve = this.makeDistortionCurve(40);
       this.triggerChime(110, 'sawtooth', 0.4, 0, 0);
     } else if (genreName === 'dnb') {
-      // 174 BPM Neurofunk & Amen Breaks (Chase & Status / Noisia)
+      // 174 BPM Neurofunk & Amen Breaks (Chase & Status / Noisia / Mefjus)
       this.filter.frequency.setTargetAtTime(1400, now, 0.12);
       this.filter.Q.setValueAtTime(6.0, now);
       this.droneOsc1.type = 'sawtooth';
       this.droneOsc2.type = 'sawtooth';
       this.subBassOsc.frequency.setValueAtTime(41.2, now); // E1
+      // Atmosphere: mid-frequency industrial hiss (bandpass 2-4kHz)
+      if (this.atmosphereGain) this.atmosphereGain.gain.setTargetAtTime(0.02, now, 0.3);
+      if (this.atmosphereFilter) {
+        this.atmosphereFilter.type = 'bandpass';
+        this.atmosphereFilter.frequency.setTargetAtTime(3000, now, 0.2);
+        this.atmosphereFilter.Q.setValueAtTime(1.5, now);
+      }
+      if (this.distortion) this.distortion.curve = this.makeDistortionCurve(28);
       this.triggerChime(164.81, 'sawtooth', 0.35, 0, 0);
     } else if (genreName === 'dubstep' || genreName === 'bass') {
-      // 145 BPM Heavy Bass & Vocal Formant Growls (Skrillex / Space Laces)
+      // 145 BPM Heavy Bass & Vocal Formant Growls (Skrillex / Space Laces / Virtual Riot)
       this.filter.frequency.setTargetAtTime(1200, now, 0.1);
       this.filter.Q.setValueAtTime(10.0, now);
       this.droneOsc1.type = 'sawtooth';
       this.droneOsc2.type = 'square';
       this.subBassOsc.frequency.setValueAtTime(36.7, now); // D1
+      // Atmosphere: dark sub-noise (lowpass 80Hz, barely audible but felt)
+      if (this.atmosphereGain) this.atmosphereGain.gain.setTargetAtTime(0.04, now, 0.3);
+      if (this.atmosphereFilter) {
+        this.atmosphereFilter.type = 'lowpass';
+        this.atmosphereFilter.frequency.setTargetAtTime(80, now, 0.2);
+      }
+      if (this.distortion) this.distortion.curve = this.makeDistortionCurve(45);
       this.triggerChime(55, 'sawtooth', 0.7, 0, 0);
     } else if (genreName === 'bounce') {
       // The Big Bounce
+      if (this.atmosphereGain) this.atmosphereGain.gain.setTargetAtTime(0.01, now, 0.3);
+      if (this.distortion) this.distortion.curve = this.makeDistortionCurve(25);
       this.playBigBounceChord();
     } else {
       // Ambient Void
@@ -213,6 +238,13 @@ class SpatialSoundEngine {
       this.droneOsc1.type = 'sine';
       this.droneOsc2.type = 'triangle';
       this.subBassOsc.frequency.setValueAtTime(36.7, now);
+      // Atmosphere: ethereal wash (lowpass 400Hz, very quiet)
+      if (this.atmosphereGain) this.atmosphereGain.gain.setTargetAtTime(0.015, now, 0.3);
+      if (this.atmosphereFilter) {
+        this.atmosphereFilter.type = 'lowpass';
+        this.atmosphereFilter.frequency.setTargetAtTime(400, now, 0.2);
+      }
+      if (this.distortion) this.distortion.curve = this.makeDistortionCurve(12);
       this.triggerChime(440, 'sine', 0.6, 0, 0);
     }
   }
@@ -263,7 +295,7 @@ class SpatialSoundEngine {
         cosmicEngine.stopPlayback();
       }
     } else {
-      this.masterGain.gain.setTargetAtTime(0.42, now, 0.1);
+      this.masterGain.gain.setTargetAtTime(0.62, now, 0.1);
       this.playPowerUpSound();
       if (typeof cosmicEngine !== 'undefined' && !cosmicEngine.isMusicPlaying) {
         cosmicEngine.startPlayback();
@@ -623,6 +655,342 @@ class SpatialSoundEngine {
 
   playWobble(freq = 55, time) {
     this.playSkrillexGrowl(freq, time, 0.26);
+  }
+
+  // --- Rumble Kick with Reverb Tail (Ben Klock / Charlotte de Witte) ---
+  // Synthetic reverb tail: short noise buffer with exponential decay, lowpass filtered to sub-rumble
+  playRumbleKick(time) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      // Standard kick first
+      this.playKick(t);
+
+      // Trigger sidechain duck on bass bus
+      this.triggerSidechain(t);
+
+      // Rumble tail: filtered noise with exponential decay
+      const tailDuration = 0.35;
+      const bufferSize = Math.floor(this.ctx.sampleRate * tailDuration);
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        // Exponentially decaying noise shaped as sub-rumble
+        const decay = Math.exp(-i / (bufferSize * 0.25));
+        data[i] = (Math.random() * 2 - 1) * decay;
+      }
+      const rumbleNoise = this.ctx.createBufferSource();
+      rumbleNoise.buffer = buffer;
+
+      // Lowpass at 120Hz to keep only sub-rumble (Ben Klock style)
+      const rumbleFilter = this.ctx.createBiquadFilter();
+      rumbleFilter.type = 'lowpass';
+      rumbleFilter.frequency.setValueAtTime(120, t);
+      rumbleFilter.Q.setValueAtTime(2.5, t);
+
+      // Drive through distortion for warmth
+      const rumbleDistortion = this.ctx.createWaveShaper();
+      rumbleDistortion.curve = this.makeDistortionCurve(30);
+
+      const rumbleGain = this.ctx.createGain();
+      rumbleGain.gain.setValueAtTime(0.5, t);
+      rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + tailDuration);
+
+      rumbleNoise.connect(rumbleFilter);
+      rumbleFilter.connect(rumbleDistortion);
+      rumbleDistortion.connect(rumbleGain);
+      rumbleGain.connect(this.bassBoost || this.masterGain);
+
+      rumbleNoise.start(t + 0.015); // Slight delay after transient
+    } catch (e) {}
+  }
+
+  // --- Sidechain Ducking (Amelie Lens pump effect) ---
+  // Rapidly duck sidechainGain when kick fires, release smoothly
+  triggerSidechain(time) {
+    if (!this.sidechainGain || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    // Duck to near-zero in 8ms
+    this.sidechainGain.gain.cancelScheduledValues(t);
+    this.sidechainGain.gain.setValueAtTime(1.0, t);
+    this.sidechainGain.gain.linearRampToValueAtTime(0.05, t + 0.008);
+    // Release back to 1.0 over 80ms
+    this.sidechainGain.gain.linearRampToValueAtTime(1.0, t + 0.09);
+  }
+
+  // --- Dual 303 Acid Stacking (999999999: double detuned 303 voices) ---
+  playDual303Acid(freq, time, accent = false, slide = false, targetFreq = null) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    // Primary 303 voice
+    this.play303Acid(freq, t, accent, slide, targetFreq);
+    // Second detuned voice (+7 cents sharp) for 999999999 stacking
+    try {
+      const detuneRatio = Math.pow(2, 7 / 1200); // +7 cents
+      const osc = this.ctx.createOscillator();
+      const noteFilter = this.ctx.createBiquadFilter();
+      const noteGain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq * detuneRatio, t);
+      if (slide && targetFreq) {
+        osc.frequency.exponentialRampToValueAtTime(targetFreq * detuneRatio, t + 0.12);
+      }
+
+      noteFilter.type = 'lowpass';
+      const baseQ = accent ? 18.0 : 11.0; // Screaming resonance on accents
+      noteFilter.Q.setValueAtTime(baseQ, t);
+      const baseCutoff = accent ? 5200 : 2200;
+      noteFilter.frequency.setValueAtTime(baseCutoff, t);
+      noteFilter.frequency.exponentialRampToValueAtTime(120, t + (accent ? 0.22 : 0.14));
+
+      const gainLvl = accent ? 0.38 : 0.22;
+      noteGain.gain.setValueAtTime(gainLvl, t);
+      noteGain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+
+      osc.connect(noteFilter);
+      noteFilter.connect(noteGain);
+      noteGain.connect(this.sidechainGain || this.masterGain);
+
+      osc.start(t);
+      osc.stop(t + 0.22);
+    } catch (e) {}
+  }
+
+  // --- Ride Cymbal (Amelie Lens rolling energy) ---
+  playRideCymbal(time) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const duration = 0.15;
+      const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      // Metallic bandpass at 4.5kHz for shimmery ride character
+      const rideFilter = this.ctx.createBiquadFilter();
+      rideFilter.type = 'bandpass';
+      rideFilter.frequency.setValueAtTime(4500, t);
+      rideFilter.Q.setValueAtTime(3.0, t);
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+      noise.connect(rideFilter);
+      rideFilter.connect(gain);
+      gain.connect(this.masterGain);
+
+      noise.start(t);
+    } catch (e) {}
+  }
+
+  // --- Metallic Percussion Clank (Kobosil industrial stab) ---
+  playMetalClank(time) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      // Ring modulation: two oscillators at inharmonic frequencies
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const ringGain = this.ctx.createGain();
+      const outputGain = this.ctx.createGain();
+
+      osc1.type = 'square';
+      osc1.frequency.setValueAtTime(340, t);
+      osc2.type = 'square';
+      osc2.frequency.setValueAtTime(587, t); // Inharmonic ratio for metallic timbre
+
+      // Simulate ring mod: osc1 modulates ringGain which processes osc2
+      ringGain.gain.setValueAtTime(0, t);
+      osc1.connect(ringGain.gain); // osc1 modulates gain
+      osc2.connect(ringGain);
+
+      outputGain.gain.setValueAtTime(0.18, t);
+      outputGain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+
+      ringGain.connect(outputGain);
+      outputGain.connect(this.distortion || this.masterGain);
+
+      osc1.start(t);
+      osc2.start(t);
+      osc1.stop(t + 0.07);
+      osc2.stop(t + 0.07);
+    } catch (e) {}
+  }
+
+  // --- FM Synthesis Bass (Mefjus / Noisia: evolving metallic wobble) ---
+  playFMBass(carrierFreq, modFreq, modDepth, time, duration = 0.35) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const carrier = this.ctx.createOscillator();
+      const modulator = this.ctx.createOscillator();
+      const modGain = this.ctx.createGain();
+      const outputGain = this.ctx.createGain();
+      const fmFilter = this.ctx.createBiquadFilter();
+
+      carrier.type = 'sawtooth';
+      carrier.frequency.setValueAtTime(carrierFreq, t);
+
+      modulator.type = 'sine';
+      modulator.frequency.setValueAtTime(modFreq, t);
+
+      // Modulation depth sweeps for evolving timbre
+      modGain.gain.setValueAtTime(modDepth, t);
+      modGain.gain.exponentialRampToValueAtTime(modDepth * 0.1, t + duration);
+
+      // Connect modulator -> modGain -> carrier.frequency (FM synthesis)
+      modulator.connect(modGain);
+      modGain.connect(carrier.frequency);
+
+      // Filter sweep
+      fmFilter.type = 'lowpass';
+      fmFilter.frequency.setValueAtTime(2400, t);
+      fmFilter.frequency.exponentialRampToValueAtTime(200, t + duration);
+      fmFilter.Q.setValueAtTime(8.0, t);
+
+      outputGain.gain.setValueAtTime(0.48, t);
+      outputGain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+      carrier.connect(fmFilter);
+      fmFilter.connect(outputGain);
+      outputGain.connect(this.sidechainGain || this.masterGain);
+
+      carrier.start(t);
+      modulator.start(t);
+      carrier.stop(t + duration);
+      modulator.stop(t + duration);
+    } catch (e) {}
+  }
+
+  // --- Enhanced Skrillex Growl with LFO Chop (Virtual Riot / Must Die!) ---
+  playSkrillexGrowlAdvanced(freq, time, duration = 0.32) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const osc3 = this.ctx.createOscillator(); // Ring mod harmonic layer (Must Die!)
+
+      // Stage 1: Dual oscillator core
+      osc1.type = 'sawtooth';
+      osc2.type = 'square';
+      osc1.frequency.setValueAtTime(freq, t);
+      osc2.frequency.setValueAtTime(freq * 0.5, t); // Sub-octave
+
+      // Stage 2: Ring modulation metallic layer
+      osc3.type = 'square';
+      osc3.frequency.setValueAtTime(freq * 2.73, t); // Inharmonic for metallic upper harmonics
+
+      // Formant filter 1: Primary vowel sweep (AH -> EE)
+      const formant1 = this.ctx.createBiquadFilter();
+      formant1.type = 'bandpass';
+      formant1.Q.setValueAtTime(8.0, t);
+      formant1.frequency.setValueAtTime(450, t);
+      formant1.frequency.exponentialRampToValueAtTime(2800, t + duration * 0.35);
+
+      // Formant filter 2: Secondary vowel sweep (EE -> OW) for "OW-EE-AH" compound
+      const formant2 = this.ctx.createBiquadFilter();
+      formant2.type = 'bandpass';
+      formant2.Q.setValueAtTime(5.5, t);
+      formant2.frequency.setValueAtTime(2800, t + duration * 0.35);
+      formant2.frequency.exponentialRampToValueAtTime(320, t + duration);
+
+      // LFO Chop (Virtual Riot tempo-synced amplitude stutter)
+      const lfo = this.ctx.createOscillator();
+      const lfoGain = this.ctx.createGain();
+      const chopGain = this.ctx.createGain();
+      lfo.type = 'square';
+      lfo.frequency.setValueAtTime(16, t); // 16th note rate stutter
+      lfoGain.gain.setValueAtTime(0.4, t); // Depth: chops between 0.6 and 1.0
+      chopGain.gain.setValueAtTime(0.6, t); // Baseline
+      lfo.connect(lfoGain);
+      lfoGain.connect(chopGain.gain);
+      lfo.start(t);
+      lfo.stop(t + duration);
+
+      const outputGain = this.ctx.createGain();
+      outputGain.gain.setValueAtTime(0.55, t);
+      outputGain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+      // Routing: oscs -> formant1 -> formant2 -> chopGain -> outputGain -> distortion
+      osc1.connect(formant1);
+      osc2.connect(formant1);
+      osc3.connect(formant1); // metallic harmonics into formant chain
+      formant1.connect(formant2);
+      formant2.connect(chopGain);
+      chopGain.connect(outputGain);
+      outputGain.connect(this.distortion || this.masterGain);
+
+      osc1.start(t);
+      osc2.start(t);
+      osc3.start(t);
+      osc1.stop(t + duration);
+      osc2.stop(t + duration);
+      osc3.stop(t + duration);
+    } catch (e) {}
+  }
+
+  // --- 808 Sub Layer (Trampa: devastating sub pressure underneath growl bass) ---
+  play808Sub(freq, time, duration = 0.5) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine'; // Pure sub
+      osc.frequency.setValueAtTime(freq, t);
+      // Gentle pitch bend down for weight
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.85, t + duration);
+
+      gain.gain.setValueAtTime(0.6, t);
+      gain.gain.setValueAtTime(0.6, t + duration * 0.6); // Long sustain
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+      osc.connect(gain);
+      gain.connect(this.bassBoost || this.masterGain);
+      osc.start(t);
+      osc.stop(t + duration);
+    } catch (e) {}
+  }
+
+  // --- Ghost Snare (Paula Temple: low-velocity off-beat ghost hits) ---
+  playGhostSnare(time) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const duration = 0.04;
+      const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1800 + Math.random() * 1200, t);
+      filter.Q.setValueAtTime(2.0, t);
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0.06 + Math.random() * 0.06, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.masterGain);
+
+      noise.start(t);
+    } catch (e) {}
   }
 }
 
