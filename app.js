@@ -193,9 +193,15 @@ class SpatialSoundEngine {
     if (this.isMuted) {
       this.playPowerDownSound();
       this.masterGain.gain.setTargetAtTime(0, now + 0.15, 0.12);
+      if (typeof cosmicEngine !== 'undefined' && cosmicEngine.isMusicPlaying) {
+        cosmicEngine.stopPlayback();
+      }
     } else {
       this.masterGain.gain.setTargetAtTime(0.42, now, 0.1);
       this.playPowerUpSound();
+      if (typeof cosmicEngine !== 'undefined' && !cosmicEngine.isMusicPlaying) {
+        cosmicEngine.startPlayback();
+      }
     }
     syncAudioButtons(!this.isMuted);
     return !this.isMuted;
