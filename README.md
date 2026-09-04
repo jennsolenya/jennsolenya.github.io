@@ -45,8 +45,9 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 | **Click** | Canvas / Background | Sends expanding kinetic shockwave rings across the coordinate grid. |
 | **Keys `1 – 5` / `A – G`** | Keyboard Synth | Triggers tuned harmonic crystalline frequencies (`A3`, `C#4`, `E4`, `A4`, `C#5`). |
 | **Key `M`** | Sound Engine | Toggles global audio mute / unmute. |
+| **Key `T` or Button** | System Log | Opens / closes the in-app **SYSTEM LOG // CHRONICLES** evolution timeline drawer. |
 | **Key `?` or Button** | HUD Guide | Opens / closes the slide-out Mechanics & Controls drawer. |
-| **Key `Esc`** | Modal | Closes open drawers or overlays. |
+| **Key `Esc`** | Modals | Closes open drawers or overlays. |
 
 ---
 
