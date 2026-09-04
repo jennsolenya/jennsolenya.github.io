@@ -23,14 +23,20 @@
   <header class="hud-header">
     <div class="hud-left">
       <span class="brand-title">VOID // 001</span>
-      <span class="hud-tag">ART EXPERIMENT</span>
+      <span class="hud-tag">SPATIAL LAB</span>
     </div>
 
     <div class="hud-center">
       <div id="coords" class="coords-tracker">X: 000 | Y: 000</div>
+      <div id="force-meter" class="force-meter">FORCE: 0%</div>
     </div>
 
     <div class="hud-right">
+      <button id="controls-toggle" class="hud-btn" aria-label="Open Mechanics Guide">
+        <span>?</span>
+        <span>CONTROLS</span>
+      </button>
+
       <button id="sound-toggle" class="hud-btn" aria-label="Toggle Sound Engine">
         <div class="sound-bars">
           <span></span>
@@ -42,13 +48,82 @@
     </div>
   </header>
 
+  <!-- Sliding Controls & Mechanics Drawer -->
+  <div id="controls-modal" class="controls-modal" role="dialog" aria-modal="true">
+    <div id="controls-backdrop" class="controls-backdrop"></div>
+    <div class="controls-drawer">
+      <div class="controls-header">
+        <h2>MECHANICS &amp; CONTROLS</h2>
+        <button id="close-controls" class="close-btn" aria-label="Close Guide">&times;</button>
+      </div>
+
+      <div class="mechanics-list">
+        <!-- Mechanic 1 -->
+        <div class="mechanic-item">
+          <div class="mechanic-icon">&#10022;</div>
+          <div class="mechanic-info">
+            <h4>Direct 3D Orbit &amp; Zoom</h4>
+            <p>Click and drag anywhere to rotate the 3D wireframe freely with fluid inertia. Use your mouse wheel or trackpad pinch to zoom in and out.</p>
+            <span class="mechanic-badge">DRAG + SCROLL WHEEL</span>
+          </div>
+        </div>
+
+        <!-- Mechanic 2 -->
+        <div class="mechanic-item">
+          <div class="mechanic-icon">&#9678;</div>
+          <div class="mechanic-info">
+            <h4>Mac Trackpad Force Touch</h4>
+            <p>Press deeper into your Mac trackpad to surge energy into the void. Modulates spotlight radius, sub-bass drone amplitude, and wireframe expansion in real-time.</p>
+            <span class="mechanic-badge">PRESSURE SENSITIVE</span>
+          </div>
+        </div>
+
+        <!-- Mechanic 3 -->
+        <div class="mechanic-item">
+          <div class="mechanic-icon">&#9835;</div>
+          <div class="mechanic-info">
+            <h4>HRTF 3D Spatial Audio</h4>
+            <p>Binaural audio engine calibrated for AirPods Pro 3 and all high-fidelity headphones. Moving the 3D sculpture rotates sound sources around your head in true 3D acoustic space.</p>
+            <span class="mechanic-badge">HEADPHONES RECOMMENDED</span>
+          </div>
+        </div>
+
+        <!-- Mechanic 4 -->
+        <div class="mechanic-item">
+          <div class="mechanic-icon">&#9000;</div>
+          <div class="mechanic-info">
+            <h4>Playable Keyboard Synthesis</h4>
+            <p>Play the acoustic chamber using your physical computer keyboard. Press keys 1 through 5 or A through G to trigger crystalline harmonic frequencies.</p>
+            <span class="mechanic-badge">KEYS [1-5] OR [A-G]</span>
+          </div>
+        </div>
+
+        <!-- Mechanic 5 -->
+        <div class="mechanic-item">
+          <div class="mechanic-icon">&#8734;</div>
+          <div class="mechanic-info">
+            <h4>Generative Auto-Arpeggiator</h4>
+            <p>Activate the automated arpeggiator in the Acoustic Chamber to hear a continuous, evolving ambient sequence while you manipulate the 3D forms.</p>
+            <span class="mechanic-badge">SEAMLESS LOOP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Content Container -->
   <main class="page-container">
     <!-- Hero Section -->
     <section class="hero-section">
-      <div class="pill-badge">
-        <span class="pill-dot"></span>
-        <span>DIMENSIONAL LAB // EXPERIMENTAL</span>
+      <div class="pill-row">
+        <div class="pill-badge">
+          <span class="pill-dot"></span>
+          <span>VOID LAB // SPATIAL ENGINE</span>
+        </div>
+        <div id="active-geo-pill" class="geo-badge">
+          <span>&#10022;</span>
+          <span id="active-geo-text">1/4: ICOSAHEDRON</span>
+        </div>
       </div>
 
       <h1 class="hero-title">
@@ -58,7 +133,7 @@
       </h1>
 
       <p class="hero-subtitle">
-        An interactive aesthetic playground in total absence of color. Explore the coordinate matrix with your cursor, modulate geometry in 3D space, and awaken generative sound synthesis.
+        An interactive aesthetic playground in total absence of color. Drag in 3D space, press into the trackpad for void pressure, and experience binaural spatial acoustics.
       </p>
 
       <div class="hero-actions">
@@ -71,13 +146,13 @@
         </button>
 
         <button class="action-btn-ghost" onclick="audio.init(); audio.toggle(); document.getElementById('sound-toggle').classList.toggle('active');">
-          AUDIO ENGINE
+          ACTIVATE AUDIO
         </button>
       </div>
 
       <div class="scroll-hint">
         <div class="scroll-line"></div>
-        <span>SCROLL TO TRAVERSE DEPTH</span>
+        <span>DRAG TO ORBIT 3D &bull; SCROLL TO TRAVERSE DEPTH</span>
       </div>
     </section>
 
@@ -92,7 +167,10 @@
         <!-- Card 1: Morph Geometry -->
         <div id="card-morph" class="tilt-card">
           <div class="card-content">
-            <span class="card-num">MODULE // 01</span>
+            <div class="card-top-row">
+              <span class="card-num">MODULE // 01</span>
+              <span id="card-geo-status" class="card-status-badge">1/4 ICOSAHEDRON</span>
+            </div>
             <div class="card-icon">
               <svg viewBox="0 0 24 24" stroke-width="1.8">
                 <polygon points="12 2 2 8.5 12 15 22 8.5 12 2"></polygon>
@@ -102,10 +180,10 @@
             </div>
             <h3 class="card-heading">Morph Geometry</h3>
             <p class="card-desc">
-              Alter the floating 3D wireframe manifold in real-time. Cycles between Icosahedron, Torus Knot, Octahedron, and Dodecahedron forms.
+              Alter the floating 3D wireframe manifold in real-time. Cycles between Icosahedron, Torus Knot, Octahedron, and Dodecahedron forms with audio resonance.
             </p>
             <div class="card-action">
-              <span>TRIGGER MUTATION</span>
+              <span>CYCLE GEOMETRY</span>
               <span>&rarr;</span>
             </div>
           </div>
@@ -114,7 +192,10 @@
         <!-- Card 2: Shockwave Matrix -->
         <div id="card-ripple" class="tilt-card">
           <div class="card-content">
-            <span class="card-num">MODULE // 02</span>
+            <div class="card-top-row">
+              <span class="card-num">MODULE // 02</span>
+              <span class="card-status-badge">KINETIC</span>
+            </div>
             <div class="card-icon">
               <svg viewBox="0 0 24 24" stroke-width="1.8">
                 <circle cx="12" cy="12" r="10"></circle>
@@ -136,7 +217,10 @@
         <!-- Card 3: Harmonic Chords -->
         <div id="card-resonance" class="tilt-card">
           <div class="card-content">
-            <span class="card-num">MODULE // 03</span>
+            <div class="card-top-row">
+              <span class="card-num">MODULE // 03</span>
+              <span class="card-status-badge">SPATIAL</span>
+            </div>
             <div class="card-icon">
               <svg viewBox="0 0 24 24" stroke-width="1.8">
                 <path d="M9 18V5l12-2v13"></path>
@@ -144,12 +228,12 @@
                 <circle cx="18" cy="16" r="3"></circle>
               </svg>
             </div>
-            <h3 class="card-heading">Harmonic Resonance</h3>
+            <h3 class="card-heading">Harmonic Cascade</h3>
             <p class="card-desc">
-              Synthesizes an ethereal arpeggiated frequency cascade using pure mathematical sine oscillations, tuned to harmonic intervals.
+              Synthesizes an ethereal arpeggiated frequency cascade circulating in binaural 3D space around your ears using pure mathematical sine waves.
             </p>
             <div class="card-action">
-              <span>ACTIVATE ARPEGGIO</span>
+              <span>ACTIVATE CASCADE</span>
               <span>&rarr;</span>
             </div>
           </div>
@@ -167,16 +251,38 @@
       <div class="audio-playground-box">
         <div class="audio-controls-row">
           <div class="audio-info">
-            <h3>Harmonic Tone Generator</h3>
-            <p>Move your cursor horizontally and vertically to sweep the master cutoff filter.</p>
+            <h3>Binaural Tone Matrix</h3>
+            <p>Play with physical keys 1-5 / A-G, or sweep your cursor across the void.</p>
           </div>
-          <div class="synth-buttons">
-            <button class="synth-key" data-freq="220" data-type="triangle">TONE 220Hz (A3)</button>
-            <button class="synth-key" data-freq="277.18" data-type="sine">TONE 277Hz (C#4)</button>
-            <button class="synth-key" data-freq="329.63" data-type="sine">TONE 330Hz (E4)</button>
-            <button class="synth-key" data-freq="440" data-type="triangle">TONE 440Hz (A4)</button>
-            <button class="synth-key" data-freq="554.37" data-type="sine">TONE 554Hz (C#5)</button>
+          <div class="audio-bar-actions">
+            <button id="arp-toggle" class="arp-toggle-btn">
+              <span>&#8734;</span>
+              <span id="arp-status">ARPEGGIATOR: OFF</span>
+            </button>
           </div>
+        </div>
+
+        <div class="synth-buttons">
+          <button class="synth-key" data-key="1" data-key-alt="a" data-freq="220" data-type="triangle">
+            <span class="key-badge">1 / A</span>
+            <span>220Hz (A3)</span>
+          </button>
+          <button class="synth-key" data-key="2" data-key-alt="s" data-freq="277.18" data-type="sine">
+            <span class="key-badge">2 / S</span>
+            <span>277Hz (C#4)</span>
+          </button>
+          <button class="synth-key" data-key="3" data-key-alt="d" data-freq="329.63" data-type="sine">
+            <span class="key-badge">3 / D</span>
+            <span>330Hz (E4)</span>
+          </button>
+          <button class="synth-key" data-key="4" data-key-alt="f" data-freq="440" data-type="triangle">
+            <span class="key-badge">4 / F</span>
+            <span>440Hz (A4)</span>
+          </button>
+          <button class="synth-key" data-key="5" data-key-alt="g" data-freq="554.37" data-type="sine">
+            <span class="key-badge">5 / G</span>
+            <span>554Hz (C#5)</span>
+          </button>
         </div>
 
         <div class="visualizer-canvas-wrap">
@@ -191,7 +297,7 @@
         <span>VOID LAB &copy; 2026</span> &mdash; <span>JENNSOLENYA</span>
       </div>
       <div class="footer-links">
-        <a href="https://github.com/jennsolenya/jennsolenya.github.io" target="_blank" rel="noopener noreferrer">SOURCE CODE</a>
+        <a href="https://github.com/jennsolenya/jennsolenya.github.io" target="_blank" rel="noopener noreferrer">GITHUB REPO</a>
         <a href="#top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">BACK TO TOP &uarr;</a>
       </div>
     </footer>
