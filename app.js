@@ -1223,53 +1223,53 @@ if (arpBtn) {
 const COSMIC_EPOCHS = [
   {
     id: 0,
-    key: 'singularity',
-    name: 'EPOCH 00 // PRIMORDIAL SINGULARITY',
+    key: 'ambient',
+    name: '00 // AMBIENT VOID',
     time: 'T + 0.00 GYR',
-    bpm: 65,
-    title: 'Primordial Singularity',
-    desc: 'Pure quantum vacuum fluctuations & minimal entropy in the infinite void.',
-    visualScale: 0.45
+    bpm: 70,
+    title: 'Ambient Void',
+    desc: 'Deep sub-frequency meditation (36.7Hz) and generative spatial chimes.',
+    visualScale: 0.65
   },
   {
     id: 1,
-    key: 'ambient',
-    name: 'EPOCH 01 // COSMIC INFLATION',
-    time: 'T + 0.01 GYR',
-    bpm: 85,
-    title: 'Cosmic Inflation & Big Bang',
-    desc: 'Superluminal spacetime expansion & explosive photon decoupling.',
-    visualScale: 1.25
+    key: 'dnb',
+    name: '01 // DNB NEUROFUNK',
+    time: 'T + 2.50 GYR',
+    bpm: 174,
+    title: 'Neurofunk & Amen Breaks',
+    desc: 'Rapid 174 BPM syncopated breakbeats and detuned Reese sub-bass (Chase & Status / Noisia).',
+    visualScale: 1.2
   },
   {
     id: 2,
     key: 'techno',
-    name: 'EPOCH 02 // STELLAR NUCLEOSYNTHESIS',
+    name: '02 // ACID WAREHOUSE',
     time: 'T + 4.50 GYR',
-    bpm: 128,
-    title: 'Stellar Nucleosynthesis & Galactic Dawn',
-    desc: 'Gravitational fusion, planetary orbits, and driving Cyber Techno rhythm.',
+    bpm: 135,
+    title: 'Warehouse Acid Techno',
+    desc: 'Driving 909 kicks, distorted 303 acid bassline squelches, and rolling hats (Charlotte de Witte / 999999999 / Amelie Lens).',
     visualScale: 1.0
   },
   {
     id: 3,
     key: 'dubstep',
-    name: 'EPOCH 03 // COSMIC TURBULENCE',
+    name: '03 // SKRILLEX BASS',
     time: 'T + 9.80 GYR',
-    bpm: 140,
-    title: 'Cosmic Turbulence & Black Hole Mergers',
-    desc: 'Dark energy acceleration, gravitational ripples, and heavy wobble bass.',
-    visualScale: 1.15
+    bpm: 145,
+    title: 'Heavy Formant Bass & Dubstep',
+    desc: 'Aggressive vocal throat growls, half-time riddim, and 808 sub drops (Skrillex / Space Laces).',
+    visualScale: 1.3
   },
   {
     id: 4,
     key: 'bounce',
-    name: 'EPOCH 04 // THE BIG BOUNCE',
+    name: '04 // THE BIG BOUNCE',
     time: 'T + 13.80 GYR',
-    bpm: 120,
-    title: 'The Big Bounce & Cyclic Rebirth',
-    desc: 'Gravitational contraction glissando rebounding into higher-dimensional rebirth!',
-    visualScale: 1.4
+    bpm: 128,
+    title: 'The Big Bounce & Rebirth',
+    desc: 'Cyclic contraction glissando rebounding into higher-dimensional rebirth!',
+    visualScale: 1.45
   }
 ];
 
