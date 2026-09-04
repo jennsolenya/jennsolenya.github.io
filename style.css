@@ -202,7 +202,17 @@ html, body {
   pointer-events: none;
 }
 
-.hero-section, .section, .site-footer {
+.hero-section {
+  pointer-events: none;
+}
+
+.hero-section button,
+.hero-section a,
+.hero-section .hero-actions {
+  pointer-events: auto;
+}
+
+.section, .site-footer {
   pointer-events: auto;
 }
 
