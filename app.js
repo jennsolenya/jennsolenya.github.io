@@ -1954,33 +1954,416 @@ document.querySelectorAll('.tilt-card').forEach((card) => {
   });
 });
 
-// Card 1: Morph Geometry
-const cardMorph = document.getElementById('card-morph');
-if (cardMorph) {
-  cardMorph.addEventListener('click', morphGeometry);
+// --- 8. Stellar Nucleosynthesis Manifold Action ---
+const cardMorphAction = document.getElementById('card-morph-action');
+if (cardMorphAction) {
+  cardMorphAction.addEventListener('click', morphGeometry);
 }
 
-// Card 2: Send Shockwave Ripple
-const cardRipple = document.getElementById('card-ripple');
-if (cardRipple) {
-  cardRipple.addEventListener('click', () => {
-    const rect = cardRipple.getBoundingClientRect();
-    ripples.push(new Ripple(rect.left + rect.width / 2, rect.top + rect.height / 2, 1.8));
-    audio.triggerChime(392.0, 'triangle', 0.8, -0.6, 0); // G4
-  });
-}
+// --- 8b. Cosmic Particle Collider & Quantum Foam Sandbox ---
+class ParticleColliderLab {
+  constructor() {
+    this.canvas = document.getElementById('particle-sandbox-canvas');
+    if (!this.canvas) return;
 
-// Card 3: Resonant Chime Chord
-const cardResonance = document.getElementById('card-resonance');
-if (cardResonance) {
-  cardResonance.addEventListener('click', () => {
-    [440, 554.37, 659.25, 880].forEach((freq, i) => {
-      setTimeout(() => {
-        const panX = ((i - 1.5) / 1.5) * 2;
-        audio.triggerChime(freq, 'sine', 0.9, panX, 0);
-      }, i * 140);
+    this.ctx = this.canvas.getContext('2d');
+    this.particles = [];
+    this.numParticles = 2500;
+    this.mode = 'inflation'; // 'inflation' | 'vortex' | 'accretion' | 'quantum'
+    this.isDragging = false;
+    this.attractor = { x: 0, y: 0, active: false };
+    this.shockwaves = [];
+    this.isCollapsing = false;
+    this.collapseTimer = 0;
+    this.gravityMult = 1.0;
+    this.time = 0;
+
+    // Badges
+    this.modeBadge = document.getElementById('sandbox-mode-badge');
+    this.particlesBadge = document.getElementById('sandbox-particles-badge');
+    this.gravityBadge = document.getElementById('sandbox-gravity-badge');
+    this.velocityBadge = document.getElementById('sandbox-velocity-badge');
+
+    this.initCanvas();
+    this.initParticles();
+    this.bindEvents();
+    this.animate = this.animate.bind(this);
+    requestAnimationFrame(this.animate);
+  }
+
+  initCanvas() {
+    const parent = this.canvas.parentElement;
+    if (!parent) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.width = parent.clientWidth || 800;
+    this.height = parent.clientHeight || 450;
+
+    this.canvas.width = this.width * dpr;
+    this.canvas.height = this.height * dpr;
+    this.canvas.style.width = `${this.width}px`;
+    this.canvas.style.height = `${this.height}px`;
+
+    this.ctx.scale(dpr, dpr);
+    this.centerX = this.width / 2;
+    this.centerY = this.height / 2;
+    this.attractor.x = this.centerX;
+    this.attractor.y = this.centerY;
+  }
+
+  initParticles() {
+    this.particles = [];
+    for (let i = 0; i < this.numParticles; i++) {
+      this.particles.push(this.createParticle());
+    }
+  }
+
+  createParticle() {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = Math.random() * Math.min(this.width, this.height) * 0.45;
+    const speed = 0.6 + Math.random() * 2.2;
+
+    return {
+      x: this.centerX + Math.cos(angle) * radius,
+      y: this.centerY + Math.sin(angle) * radius,
+      vx: Math.cos(angle) * speed * (Math.random() - 0.2),
+      vy: Math.sin(angle) * speed * (Math.random() - 0.2),
+      size: Math.random() < 0.08 ? 2.0 : (0.8 + Math.random() * 0.9),
+      alpha: 0.25 + Math.random() * 0.7,
+      orbitRadius: 30 + Math.random() * (Math.min(this.width, this.height) * 0.44),
+      orbitAngle: Math.random() * Math.PI * 2,
+      orbitSpeed: (0.015 + Math.random() * 0.035) * (Math.random() < 0.5 ? 1 : -1),
+      mass: 0.6 + Math.random() * 0.8,
+    };
+  }
+
+  setMode(modeName) {
+    this.mode = modeName;
+    const modeTitles = {
+      inflation: 'MODE: INFLATION (EXPANSION)',
+      vortex: 'MODE: VORTEX (GRAVITY)',
+      accretion: 'MODE: ACCRETION (ORBITS)',
+      quantum: 'MODE: QUANTUM FOAM',
+    };
+    if (this.modeBadge) this.modeBadge.textContent = modeTitles[modeName] || modeName.toUpperCase();
+
+    // Visual feedback & harmonic interval
+    const freqs = { inflation: 523.25, vortex: 392.0, accretion: 659.25, quantum: 783.99 };
+    if (typeof audio !== 'undefined') {
+      audio.triggerChime(freqs[modeName] || 440, 'triangle', 0.65, 0, 0);
+    }
+
+    if (modeName === 'inflation') {
+      this.triggerPulse(this.centerX, this.centerY, 12);
+    } else if (modeName === 'quantum') {
+      this.particles.forEach(p => {
+        p.vx = (Math.random() - 0.5) * 3;
+        p.vy = (Math.random() - 0.5) * 3;
+      });
+    }
+  }
+
+  triggerPulse(originX, originY, force = 9) {
+    this.shockwaves.push({
+      x: originX,
+      y: originY,
+      radius: 4,
+      maxRadius: Math.max(this.width, this.height) * 0.9,
+      speed: 16,
+      opacity: 0.9,
     });
-  });
+
+    this.particles.forEach(p => {
+      const dx = p.x - originX;
+      const dy = p.y - originY;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const push = (force * 38) / Math.max(25, dist);
+      p.vx += (dx / dist) * push;
+      p.vy += (dy / dist) * push;
+    });
+
+    if (typeof cosmicEngine !== 'undefined') {
+      cosmicEngine.addEntropy(0.12, 'collider-pulse');
+    }
+  }
+
+  triggerCollapse() {
+    this.isCollapsing = true;
+    this.collapseTimer = 160;
+    if (typeof audio !== 'undefined') {
+      audio.playSubDrop();
+      audio.triggerChime(65.41, 'sawtooth', 0.9, 0, 0); // C2
+    }
+    if (typeof cosmicEngine !== 'undefined') {
+      cosmicEngine.addEntropy(0.25, 'singularity-collapse');
+    }
+  }
+
+  resetField() {
+    this.isCollapsing = false;
+    this.shockwaves = [];
+    this.initParticles();
+    if (typeof audio !== 'undefined') {
+      audio.triggerChime(440, 'sine', 0.5, 0, 0);
+    }
+  }
+
+  bindEvents() {
+    window.addEventListener('resize', () => this.initCanvas());
+
+    this.canvas.addEventListener('pointerdown', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      this.isDragging = true;
+      this.attractor.x = clickX;
+      this.attractor.y = clickY;
+      this.attractor.active = true;
+
+      // Click shockwave
+      this.triggerPulse(clickX, clickY, 8);
+      const panX = ((clickX / this.width) * 2 - 1) * 0.8;
+      if (typeof audio !== 'undefined') {
+        const pitch = 300 + (1 - clickY / this.height) * 600;
+        audio.triggerChime(pitch, 'triangle', 0.7, panX, 0);
+      }
+    });
+
+    this.canvas.addEventListener('pointermove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      this.attractor.x = e.clientX - rect.left;
+      this.attractor.y = e.clientY - rect.top;
+      this.attractor.active = true;
+    });
+
+    this.canvas.addEventListener('pointerup', () => {
+      this.isDragging = false;
+    });
+
+    this.canvas.addEventListener('pointerleave', () => {
+      this.isDragging = false;
+      this.attractor.active = false;
+    });
+
+    // Wire mode selector pills
+    document.querySelectorAll('.sandbox-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.sandbox-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const mode = pill.getAttribute('data-mode');
+        this.setMode(mode);
+      });
+    });
+
+    // Wire action buttons
+    const btnPulse = document.getElementById('btn-collider-pulse');
+    if (btnPulse) {
+      btnPulse.addEventListener('click', () => {
+        this.triggerPulse(this.centerX, this.centerY, 14);
+        if (typeof audio !== 'undefined') audio.triggerChime(523.25, 'sawtooth', 0.8, 0, 0);
+      });
+    }
+
+    const btnCollapse = document.getElementById('btn-collider-collapse');
+    if (btnCollapse) {
+      btnCollapse.addEventListener('click', () => {
+        this.triggerCollapse();
+      });
+    }
+
+    const btnReset = document.getElementById('btn-collider-reset');
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        this.resetField();
+      });
+    }
+  }
+
+  animate() {
+    requestAnimationFrame(this.animate);
+    this.time += 0.016;
+
+    // Semi-transparent void fade for motion trails
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+    this.ctx.fillRect(0, 0, this.width, this.height);
+
+    // Gravity calculation from trackpad force + drag + collapse
+    let currentGrav = 1.0;
+    if (typeof trackpadForce !== 'undefined' && trackpadForce > 0.05) {
+      currentGrav += trackpadForce * 6.0;
+    }
+    if (this.isDragging) {
+      currentGrav += 2.5;
+    }
+    if (this.isCollapsing) {
+      currentGrav += 12.0;
+      this.collapseTimer--;
+      if (this.collapseTimer <= 0) {
+        this.isCollapsing = false;
+        // Rebound explosion after black hole collapse
+        this.triggerPulse(this.centerX, this.centerY, 18);
+        if (typeof audio !== 'undefined') audio.playBigBounceChord();
+      }
+    }
+    this.gravityMult = currentGrav;
+
+    // Default attractor drift if pointer inactive
+    const targetAttractorX = this.attractor.active ? this.attractor.x : (this.centerX + Math.sin(this.time * 0.8) * (this.width * 0.2));
+    const targetAttractorY = this.attractor.active ? this.attractor.y : (this.centerY + Math.cos(this.time * 0.6) * (this.height * 0.18));
+
+    // Render shockwaves
+    for (let i = this.shockwaves.length - 1; i >= 0; i--) {
+      const sw = this.shockwaves[i];
+      sw.radius += sw.speed;
+      sw.opacity *= 0.94;
+
+      this.ctx.beginPath();
+      this.ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+      this.ctx.strokeStyle = `rgba(255, 255, 255, ${sw.opacity.toFixed(3)})`;
+      this.ctx.lineWidth = 1.5;
+      this.ctx.stroke();
+
+      if (sw.opacity < 0.01 || sw.radius > sw.maxRadius) {
+        this.shockwaves.splice(i, 1);
+      }
+    }
+
+    // Attractor visual core
+    this.ctx.beginPath();
+    this.ctx.arc(targetAttractorX, targetAttractorY, 3 + currentGrav * 0.6, 0, Math.PI * 2);
+    this.ctx.fillStyle = this.isCollapsing ? '#ffffff' : 'rgba(255, 255, 255, 0.4)';
+    this.ctx.fill();
+
+    let sumVelocitySq = 0;
+    const len = this.particles.length;
+
+    // Update & Render Particles
+    for (let i = 0; i < len; i++) {
+      const p = this.particles[i];
+
+      if (this.mode === 'inflation') {
+        // High radial outward expansion
+        const dx = p.x - this.centerX;
+        const dy = p.y - this.centerY;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        p.vx += (dx / dist) * 0.08;
+        p.vy += (dy / dist) * 0.08;
+
+        // Attractor gravitational pull
+        const adx = targetAttractorX - p.x;
+        const ady = targetAttractorY - p.y;
+        const adist = Math.sqrt(adx * adx + ady * ady) || 1;
+        if (adist < 220) {
+          const force = (currentGrav * 15) / (adist * p.mass);
+          p.vx += (adx / adist) * force;
+          p.vy += (ady / adist) * force;
+        }
+
+        p.vx *= 0.985;
+        p.vy *= 0.985;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Toroidal bounds wrapping
+        if (p.x < 0) p.x = this.width;
+        if (p.x > this.width) p.x = 0;
+        if (p.y < 0) p.y = this.height;
+        if (p.y > this.height) p.y = 0;
+
+      } else if (this.mode === 'vortex') {
+        // Spiral gravitational vortex
+        const dx = targetAttractorX - p.x;
+        const dy = targetAttractorY - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+        const radialForce = (currentGrav * 25) / (dist * p.mass);
+        const tangentForce = (currentGrav * 32) / (Math.max(30, dist) * p.mass);
+
+        p.vx += (dx / dist) * radialForce + (-dy / dist) * tangentForce;
+        p.vy += (dy / dist) * radialForce + (dx / dist) * tangentForce;
+
+        p.vx *= 0.975;
+        p.vy *= 0.975;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (dist < 8 && !this.isCollapsing) {
+          const throwAngle = Math.random() * Math.PI * 2;
+          p.x = targetAttractorX + Math.cos(throwAngle) * 50;
+          p.y = targetAttractorY + Math.sin(throwAngle) * 50;
+          p.vx = Math.cos(throwAngle) * 3;
+          p.vy = Math.sin(throwAngle) * 3;
+        }
+
+      } else if (this.mode === 'accretion') {
+        // Keplerian accretion disk orbits
+        p.orbitAngle += p.orbitSpeed * (1 + currentGrav * 0.4);
+        const currentR = this.isCollapsing ? p.orbitRadius * (this.collapseTimer / 160) : p.orbitRadius;
+        const targetPx = targetAttractorX + Math.cos(p.orbitAngle) * currentR;
+        const targetPy = targetAttractorY + Math.sin(p.orbitAngle) * (currentR * 0.45);
+
+        p.vx = (targetPx - p.x) * 0.12;
+        p.vy = (targetPy - p.y) * 0.12;
+        p.x += p.vx;
+        p.y += p.vy;
+
+      } else if (this.mode === 'quantum') {
+        // Brownian quantum foam fluctuation
+        p.vx += (Math.random() - 0.5) * 1.8;
+        p.vy += (Math.random() - 0.5) * 1.8;
+
+        const adx = targetAttractorX - p.x;
+        const ady = targetAttractorY - p.y;
+        const adist = Math.sqrt(adx * adx + ady * ady) || 1;
+        if (adist < 180) {
+          p.vx += (adx / adist) * (currentGrav * 0.8);
+          p.vy += (ady / adist) * (currentGrav * 0.8);
+        }
+
+        p.vx *= 0.92;
+        p.vy *= 0.92;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = this.width;
+        if (p.x > this.width) p.x = 0;
+        if (p.y < 0) p.y = this.height;
+        if (p.y > this.height) p.y = 0;
+      }
+
+      // Sample RMS velocity
+      if (i < 100) {
+        sumVelocitySq += (p.vx * p.vx + p.vy * p.vy);
+      }
+
+      this.ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+      this.ctx.fillRect(p.x, p.y, p.size, p.size);
+    }
+
+    // Update Telemetry Badges
+    if (this.gravityBadge) {
+      this.gravityBadge.textContent = `GRAV CONST: ${currentGrav.toFixed(2)}x`;
+      if (currentGrav > 3.0) {
+        this.gravityBadge.style.color = '#ffffff';
+        this.gravityBadge.style.borderColor = '#ffffff';
+      } else {
+        this.gravityBadge.style.color = 'var(--text-secondary)';
+        this.gravityBadge.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+      }
+    }
+
+    if (this.velocityBadge && Math.random() < 0.2) {
+      const rms = Math.sqrt(sumVelocitySq / 100);
+      const cFrac = Math.min(0.99, (rms / 8.0)).toFixed(2);
+      this.velocityBadge.textContent = `RMS VELOCITY: ${cFrac} c`;
+    }
+  }
+}
+
+let colliderLab;
+try {
+  colliderLab = new ParticleColliderLab();
+} catch (err) {
+  console.warn('ParticleColliderLab initialization:', err);
 }
 
 // --- 9. Audio Visualizer Canvas ---
