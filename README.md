@@ -44,15 +44,16 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 | **Click & Drag / 2-Finger Swipe** | 3D WebGL Canvas | Rotates the 3D wireframe manifold freely in 3D space with fluid inertia (+0.08 entropy). |
 | **Pinch / Scroll** | 3D WebGL Canvas | Zooms camera closer (`z: 3.8`) or further into the deep void (`z: 11.5`) (+0.03 entropy). |
 | **Trackpad Force** | Mac Trackpad | Calibrated analog pressure: light touch (0-49%), click (50%), deep press (50-100%). Surges spotlight radius, sub-bass, and wireframe scale. |
-| **Click** | Canvas / Background | Sends expanding kinetic shockwave rings across the coordinate grid (+0.65 entropy). |
+| **Click / Drag** | Particle Collider Canvas | Shapes the gravitational attractor well; sends kinetic shockwaves across 2,500 particles (+0.12 entropy). |
+| **Trackpad Deep Force** | Particle Collider Lab | Escalates gravity up to 12.0x, collapsing the cosmic field into a black hole singularity with sub-bass drop. |
+| **Pills & Action Buttons** | Collider Lab Controls | Switches between Inflation, Vortex, Accretion, and Quantum Foam modes; triggers Big Bang pulses or field resets. |
 | **Keys `A – Z` / `0 – 9`** | Keyboard Synth | Musically mapped 3-octave keyboard across AZERTY or QWERTY layouts with real-time HUD tracker (+0.45 entropy). |
 | **Spacebar** | Sound Engine | Drops a massive sub-bass 808 hit (`43.65Hz F1`) and sends a high-power shockwave across the void. |
 | **Key `B` or Button** | Music Engine | Toggles the 16-step generative electronic beat engine. |
-| **Key `P` or Button** | Cosmic Engine | Freezes / resumes the evolution of cosmic time and entropy. |
-| **Key `S` or Button** | Memories Shelf | Captures the current cosmic state into the permanent Cosmic Memories bank. |
-| **Key `U` or Button** | Universe Guide | Opens / closes the slide-out **Universe Creation & Cosmological Theories** modal. |
-| **Key `M`** | Sound Engine | Toggles global audio mute / unmute with synchronized power-up/down transitions. |
-| **Key `T` or Button** | System Log | Opens / closes the in-app **SYSTEM LOG // CHRONICLES** evolution timeline drawer. |
+| **`Shift + P` or Button** | Cosmic Engine | Freezes / resumes the evolution of cosmic time and entropy. |
+| **`Shift + S` or Button** | Memories Shelf | Captures the current cosmic state into the permanent Cosmic Memories bank. |
+| **`Shift + U` or Button** | Universe Guide | Opens / closes the slide-out **Universe Creation & Cosmological Theories** modal. |
+| **`Shift + T` or Button** | System Log | Opens / closes the in-app **SYSTEM LOG // CHRONICLES** evolution timeline drawer. |
 | **Key `?` or Button** | HUD Guide | Opens / closes the slide-out Mechanics & Controls drawer. |
 | **Key `Esc`** | Modals | Closes open drawers or overlays. |
 
