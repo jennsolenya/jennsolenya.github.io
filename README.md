@@ -29,7 +29,8 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 | :--- | :--- | :--- | :--- |
 | **Phase 0: Genesis** | [`init`](https://github.com/jennsolenya/jennsolenya.github.io/commit/ed61790) | 2026-09-04 | Clean repository initialization and GitHub Pages baseline. |
 | **Phase 1: Void Foundation** | [`v0.1.0`](https://github.com/jennsolenya/jennsolenya.github.io/commit/fefbb25) | 2026-09-04 | • 100% pitch-black background (`#000000`) with zero bleed.<br>• Interactive cursor spotlight revealing hidden coordinate matrix & dust.<br>• Floating 3D wireframe geometric sculpture with Three.js.<br>• Web Audio API ambient drone and interactive sine chimes.<br>• 3D perspective card tilt on hover. |
-| **Phase 2: Tactile & Spatial Leap** | [`v0.2.0-spatial-orbit`](https://github.com/jennsolenya/jennsolenya.github.io/releases/tag/v0.2.0-spatial-orbit) | 2026-09-04 | • **Mac Force Touch Trackpad**: pressure sensitivity expands spotlight, triggers sub-bass (`36.7Hz D1`), and grows 3D shape.<br>• **Direct 3D Orbit & Zoom**: click-and-drag rotation with momentum + pinch/wheel zoom.<br>• **Active Geometry HUD**: real-time `[ 1/4: ICOSAHEDRON ]` badge.<br>• **Binaural HRTF Spatial Audio**: calibrated for AirPods Pro 3 & stereo headphones; sound rotates in 3D around head.<br>• **Audio-Reactive Mesh**: wireframe pulses to live audio frequencies.<br>• **Physical Keyboard Synthesis**: play keys `1-5` or `A-G` directly.<br>• **Auto-Arpeggiator**: generative ambient loop.<br>• **Mechanics Guide**: accessible `[ ? CONTROLS ]` drawer overlay. |
+| **Phase 2: Tactile & Spatial Leap** | [`v0.2.0-spatial-orbit`](https://github.com/jennsolenya.github.io/releases/tag/v0.2.0-spatial-orbit) | 2026-09-04 | • **Mac Force Touch Trackpad**: pressure sensitivity expands spotlight, triggers sub-bass (`36.7Hz D1`), and grows 3D shape.<br>• **Direct 3D Orbit & Zoom**: click-and-drag rotation with momentum + pinch/wheel zoom.<br>• **Active Geometry HUD**: real-time `[ 1/4: ICOSAHEDRON ]` badge.<br>• **Binaural HRTF Spatial Audio**: calibrated for AirPods Pro 3 & stereo headphones; sound rotates in 3D around head.<br>• **Audio-Reactive Mesh**: wireframe pulses to live audio frequencies.<br>• **Physical Keyboard Synthesis**: play keys `1-5` or `A-G` directly.<br>• **Auto-Arpeggiator**: generative ambient loop.<br>• **Mechanics Guide**: accessible `[ ? CONTROLS ]` drawer overlay. |
+| **Phase 2.3: Generative Beat Engine** | [`v0.2.3-beat-engine`](https://github.com/jennsolenya.github.io/releases/tag/v0.2.3-beat-engine) | 2026-09-04 | • **Generative Electronic Beat Sequencer**: procedural 16-step drum machine with Kick, Snare, Hi-Hats, and Wobble Bass.<br>• **Genre Modes**: 130 BPM Industrial Techno, 140 BPM Skrillex-style Wobble Dubstep, and 85 BPM Ambient.<br>• **AZERTY / QWERTY Toggle**: physical layout switcher + auto-detection heuristic on keystroke.<br>• **Calibrated Force Touch**: smooth analog pressure curve (0-50% touch/click, 50-100% deep force).<br>• **Trackpad 2-Finger Orbit**: two-finger swipe spins 3D models with momentum. |
 | **Phase 3: Upcoming Horizons** | `v0.3.0` | In Progress | • 360° Radar Scan mode for matrix exploration.<br>• Vertex wave shader distortion.<br>• Mobile multi-touch gravitational particles.<br>• Tone customization & recording export. |
 
 ---
@@ -39,12 +40,14 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 | Input | Target | Action |
 | :--- | :--- | :--- |
 | **Cursor Move** | Viewport | Casts a radial spotlight revealing hidden grid coordinates and cosmic dust. Modulates audio filter cutoff frequency. |
-| **Click & Drag** | 3D WebGL Canvas | Rotates the 3D wireframe manifold freely in 3D space with fluid inertia. |
-| **Scroll / Pinch** | 3D WebGL Canvas | Zooms camera closer (`z: 3.8`) or further into the deep void (`z: 11.5`). |
-| **Trackpad Force** | Mac Trackpad | Pressing firmly down on the trackpad surges the void spotlight radius, triggers deep sub-bass drone, and expands the wireframe scale. |
+| **Click & Drag / 2-Finger Swipe** | 3D WebGL Canvas | Rotates the 3D wireframe manifold freely in 3D space with fluid inertia. |
+| **Pinch / Scroll** | 3D WebGL Canvas | Zooms camera closer (`z: 3.8`) or further into the deep void (`z: 11.5`). |
+| **Trackpad Force** | Mac Trackpad | Calibrated analog pressure: light touch (0-49%), click (50%), deep press (50-100%). Surges spotlight radius, sub-bass, and wireframe scale. |
 | **Click** | Canvas / Background | Sends expanding kinetic shockwave rings across the coordinate grid. |
-| **Keys `1 – 5` / `A – G`** | Keyboard Synth | Triggers tuned harmonic crystalline frequencies (`A3`, `C#4`, `E4`, `A4`, `C#5`). |
-| **Key `M`** | Sound Engine | Toggles global audio mute / unmute. |
+| **Keys `A – Z` / `0 – 9`** | Keyboard Synth | Musically mapped 3-octave keyboard across AZERTY or QWERTY layouts with real-time HUD tracker. |
+| **Spacebar** | Sound Engine | Drops a massive sub-bass 808 hit (`43.65Hz F1`) and sends a high-power shockwave across the void. |
+| **Key `B` or Button** | Music Engine | Toggles the 16-step generative electronic beat sequencer (Techno, Dubstep, or Ambient). |
+| **Key `M`** | Sound Engine | Toggles global audio mute / unmute with synchronized power-up/down transitions. |
 | **Key `T` or Button** | System Log | Opens / closes the in-app **SYSTEM LOG // CHRONICLES** evolution timeline drawer. |
 | **Key `?` or Button** | HUD Guide | Opens / closes the slide-out Mechanics & Controls drawer. |
 | **Key `Esc`** | Modals | Closes open drawers or overlays. |

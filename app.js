@@ -275,6 +275,136 @@ class SpatialSoundEngine {
       // Ignored
     }
   }
+
+  playKick(time) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(160, t);
+      osc.frequency.exponentialRampToValueAtTime(34, t + 0.18);
+
+      gain.gain.setValueAtTime(0.6, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+
+      osc.connect(gain);
+      gain.connect(this.bassBoost || this.masterGain);
+      osc.start(t);
+      osc.stop(t + 0.28);
+
+      // Pulse 3D wireframe mesh on kick
+      if (typeof wireframeMesh !== 'undefined' && wireframeMesh) {
+        wireframeMesh.scale.set(1.28, 1.28, 1.28);
+      }
+    } catch (e) {}
+  }
+
+  playSnare(time) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      // Noise burst
+      const bufferSize = Math.floor(this.ctx.sampleRate * 0.12);
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const noiseFilter = this.ctx.createBiquadFilter();
+      noiseFilter.type = 'highpass';
+      noiseFilter.frequency.setValueAtTime(900, t);
+
+      const noiseGain = this.ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.35, t);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(this.masterGain);
+
+      // Tonal punch
+      const osc = this.ctx.createOscillator();
+      const oscGain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(200, t);
+      osc.frequency.exponentialRampToValueAtTime(70, t + 0.08);
+
+      oscGain.gain.setValueAtTime(0.3, t);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+
+      osc.connect(oscGain);
+      oscGain.connect(this.masterGain);
+
+      noise.start(t);
+      osc.start(t);
+      osc.stop(t + 0.12);
+    } catch (e) {}
+  }
+
+  playHiHat(open = false, time) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const duration = open ? 0.2 : 0.04;
+      const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(7000, t);
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(open ? 0.22 : 0.15, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.masterGain);
+
+      noise.start(t);
+    } catch (e) {}
+  }
+
+  playWobble(freq = 55, time) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const osc = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, t);
+
+      filter.type = 'lowpass';
+      filter.Q.setValueAtTime(10.5, t);
+      filter.frequency.setValueAtTime(180, t);
+      filter.frequency.exponentialRampToValueAtTime(1900, t + 0.11);
+      filter.frequency.exponentialRampToValueAtTime(220, t + 0.24);
+
+      gain.gain.setValueAtTime(0.42, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.26);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.bassBoost || this.masterGain);
+
+      osc.start(t);
+      osc.stop(t + 0.26);
+    } catch (e) {}
+  }
 }
 
 const audio = new SpatialSoundEngine();
@@ -506,10 +636,16 @@ function setupOrbitControls(canvas) {
     canvas.classList.remove('grabbing');
   });
 
-  // Wheel zoom
+  // Trackpad 2-finger gestures & Pinch zoom
   window.addEventListener('wheel', (e) => {
-    // Zoom if hovering near canvas or holding shift / trackpad pinch
-    targetCameraZ = Math.min(11.5, Math.max(3.8, targetCameraZ + e.deltaY * 0.005));
+    if (e.ctrlKey) {
+      // 2-Finger Pinch-to-zoom on Mac trackpad
+      targetCameraZ = Math.min(11.5, Math.max(3.8, targetCameraZ + e.deltaY * 0.02));
+    } else {
+      // 2-Finger swipe on trackpad spins the 3D model!
+      rotationVelocity.y += e.deltaX * 0.0016;
+      rotationVelocity.x += e.deltaY * 0.0016;
+    }
   }, { passive: true });
 }
 
@@ -612,11 +748,23 @@ function morphGeometry() {
 const forceMeter = document.getElementById('force-meter');
 const cursorRing = document.getElementById('cursor-ring');
 
-function updateForce(force) {
-  trackpadForce = Math.max(0, Math.min(2.0, force));
+function updateForce(rawForce) {
+  // Calibrate analog pressure curve:
+  // Pre-click / touch: 0% to 49%
+  // Standard click threshold: 50%
+  // Deep WebKit Force Touch (1.0 to 2.0): 50% to 100%
+  let normalized = 0;
+  if (rawForce > 1.0) {
+    // Deep Apple Force Touch press
+    normalized = 0.5 + Math.min(1.0, rawForce - 1.0) * 0.5;
+  } else if (rawForce > 0) {
+    // Light touch before click or standard pointer pressure
+    normalized = rawForce * 0.5;
+  }
+  trackpadForce = Math.max(0, Math.min(1.0, normalized));
 
   if (forceMeter) {
-    if (trackpadForce > 0.05) {
+    if (trackpadForce > 0.02) {
       forceMeter.classList.add('active');
       forceMeter.textContent = `FORCE: ${(trackpadForce * 100).toFixed(0)}%`;
     } else {
@@ -626,9 +774,9 @@ function updateForce(force) {
   }
 
   if (cursorRing) {
-    if (trackpadForce > 0.05) {
+    if (trackpadForce > 0.02) {
       cursorRing.style.borderWidth = `${1 + trackpadForce * 3}px`;
-      cursorRing.style.boxShadow = `0 0 ${16 * trackpadForce}px rgba(255, 255, 255, 0.8)`;
+      cursorRing.style.boxShadow = `0 0 ${20 * trackpadForce}px rgba(255, 255, 255, 0.85)`;
       cursorRing.style.borderColor = '#ffffff';
     } else {
       cursorRing.style.borderWidth = '1px';
@@ -804,30 +952,119 @@ if (arpBtn) {
   arpBtn.addEventListener('click', toggleArpeggiator);
 }
 
-// --- 7. Full Keyboard Synthesis (AZERTY & QWERTY Universal Layout) ---
-let detectedLayout = 'QWERTY';
+// --- 6B. Generative Beat & Music Track Engine ---
+let isTrackPlaying = false;
+let beatStep = 0;
+let beatTimer = null;
 
-async function initKeyboardLayout() {
-  const layoutBadge = document.getElementById('detected-layout-badge');
-  if (navigator.keyboard && navigator.keyboard.getLayoutMap) {
-    try {
-      const map = await navigator.keyboard.getLayoutMap();
-      if (map.get('KeyQ') === 'a' || map.get('KeyA') === 'q') {
-        detectedLayout = 'AZERTY';
+function startBeatTrack() {
+  audio.init();
+  if (audio.isMuted) audio.toggle();
+  isTrackPlaying = true;
+
+  const beatBtn = document.getElementById('beat-track-toggle');
+  const beatStatus = document.getElementById('beat-track-status');
+  if (beatBtn) beatBtn.classList.add('active');
+  if (beatStatus) beatStatus.textContent = 'PLAY MUSIC: ON';
+
+  const getStepInterval = () => {
+    if (audio.genre === 'techno') return 115; // ~130 BPM
+    if (audio.genre === 'dubstep') return 107; // ~140 BPM
+    return 175; // ~85 BPM Ambient
+  };
+
+  const stepRoutine = () => {
+    if (!isTrackPlaying) return;
+    const s = beatStep % 16;
+    const now = audio.ctx.currentTime;
+
+    if (audio.genre === 'techno') {
+      // 4-on-the-floor warehouse techno kick
+      if (s === 0 || s === 4 || s === 8 || s === 12) {
+        audio.playKick(now);
       }
-    } catch (e) {}
-  }
-  if (detectedLayout === 'QWERTY') {
-    const lang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-    if (lang.startsWith('fr') || lang.includes('be')) {
-      detectedLayout = 'AZERTY';
+      // Offbeat open hat
+      if (s === 2 || s === 6 || s === 10 || s === 14) {
+        audio.playHiHat(true, now);
+      } else {
+        audio.playHiHat(false, now);
+      }
+      // Rolling 16th-note acid bass
+      const technoNotes = [55, 55, 110, 55, 82.4, 55, 110, 73.4];
+      audio.triggerChime(technoNotes[s % 8], 'sawtooth', 0.12, (s % 4 - 1.5) * 0.5, 0);
+    } else if (audio.genre === 'dubstep') {
+      // Half-time Skrillex-style Dubstep
+      if (s === 0 || s === 10) audio.playKick(now);
+      if (s === 8) audio.playSnare(now);
+      if (s % 2 === 0) audio.playHiHat(s === 4 || s === 12, now);
+      // Aggressive wobble bass on syncopated steps
+      if (s === 2 || s === 4 || s === 6 || s === 12 || s === 14) {
+        const wobbleFreqs = [55, 73.4, 82.4, 55, 65.4];
+        audio.playWobble(wobbleFreqs[(s / 2) % wobbleFreqs.length], now);
+      }
+    } else {
+      // Ambient atmospheric pulse
+      if (s === 0 || s === 8) audio.playKick(now);
+      if (s % 4 === 0) audio.playHiHat(true, now);
+      const ambNotes = [130.81, 164.81, 196.0, 261.63];
+      if (s % 4 === 2) {
+        audio.triggerChime(ambNotes[(s / 4) % ambNotes.length], 'sine', 0.8, (s - 8) / 8, 0);
+      }
     }
-  }
-  if (layoutBadge) {
-    layoutBadge.textContent = `${detectedLayout} OPTIMIZED`;
+
+    beatStep++;
+    beatTimer = setTimeout(stepRoutine, getStepInterval());
+  };
+
+  stepRoutine();
+}
+
+function stopBeatTrack() {
+  isTrackPlaying = false;
+  if (beatTimer) clearTimeout(beatTimer);
+  beatTimer = null;
+
+  const beatBtn = document.getElementById('beat-track-toggle');
+  const beatStatus = document.getElementById('beat-track-status');
+  if (beatBtn) beatBtn.classList.remove('active');
+  if (beatStatus) beatStatus.textContent = 'PLAY MUSIC: OFF';
+}
+
+function toggleBeatTrack() {
+  if (isTrackPlaying) {
+    stopBeatTrack();
+  } else {
+    startBeatTrack();
   }
 }
-initKeyboardLayout();
+
+const beatTrackBtn = document.getElementById('beat-track-toggle');
+if (beatTrackBtn) {
+  beatTrackBtn.addEventListener('click', toggleBeatTrack);
+}
+
+// --- 7. Full Keyboard Synthesis (AZERTY & QWERTY Universal Layout) ---
+let currentLayout = localStorage.getItem('void_keyboard_layout') || 'AZERTY';
+
+function applyLayout(layout) {
+  currentLayout = layout;
+  localStorage.setItem('void_keyboard_layout', layout);
+  const layoutBadge = document.getElementById('detected-layout-badge');
+  if (layoutBadge) {
+    layoutBadge.textContent = currentLayout;
+  }
+}
+
+const layoutToggleBtn = document.getElementById('layout-toggle-btn');
+if (layoutToggleBtn) {
+  layoutToggleBtn.addEventListener('click', () => {
+    const nextLayout = currentLayout === 'AZERTY' ? 'QWERTY' : 'AZERTY';
+    applyLayout(nextLayout);
+    audio.triggerChime(554.37, 'sine', 0.25, 0, 0);
+  });
+}
+
+applyLayout(currentLayout);
 
 // Full 3-octave musical scale mapping for all alphanumeric keys
 const universalNoteMap = {
@@ -920,6 +1157,13 @@ window.addEventListener('keydown', (e) => {
   if (e.repeat) return;
   const key = e.key.toLowerCase();
 
+  // Auto-detect layout from physical code vs character
+  if (e.code === 'KeyQ' && key === 'a' && currentLayout !== 'AZERTY') {
+    applyLayout('AZERTY');
+  } else if (e.code === 'KeyQ' && key === 'q' && currentLayout !== 'QWERTY') {
+    applyLayout('QWERTY');
+  }
+
   // Escape closes open modals
   if (key === 'escape') {
     closeControlsModal();
@@ -942,6 +1186,12 @@ window.addEventListener('keydown', (e) => {
   // 'm' toggles global sound
   if (key === 'm') {
     audio.toggle();
+    return;
+  }
+
+  // 'b' toggles beat track
+  if (key === 'b') {
+    toggleBeatTrack();
     return;
   }
 
