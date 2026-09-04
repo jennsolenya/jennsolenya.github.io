@@ -701,15 +701,22 @@ window.addEventListener('keydown', (e) => {
   if (e.repeat) return;
   const key = e.key.toLowerCase();
 
-  // Escape key closes modal
+  // Escape key closes open modals
   if (key === 'escape') {
     closeControlsModal();
+    closeTimelineModal();
     return;
   }
 
   // Question mark toggles controls
   if (key === '?') {
     toggleControlsModal();
+    return;
+  }
+
+  // 't' key toggles Chronicles Timeline
+  if (key === 't') {
+    toggleTimelineModal();
     return;
   }
 
@@ -847,12 +854,14 @@ if (visCanvas) {
 }
 
 // --- 10. Mechanics & Controls Modal Logic ---
+// --- 10. Mechanics & Controls Modal Logic ---
 const controlsModal = document.getElementById('controls-modal');
 const controlsToggle = document.getElementById('controls-toggle');
 const closeControls = document.getElementById('close-controls');
 const controlsBackdrop = document.getElementById('controls-backdrop');
 
 function openControlsModal() {
+  closeTimelineModal();
   if (controlsModal) controlsModal.classList.add('open');
   audio.triggerChime(554.37, 'sine', 0.3, 0, 0);
 }
@@ -872,6 +881,42 @@ function toggleControlsModal() {
 if (controlsToggle) controlsToggle.addEventListener('click', toggleControlsModal);
 if (closeControls) closeControls.addEventListener('click', closeControlsModal);
 if (controlsBackdrop) controlsBackdrop.addEventListener('click', closeControlsModal);
+
+// --- 11. Chronicles // Timeline Modal Logic ---
+const timelineModal = document.getElementById('timeline-modal');
+const timelineToggle = document.getElementById('timeline-toggle');
+const closeTimeline = document.getElementById('close-timeline');
+const timelineBackdrop = document.getElementById('timeline-backdrop');
+
+function openTimelineModal() {
+  closeControlsModal();
+  if (timelineModal) timelineModal.classList.add('open');
+  audio.triggerChime(659.25, 'triangle', 0.4, 0, 0); // E5
+}
+
+function closeTimelineModal() {
+  if (timelineModal) timelineModal.classList.remove('open');
+}
+
+function toggleTimelineModal() {
+  if (timelineModal && timelineModal.classList.contains('open')) {
+    closeTimelineModal();
+  } else {
+    openTimelineModal();
+  }
+}
+
+if (timelineToggle) timelineToggle.addEventListener('click', toggleTimelineModal);
+if (closeTimeline) closeTimeline.addEventListener('click', closeTimelineModal);
+if (timelineBackdrop) timelineBackdrop.addEventListener('click', closeTimelineModal);
+
+// Sound effects on timeline nodes
+document.querySelectorAll('.timeline-node').forEach((node, i) => {
+  node.addEventListener('mouseenter', () => {
+    const freqs = [329.63, 440, 554.37, 659.25];
+    audio.triggerChime(freqs[i % freqs.length], 'sine', 0.25, 0.4, 0);
+  });
+});
 
 // Window resize
 window.addEventListener('resize', () => {
