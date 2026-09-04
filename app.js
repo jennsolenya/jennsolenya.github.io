@@ -1143,79 +1143,84 @@ const rotationVelocity = { x: 0, y: 0 };
 let targetCameraZ = 7.0;
 
 function initThreeJS() {
-  const container = document.getElementById('webgl-canvas');
-  scene = new THREE.Scene();
+  try {
+    const container = document.getElementById('webgl-canvas');
+    if (!container) return;
+    scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 7.0;
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 7.0;
 
-  renderer = new THREE.WebGLRenderer({
-    canvas: container,
-    alpha: true,
-    antialias: true,
-  });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer = new THREE.WebGLRenderer({
+      canvas: container,
+      alpha: true,
+      antialias: true,
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // 1,500 Starfield for Scrollytelling Cosmic Depth
-  const starGeo = new THREE.BufferGeometry();
-  const starCount = 1500;
-  const starPositions = new Float32Array(starCount * 3);
-  for (let i = 0; i < starCount * 3; i += 3) {
-    starPositions[i] = (Math.random() - 0.5) * 90;
-    starPositions[i + 1] = (Math.random() - 0.5) * 90;
-    starPositions[i + 2] = (Math.random() - 0.5) * 120 - 20;
+    // 1,500 Starfield for Scrollytelling Cosmic Depth
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 1500;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i += 3) {
+      starPositions[i] = (Math.random() - 0.5) * 90;
+      starPositions[i + 1] = (Math.random() - 0.5) * 90;
+      starPositions[i + 2] = (Math.random() - 0.5) * 120 - 20;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starMat = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.12,
+      transparent: true,
+      opacity: 0.5,
+    });
+    starField = new THREE.Points(starGeo, starMat);
+    scene.add(starField);
+
+    // Dynamic Geometries for Topological Cycles
+    geometries.push(new THREE.IcosahedronGeometry(1.8, 1));
+    geometries.push(new THREE.TorusKnotGeometry(1.35, 0.42, 100, 16));
+    geometries.push(new THREE.OctahedronGeometry(1.9, 1));
+    geometries.push(new THREE.DodecahedronGeometry(1.8, 1));
+
+    // Futuristic glowing white wireframe material
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.65,
+    });
+
+    wireframeMesh = new THREE.Mesh(geometries[0], wireMat);
+    scene.add(wireframeMesh);
+
+    // Inner pulsating energy core
+    const coreMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.18,
+    });
+    innerCore = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 12), coreMat);
+    scene.add(innerCore);
+
+    // Outer orbital ring
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.22,
+    });
+    outerRing = new THREE.Mesh(new THREE.TorusGeometry(3.3, 0.02, 16, 80), ringMat);
+    outerRing.rotation.x = Math.PI / 2.8;
+    scene.add(outerRing);
+
+    setupOrbitControls(container);
+    animateThreeJS();
+  } catch (err) {
+    console.warn('Three.js WebGL initialization skipped:', err);
   }
-  starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-  const starMat = new THREE.PointsMaterial({
-    color: 0xffffff,
-    size: 0.12,
-    transparent: true,
-    opacity: 0.5,
-  });
-  starField = new THREE.Points(starGeo, starMat);
-  scene.add(starField);
-
-  // Geometries list
-  geometries.push(new THREE.IcosahedronGeometry(2.1, 1));
-  geometries.push(new THREE.TorusKnotGeometry(1.4, 0.4, 100, 16));
-  geometries.push(new THREE.OctahedronGeometry(2.4, 2));
-  geometries.push(new THREE.DodecahedronGeometry(2.2, 1));
-
-  // Wireframe material
-  const wireMat = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.45,
-  });
-
-  wireframeMesh = new THREE.Mesh(geometries[0], wireMat);
-  scene.add(wireframeMesh);
-
-  // Glowing inner core
-  const coreMat = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.18,
-  });
-  innerCore = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 12), coreMat);
-  scene.add(innerCore);
-
-  // Outer orbital ring
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.22,
-  });
-  outerRing = new THREE.Mesh(new THREE.TorusGeometry(3.3, 0.02, 16, 80), ringMat);
-  outerRing.rotation.x = Math.PI / 2.8;
-  scene.add(outerRing);
-
-  setupOrbitControls(container);
-  animateThreeJS();
 }
 
 // Orbit Drag & Zoom handlers
