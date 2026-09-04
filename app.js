@@ -27,9 +27,15 @@ class SpatialSoundEngine {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AudioCtx();
 
-      // Master Gain
+      // Master Gain (increased from 0.42 to 0.62 for club-volume feel)
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.setValueAtTime(0, this.ctx.currentTime);
+
+      // Sidechain Ducking Bus (Amelie Lens pump effect)
+      // Bass/acid elements route through this node; kick triggers rapid duck + release
+      this.sidechainGain = this.ctx.createGain();
+      this.sidechainGain.gain.setValueAtTime(1.0, this.ctx.currentTime);
+      this.sidechainGain.connect(this.masterGain);
 
       // Lowpass Filter
       this.filter = this.ctx.createBiquadFilter();
@@ -55,20 +61,35 @@ class SpatialSoundEngine {
       this.analyser.fftSize = 64;
       this.analyser.smoothingTimeConstant = 0.8;
 
-      // Heavy Bass Boost EQ (Lowshelf +8dB at 80Hz for AirPods Pro 3 & High-end Headphones)
+      // Heavy Bass Boost EQ (Lowshelf +11dB at 80Hz for devastating sub pressure)
       this.bassBoost = this.ctx.createBiquadFilter();
       this.bassBoost.type = 'lowshelf';
       this.bassBoost.frequency.setValueAtTime(80, this.ctx.currentTime);
-      this.bassBoost.gain.setValueAtTime(8.5, this.ctx.currentTime);
+      this.bassBoost.gain.setValueAtTime(11.0, this.ctx.currentTime);
 
-      // Waveshaper Overdrive & Distortion for Analog Warmth and Acid Bite
+      // High-Shelf Presence Boost (+4dB at 8kHz for hat/percussion clarity on headphones)
+      this.presenceEQ = this.ctx.createBiquadFilter();
+      this.presenceEQ.type = 'highshelf';
+      this.presenceEQ.frequency.setValueAtTime(8000, this.ctx.currentTime);
+      this.presenceEQ.gain.setValueAtTime(4.0, this.ctx.currentTime);
+
+      // Waveshaper Overdrive & Distortion (harder curve: 35 for aggressive analog bite)
       this.distortion = this.ctx.createWaveShaper();
-      this.distortion.curve = this.makeDistortionCurve(22);
-      this.distortion.oversample = '2x';
+      this.distortion.curve = this.makeDistortionCurve(35);
+      this.distortion.oversample = '4x';
 
-      // Routing: MasterGain -> BassBoost -> Distortion -> Filter -> SpatialPanner -> Analyser -> Destination
+      // DynamicsCompressor (Limiter) to prevent clipping at louder master volume
+      this.compressor = this.ctx.createDynamicsCompressor();
+      this.compressor.threshold.setValueAtTime(-6, this.ctx.currentTime);
+      this.compressor.knee.setValueAtTime(3, this.ctx.currentTime);
+      this.compressor.ratio.setValueAtTime(12, this.ctx.currentTime);
+      this.compressor.attack.setValueAtTime(0.002, this.ctx.currentTime);
+      this.compressor.release.setValueAtTime(0.15, this.ctx.currentTime);
+
+      // Routing: MasterGain -> BassBoost -> PresenceEQ -> Distortion -> Filter -> SpatialPanner -> Analyser -> Compressor -> Destination
       this.masterGain.connect(this.bassBoost);
-      this.bassBoost.connect(this.distortion);
+      this.bassBoost.connect(this.presenceEQ);
+      this.presenceEQ.connect(this.distortion);
       this.distortion.connect(this.filter);
 
       if (this.spatialPanner) {
@@ -77,7 +98,8 @@ class SpatialSoundEngine {
       } else {
         this.filter.connect(this.analyser);
       }
-      this.analyser.connect(this.ctx.destination);
+      this.analyser.connect(this.compressor);
+      this.compressor.connect(this.ctx.destination);
 
       // Ambient Drone Oscillators
       this.droneGain = this.ctx.createGain();
@@ -109,6 +131,29 @@ class SpatialSoundEngine {
       this.droneOsc1.start();
       this.droneOsc2.start();
       this.subBassOsc.start();
+
+      // Atmospheric Noise Texture Generator (continuous per-genre filtered noise wash)
+      this.atmosphereGain = this.ctx.createGain();
+      this.atmosphereGain.gain.setValueAtTime(0, this.ctx.currentTime);
+      this.atmosphereFilter = this.ctx.createBiquadFilter();
+      this.atmosphereFilter.type = 'lowpass';
+      this.atmosphereFilter.frequency.setValueAtTime(200, this.ctx.currentTime);
+      this.atmosphereFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
+
+      // Create a 2-second looping noise buffer for atmosphere
+      const noiseLen = 2 * this.ctx.sampleRate;
+      const noiseBuf = this.ctx.createBuffer(1, noiseLen, this.ctx.sampleRate);
+      const noiseData = noiseBuf.getChannelData(0);
+      for (let i = 0; i < noiseLen; i++) {
+        noiseData[i] = Math.random() * 2 - 1;
+      }
+      this.atmosphereSource = this.ctx.createBufferSource();
+      this.atmosphereSource.buffer = noiseBuf;
+      this.atmosphereSource.loop = true;
+      this.atmosphereSource.connect(this.atmosphereFilter);
+      this.atmosphereFilter.connect(this.atmosphereGain);
+      this.atmosphereGain.connect(this.masterGain);
+      this.atmosphereSource.start();
 
       this.genre = 'techno'; // 'techno' (Acid) | 'dnb' | 'dubstep' | 'ambient'
       this.initialized = true;
