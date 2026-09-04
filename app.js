@@ -1385,10 +1385,14 @@ function animateThreeJS() {
 
 // Morph to next 3D geometry and update HUD badges
 function morphGeometry() {
-  currentGeoIndex = (currentGeoIndex + 1) % geometries.length;
-  wireframeMesh.geometry = geometries[currentGeoIndex];
+  if (geometries.length > 0) {
+    currentGeoIndex = (currentGeoIndex + 1) % geometries.length;
+  }
+  if (wireframeMesh && geometries[currentGeoIndex]) {
+    wireframeMesh.geometry = geometries[currentGeoIndex];
+  }
 
-  const currentName = geometryNames[currentGeoIndex];
+  const currentName = geometryNames[currentGeoIndex] || '1/4: ICOSAHEDRON';
   const activeGeoText = document.getElementById('active-geo-text');
   const cardGeoStatus = document.getElementById('card-geo-status');
   const stellarGeoIndicator = document.getElementById('stellar-geo-indicator');
@@ -1401,7 +1405,9 @@ function morphGeometry() {
     stellarGeoIndicator.textContent = currentName.replace(/^\d\/\d:\s*/, '');
   }
 
-  audio.triggerChime(587.33, 'triangle', 0.6, 0, 0); // D5
+  if (typeof audio !== 'undefined' && audio.triggerChime) {
+    audio.triggerChime(587.33, 'triangle', 0.6, 0, 0); // D5
+  }
 }
 
 // --- 4. Mac Force Touch Trackpad Integration ---
