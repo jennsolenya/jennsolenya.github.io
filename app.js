@@ -923,14 +923,21 @@ window.addEventListener('click', (e) => {
 function syncAudioButtons(isPlaying) {
   const soundToggle = document.getElementById('sound-toggle');
   const heroSoundToggle = document.getElementById('hero-sound-toggle');
+  const cosmicMusicBtn = document.getElementById('cosmic-music-btn');
+  const cosmicMusicLabel = document.getElementById('cosmic-music-label');
+  const beatTrackBtn = document.getElementById('beat-track-toggle');
+  const beatTrackStatus = document.getElementById('beat-track-status');
+  const beatTrackIcon = document.getElementById('beat-track-icon');
 
   if (soundToggle) {
     if (isPlaying) {
       soundToggle.classList.add('active');
-      soundToggle.querySelector('.sound-state').textContent = 'SOUND: ON';
+      const stateSpan = soundToggle.querySelector('.sound-state');
+      if (stateSpan) stateSpan.textContent = 'SOUND: ON';
     } else {
       soundToggle.classList.remove('active');
-      soundToggle.querySelector('.sound-state').textContent = 'SOUND: OFF';
+      const stateSpan = soundToggle.querySelector('.sound-state');
+      if (stateSpan) stateSpan.textContent = 'SOUND: OFF';
     }
   }
 
@@ -947,6 +954,28 @@ function syncAudioButtons(isPlaying) {
       heroSoundToggle.style.borderColor = 'var(--border-subtle)';
       heroSoundToggle.style.backgroundColor = 'transparent';
       heroSoundToggle.style.boxShadow = 'none';
+    }
+  }
+
+  if (cosmicMusicBtn) {
+    if (isPlaying) {
+      cosmicMusicBtn.classList.add('active');
+      if (cosmicMusicLabel) cosmicMusicLabel.textContent = 'STOP COSMIC MUSIC';
+    } else {
+      cosmicMusicBtn.classList.remove('active');
+      if (cosmicMusicLabel) cosmicMusicLabel.textContent = 'START COSMIC MUSIC';
+    }
+  }
+
+  if (beatTrackBtn) {
+    if (isPlaying) {
+      beatTrackBtn.classList.add('active');
+      if (beatTrackStatus) beatTrackStatus.textContent = 'PLAY MUSIC: ON';
+      if (beatTrackIcon) beatTrackIcon.innerHTML = '&#9632;';
+    } else {
+      beatTrackBtn.classList.remove('active');
+      if (beatTrackStatus) beatTrackStatus.textContent = 'PLAY MUSIC: OFF';
+      if (beatTrackIcon) beatTrackIcon.innerHTML = '&#9654;';
     }
   }
 }
@@ -1462,48 +1491,7 @@ class CosmicUniverseEngine {
   }
 
   syncTransportButtons(isPlaying) {
-    // 1. Hero Deck Music Button
-    const heroBtn = document.getElementById('cosmic-music-btn');
-    const heroLabel = document.getElementById('cosmic-music-label');
-    if (heroBtn) {
-      if (isPlaying) {
-        heroBtn.classList.add('active');
-        if (heroLabel) heroLabel.textContent = 'STOP COSMIC MUSIC';
-      } else {
-        heroBtn.classList.remove('active');
-        if (heroLabel) heroLabel.textContent = 'START COSMIC MUSIC';
-      }
-    }
-
-    // 2. Header Music Button
-    const headerBtn = document.getElementById('header-music-toggle');
-    const headerStatus = document.getElementById('header-music-status');
-    if (headerBtn) {
-      if (isPlaying) {
-        headerBtn.classList.add('active');
-        if (headerStatus) headerStatus.textContent = 'MUSIC: ON';
-      } else {
-        headerBtn.classList.remove('active');
-        if (headerStatus) headerStatus.textContent = 'MUSIC: OFF';
-      }
-    }
-
-    // 3. Act II Beat Track Button
-    const beatBtn = document.getElementById('beat-track-toggle');
-    const beatStatus = document.getElementById('beat-track-status');
-    const beatIcon = document.getElementById('beat-track-icon');
-    if (beatBtn) {
-      if (isPlaying) {
-        beatBtn.classList.add('active');
-        if (beatStatus) beatStatus.textContent = 'PLAY MUSIC: ON';
-        if (beatIcon) beatIcon.innerHTML = '&#9632;';
-      } else {
-        beatBtn.classList.remove('active');
-        if (beatStatus) beatStatus.textContent = 'PLAY MUSIC: OFF';
-        if (beatIcon) beatIcon.innerHTML = '&#9654;';
-      }
-    }
-
+    syncAudioButtons(isPlaying);
     this.updateTelemetryHUD();
   }
 }
