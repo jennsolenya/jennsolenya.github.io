@@ -252,10 +252,14 @@
         <div class="audio-controls-row">
           <div class="audio-info">
             <h3>Binaural Tone Matrix</h3>
-            <p>Every key on your keyboard is mapped (<span id="detected-layout-badge" class="layout-badge">DETECTING LAYOUT...</span>). Press letters/numbers or sweep cursor.</p>
+            <p>Every key is musically mapped. <button id="layout-toggle-btn" class="layout-toggle-pill" aria-label="Toggle AZERTY or QWERTY keyboard layout">LAYOUT: <span id="detected-layout-badge" class="layout-badge">AZERTY</span> [SWITCH]</button></p>
           </div>
           <div class="audio-bar-actions">
             <div id="last-key-hud" class="key-hud-display">KEY: READY</div>
+            <button id="beat-track-toggle" class="beat-track-btn" aria-label="Toggle Generative Music Track">
+              <span>&#9654;</span>
+              <span id="beat-track-status">PLAY MUSIC: OFF</span>
+            </button>
             <button id="arp-toggle" class="arp-toggle-btn">
               <span>&#8734;</span>
               <span id="arp-status">ARPEGGIATOR: OFF</span>

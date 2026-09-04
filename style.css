@@ -584,13 +584,65 @@ html, body {
   box-shadow: 0 0 16px rgba(255, 255, 255, 0.4);
 }
 
+.beat-track-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.beat-track-btn:hover {
+  border-color: var(--border-active);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.beat-track-btn.active {
+  background: #ffffff;
+  color: #000000;
+  font-weight: 700;
+  border-color: #ffffff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  animation: beatPulse 0.5s infinite alternate ease-in-out;
+}
+
+@keyframes beatPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.02); box-shadow: 0 0 26px rgba(255, 255, 255, 0.7); }
+}
+
+.layout-toggle-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.layout-toggle-pill:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #ffffff;
+}
+
 .layout-badge {
   font-family: var(--font-mono);
   font-size: 0.68rem;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
   color: #ffffff;
+  font-weight: 700;
 }
 
 .key-hud-display {
