@@ -1800,39 +1800,41 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
-  // 't' toggles Chronicles Timeline
-  if (key === 't') {
-    toggleTimelineModal();
-    return;
-  }
-
-  // 'u' toggles Universe Story
-  if (key === 'u') {
+  // Shift + U toggles Universe Story
+  if (e.shiftKey && (key === 'u' || e.code === 'KeyU')) {
     toggleUniverseModal();
     return;
   }
 
-  // 'm' toggles global sound
-  if (key === 'm') {
-    audio.toggle();
+  // Shift + T toggles Chronicles Timeline
+  if (e.shiftKey && (key === 't' || e.code === 'KeyT')) {
+    toggleTimelineModal();
     return;
   }
 
-  // 'b' toggles beat / cosmic music track
-  if (key === 'b') {
-    cosmicEngine.togglePlayback();
-    return;
-  }
-
-  // 'p' freezes / pauses cosmic evolution
-  if (key === 'p') {
+  // Shift + P freezes / resumes cosmic evolution
+  if (e.shiftKey && (key === 'p' || e.code === 'KeyP')) {
     cosmicEngine.togglePause();
     return;
   }
 
-  // 's' captures a cosmic memory state
-  if (key === 's') {
+  // Shift + S captures a cosmic memory state
+  if (e.shiftKey && (key === 's' || e.code === 'KeyS')) {
     cosmicEngine.saveMemory();
+    return;
+  }
+
+  // Shift + M toggles master audio
+  if (e.shiftKey && (key === 'm' || e.code === 'KeyM')) {
+    audio.toggle();
+    return;
+  }
+
+  // Spacebar drops deep sub-bass hit
+  if (key === ' ' || e.code === 'Space') {
+    audio.playSubDrop();
+    ripples.push(new Ripple(width / 2, height / 2, 2.5));
+    cosmicEngine.addEntropy(0.8, 'sub-drop');
     return;
   }
 
@@ -1975,7 +1977,9 @@ function openControlsModal() {
   closeTimelineModal();
   closeUniverseModal();
   if (controlsModal) controlsModal.classList.add('open');
-  audio.triggerChime(554.37, 'sine', 0.3, 0, 0);
+  if (audio && audio.ctx && !audio.isMuted) {
+    audio.triggerChime(554.37, 'sine', 0.3, 0, 0);
+  }
 }
 
 function closeControlsModal() {
@@ -1990,9 +1994,24 @@ function toggleControlsModal() {
   }
 }
 
-if (controlsToggle) controlsToggle.addEventListener('click', toggleControlsModal);
-if (closeControls) closeControls.addEventListener('click', closeControlsModal);
-if (controlsBackdrop) controlsBackdrop.addEventListener('click', closeControlsModal);
+if (controlsToggle) {
+  controlsToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleControlsModal();
+  });
+}
+if (closeControls) {
+  closeControls.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeControlsModal();
+  });
+}
+if (controlsBackdrop) {
+  controlsBackdrop.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeControlsModal();
+  });
+}
 
 // --- 11. Chronicles // Timeline Modal Logic ---
 const timelineModal = document.getElementById('timeline-modal');
@@ -2004,7 +2023,9 @@ function openTimelineModal() {
   closeControlsModal();
   closeUniverseModal();
   if (timelineModal) timelineModal.classList.add('open');
-  audio.triggerChime(659.25, 'triangle', 0.4, 0, 0); // E5
+  if (audio && audio.ctx && !audio.isMuted) {
+    audio.triggerChime(659.25, 'triangle', 0.4, 0, 0); // E5
+  }
 }
 
 function closeTimelineModal() {
@@ -2019,9 +2040,24 @@ function toggleTimelineModal() {
   }
 }
 
-if (timelineToggle) timelineToggle.addEventListener('click', toggleTimelineModal);
-if (closeTimeline) closeTimeline.addEventListener('click', closeTimelineModal);
-if (timelineBackdrop) timelineBackdrop.addEventListener('click', closeTimelineModal);
+if (timelineToggle) {
+  timelineToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleTimelineModal();
+  });
+}
+if (closeTimeline) {
+  closeTimeline.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeTimelineModal();
+  });
+}
+if (timelineBackdrop) {
+  timelineBackdrop.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeTimelineModal();
+  });
+}
 
 // --- 12. Universe Creation & Theories Modal Logic ---
 const universeModal = document.getElementById('universe-modal');
@@ -2034,7 +2070,9 @@ function openUniverseModal() {
   closeControlsModal();
   closeTimelineModal();
   if (universeModal) universeModal.classList.add('open');
-  audio.triggerChime(783.99, 'sine', 0.45, 0, 0); // G5
+  if (audio && audio.ctx && !audio.isMuted) {
+    audio.triggerChime(783.99, 'sine', 0.45, 0, 0); // G5
+  }
 }
 
 function closeUniverseModal() {
@@ -2049,10 +2087,30 @@ function toggleUniverseModal() {
   }
 }
 
-if (universeStoryToggle) universeStoryToggle.addEventListener('click', toggleUniverseModal);
-if (cosmicStoryBtn) cosmicStoryBtn.addEventListener('click', toggleUniverseModal);
-if (closeUniverse) closeUniverse.addEventListener('click', closeUniverseModal);
-if (universeBackdrop) universeBackdrop.addEventListener('click', closeUniverseModal);
+if (universeStoryToggle) {
+  universeStoryToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleUniverseModal();
+  });
+}
+if (cosmicStoryBtn) {
+  cosmicStoryBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleUniverseModal();
+  });
+}
+if (closeUniverse) {
+  closeUniverse.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeUniverseModal();
+  });
+}
+if (universeBackdrop) {
+  universeBackdrop.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeUniverseModal();
+  });
+}
 
 // Sound effects on timeline nodes
 document.querySelectorAll('.timeline-node').forEach((node, i) => {
