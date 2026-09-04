@@ -32,6 +32,16 @@
     </div>
 
     <div class="hud-right">
+      <button id="universe-story-toggle" class="hud-btn" aria-label="Open Universe Story & Theories">
+        <span>🌌</span>
+        <span>UNIVERSE STORY</span>
+      </button>
+
+      <button id="header-music-toggle" class="hud-btn hud-btn-music" aria-label="Toggle Cosmic Music Engine">
+        <span class="music-icon">▶</span>
+        <span id="header-music-status">MUSIC: OFF</span>
+      </button>
+
       <button id="controls-toggle" class="hud-btn" aria-label="Open Mechanics Guide">
         <span>?</span>
         <span>CONTROLS</span>
@@ -92,19 +102,29 @@
         <div class="mechanic-item">
           <div class="mechanic-icon">&#9000;</div>
           <div class="mechanic-info">
-            <h4>Playable Keyboard Synthesis</h4>
-            <p>Play the acoustic chamber using your physical computer keyboard. Press keys 1 through 5 or A through G to trigger crystalline harmonic frequencies.</p>
-            <span class="mechanic-badge">KEYS [1-5] OR [A-G]</span>
+            <h4>AZERTY &amp; QWERTY Dual Matrix</h4>
+            <p>Full 3-octave musical scale. Toggle between AZERTY (Belgian/French) and QWERTY with on-screen visual keyboard feedback or auto-detection.</p>
+            <span class="mechanic-badge">ALL KEYS [A-Z] [0-9]</span>
           </div>
         </div>
 
         <!-- Mechanic 5 -->
         <div class="mechanic-item">
-          <div class="mechanic-icon">&#8734;</div>
+          <div class="mechanic-icon">&#9654;</div>
           <div class="mechanic-info">
-            <h4>Generative Auto-Arpeggiator</h4>
-            <p>Activate the automated arpeggiator in the Acoustic Chamber to hear a continuous, evolving ambient sequence while you manipulate the 3D forms.</p>
-            <span class="mechanic-badge">SEAMLESS LOOP</span>
+            <h4>Ever-Evolving Cosmic Music</h4>
+            <p>Every browser interaction accelerates cosmic entropy, driving sound and 3D forms across 5 epochs from the Primordial Singularity to Cosmic Inflation, Stellar Techno, and The Big Bounce.</p>
+            <span class="mechanic-badge">KEY [B] OR BUTTON</span>
+          </div>
+        </div>
+
+        <!-- Mechanic 6 -->
+        <div class="mechanic-item">
+          <div class="mechanic-icon">&#10074;&#10074;</div>
+          <div class="mechanic-info">
+            <h4>Pause Progress &amp; Cosmic Memories</h4>
+            <p>Freeze evolution in time at any moment while music continues to loop. Capture snapshots as "Cosmic Memories" and travel back in time through the memory shelf.</p>
+            <span class="mechanic-badge">KEY [P] / [S]</span>
           </div>
         </div>
       </div>
@@ -124,6 +144,10 @@
           <span>&#10022;</span>
           <span id="active-geo-text">1/4: ICOSAHEDRON</span>
         </div>
+        <div class="geo-badge">
+          <span>⌨</span>
+          <span id="hero-layout-indicator">AZERTY MATRIX ACTIVE</span>
+        </div>
       </div>
 
       <h1 class="hero-title">
@@ -133,8 +157,66 @@
       </h1>
 
       <p class="hero-subtitle">
-        An interactive aesthetic playground in total absence of color. Drag in 3D space, press into the trackpad for void pressure, and experience binaural spatial acoustics.
+        An ever-evolving audiovisual universe in total absence of color. Every browser interaction injects cosmic entropy, driving sound and geometry across cosmological creation, stellar harmony, and the cyclic Big Bounce.
       </p>
+
+      <!-- Cosmic Universe Telemetry & Genesis Deck -->
+      <div class="cosmic-deck">
+        <div class="cosmic-deck-header">
+          <div class="cosmic-epoch-tag">
+            <span class="pulsing-cosmic-dot"></span>
+            <span id="epoch-name-badge">EPOCH 00 // PRIMORDIAL SINGULARITY</span>
+          </div>
+          <div class="cosmic-stats">
+            <span id="cosmic-time-badge" class="stat-pill">T + 0.00 GYR</span>
+            <span id="cosmic-status-badge" class="stat-pill status-active">EVOLVING</span>
+          </div>
+        </div>
+
+        <div class="entropy-track-wrap">
+          <div class="entropy-info">
+            <span>COSMIC ENTROPY // EVOLUTION PRESSURE</span>
+            <span id="entropy-text-val">0.0%</span>
+          </div>
+          <div class="entropy-progress-bar">
+            <div id="entropy-bar-fill" class="entropy-bar-fill" style="width: 0%;"></div>
+          </div>
+          <div class="entropy-subhint">INTERACTION DRIVES TIME &bull; MOVE, DRAG, PRESS, TYPE OR SCROLL TO EVOLVE THE UNIVERSE</div>
+        </div>
+
+        <div class="cosmic-deck-actions">
+          <button id="cosmic-music-btn" class="cosmic-btn cosmic-btn-primary" aria-label="Toggle Universe Music Engine">
+            <span class="btn-icon">&#9654;</span>
+            <span id="cosmic-music-label">START COSMIC MUSIC</span>
+          </button>
+
+          <button id="cosmic-pause-btn" class="cosmic-btn" aria-label="Pause or Resume Cosmic Evolution">
+            <span class="btn-icon">&#10074;&#10074;</span>
+            <span id="cosmic-pause-label">FREEZE EVOLUTION</span>
+          </button>
+
+          <button id="cosmic-memory-btn" class="cosmic-btn" aria-label="Capture Cosmic Memory">
+            <span class="btn-icon">&#10022;</span>
+            <span>CAPTURE MEMORY</span>
+          </button>
+
+          <button id="cosmic-story-btn" class="cosmic-btn cosmic-btn-ghost" aria-label="Open Cosmic Story Guide">
+            <span class="btn-icon">🌌</span>
+            <span>UNIVERSE STORY</span>
+          </button>
+        </div>
+
+        <!-- Cosmic Memories Bank / Shelf -->
+        <div class="memory-bank-wrap">
+          <div class="memory-bank-title">
+            <span>SAVED COSMIC MEMORIES (TIME TRAVEL):</span>
+            <span id="memory-count-badge">3 MEMORIES</span>
+          </div>
+          <div id="memory-shelf" class="memory-shelf">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
+      </div>
 
       <div class="hero-actions">
         <button class="action-btn" onclick="document.getElementById('experiments').scrollIntoView({ behavior: 'smooth' });">
