@@ -145,7 +145,7 @@
           </svg>
         </button>
 
-        <button class="action-btn-ghost" onclick="audio.init(); audio.toggle(); document.getElementById('sound-toggle').classList.toggle('active');">
+        <button id="hero-sound-toggle" class="action-btn-ghost">
           ACTIVATE AUDIO
         </button>
       </div>
@@ -252,9 +252,10 @@
         <div class="audio-controls-row">
           <div class="audio-info">
             <h3>Binaural Tone Matrix</h3>
-            <p>Play with physical keys 1-5 / A-G, or sweep your cursor across the void.</p>
+            <p>Every key on your keyboard is mapped (<span id="detected-layout-badge" class="layout-badge">DETECTING LAYOUT...</span>). Press letters/numbers or sweep cursor.</p>
           </div>
           <div class="audio-bar-actions">
+            <div id="last-key-hud" class="key-hud-display">KEY: READY</div>
             <button id="arp-toggle" class="arp-toggle-btn">
               <span>&#8734;</span>
               <span id="arp-status">ARPEGGIATOR: OFF</span>
@@ -262,27 +263,42 @@
           </div>
         </div>
 
+        <!-- Sound Profile / Genre Selector -->
+        <div class="genre-selector-row">
+          <span class="genre-label">GENRE // PROFILE:</span>
+          <div class="genre-pills">
+            <button class="genre-pill active" data-genre="ambient">01 // AMBIENT VOID</button>
+            <button class="genre-pill" data-genre="techno">02 // CYBER TECHNO</button>
+            <button class="genre-pill" data-genre="dubstep">03 // DUBSTEP WOBBLE</button>
+          </div>
+        </div>
+
         <div class="synth-buttons">
-          <button class="synth-key" data-key="1" data-key-alt="a" data-freq="220" data-type="triangle">
+          <button class="synth-key" data-key="1" data-key-alt="a" data-freq="130.81" data-type="triangle">
             <span class="key-badge">1 / A</span>
-            <span>220Hz (A3)</span>
+            <span>SUB C3</span>
           </button>
-          <button class="synth-key" data-key="2" data-key-alt="s" data-freq="277.18" data-type="sine">
+          <button class="synth-key" data-key="2" data-key-alt="s" data-freq="164.81" data-type="sawtooth">
             <span class="key-badge">2 / S</span>
-            <span>277Hz (C#4)</span>
+            <span>BASS E3</span>
           </button>
-          <button class="synth-key" data-key="3" data-key-alt="d" data-freq="329.63" data-type="sine">
+          <button class="synth-key" data-key="3" data-key-alt="d" data-freq="220.00" data-type="sawtooth">
             <span class="key-badge">3 / D</span>
-            <span>330Hz (E4)</span>
+            <span>CORE A3</span>
           </button>
-          <button class="synth-key" data-key="4" data-key-alt="f" data-freq="440" data-type="triangle">
+          <button class="synth-key" data-key="4" data-key-alt="f" data-freq="277.18" data-type="square">
             <span class="key-badge">4 / F</span>
-            <span>440Hz (A4)</span>
+            <span>LEAD C#4</span>
           </button>
-          <button class="synth-key" data-key="5" data-key-alt="g" data-freq="554.37" data-type="sine">
+          <button class="synth-key" data-key="5" data-key-alt="g" data-freq="329.63" data-type="sine">
             <span class="key-badge">5 / G</span>
-            <span>554Hz (C#5)</span>
+            <span>LEAD E4</span>
           </button>
+          <button class="synth-key" data-key="6" data-key-alt="h" data-freq="440.00" data-type="sine">
+            <span class="key-badge">6 / H</span>
+            <span>HIGH A4</span>
+          </button>
+        </div>
         </div>
 
         <div class="visualizer-canvas-wrap">

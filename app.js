@@ -55,20 +55,27 @@ class SpatialSoundEngine {
       this.analyser.fftSize = 64;
       this.analyser.smoothingTimeConstant = 0.8;
 
-      // Routing: MasterGain -> Filter -> SpatialPanner -> Analyser -> Destination
+      // Heavy Bass Boost EQ (Lowshelf +8dB at 80Hz for AirPods Pro 3 & High-end Headphones)
+      this.bassBoost = this.ctx.createBiquadFilter();
+      this.bassBoost.type = 'lowshelf';
+      this.bassBoost.frequency.setValueAtTime(80, this.ctx.currentTime);
+      this.bassBoost.gain.setValueAtTime(8.5, this.ctx.currentTime);
+
+      // Routing: MasterGain -> BassBoost -> Filter -> SpatialPanner -> Analyser -> Destination
+      this.masterGain.connect(this.bassBoost);
+      this.bassBoost.connect(this.filter);
+
       if (this.spatialPanner) {
-        this.masterGain.connect(this.filter);
         this.filter.connect(this.spatialPanner);
         this.spatialPanner.connect(this.analyser);
       } else {
-        this.masterGain.connect(this.filter);
         this.filter.connect(this.analyser);
       }
       this.analyser.connect(this.ctx.destination);
 
       // Ambient Drone Oscillators
       this.droneGain = this.ctx.createGain();
-      this.droneGain.gain.setValueAtTime(0.09, this.ctx.currentTime);
+      this.droneGain.gain.setValueAtTime(0.12, this.ctx.currentTime);
 
       this.droneOsc1 = this.ctx.createOscillator();
       this.droneOsc1.type = 'sine';
@@ -97,9 +104,32 @@ class SpatialSoundEngine {
       this.droneOsc2.start();
       this.subBassOsc.start();
 
+      this.genre = 'ambient'; // 'ambient' | 'techno' | 'dubstep'
       this.initialized = true;
     } catch (e) {
       console.warn('Web Audio initialization:', e);
+    }
+  }
+
+  setGenre(genreName) {
+    this.genre = genreName;
+    if (this.isMuted || !this.ctx) return;
+
+    if (genreName === 'techno') {
+      this.filter.Q.setValueAtTime(5.5, this.ctx.currentTime);
+      this.droneOsc1.type = 'sawtooth';
+      this.droneOsc2.type = 'triangle';
+      this.triggerChime(110, 'sawtooth', 0.4, 0, 0);
+    } else if (genreName === 'dubstep') {
+      this.filter.Q.setValueAtTime(9.5, this.ctx.currentTime);
+      this.droneOsc1.type = 'sawtooth';
+      this.droneOsc2.type = 'sawtooth';
+      this.triggerChime(55, 'sawtooth', 0.8, 0, 0);
+    } else {
+      this.filter.Q.setValueAtTime(3.5, this.ctx.currentTime);
+      this.droneOsc1.type = 'sine';
+      this.droneOsc2.type = 'triangle';
+      this.triggerChime(440, 'sine', 0.6, 0, 0);
     }
   }
 
@@ -113,12 +143,55 @@ class SpatialSoundEngine {
     this.isMuted = !this.isMuted;
     const now = this.ctx.currentTime;
     if (this.isMuted) {
-      this.masterGain.gain.setTargetAtTime(0, now, 0.15);
+      this.playPowerDownSound();
+      this.masterGain.gain.setTargetAtTime(0, now + 0.15, 0.12);
     } else {
-      this.masterGain.gain.setTargetAtTime(0.38, now, 0.15);
-      this.triggerChime(440, 'sine', 0.8, 0, 0);
+      this.masterGain.gain.setTargetAtTime(0.42, now, 0.1);
+      this.playPowerUpSound();
     }
+    syncAudioButtons(!this.isMuted);
     return !this.isMuted;
+  }
+
+  playPowerUpSound() {
+    if (!this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      // Dual futuristic rising chime
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.28);
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } catch (e) {}
+  }
+
+  playPowerDownSound() {
+    if (!this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(550, now);
+      osc.frequency.exponentialRampToValueAtTime(110, now + 0.22);
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } catch (e) {}
   }
 
   updateSpatialPosition(x, y, z) {
@@ -137,13 +210,19 @@ class SpatialSoundEngine {
     if (!this.filter || this.isMuted || !this.ctx) return;
     const now = this.ctx.currentTime;
     // Modulate cutoff frequency + force boost
-    const baseFreq = 260 + normX * 1100 + (1 - normY) * 600;
-    const targetFreq = Math.min(6000, baseFreq + force * 2400);
-    this.filter.frequency.setTargetAtTime(targetFreq, now, 0.08);
+    let baseFreq = 260 + normX * 1200 + (1 - normY) * 700;
+    if (this.genre === 'dubstep') {
+      // Skrillex wobble style: cursor modulates wobble rate and heavy filter resonance
+      const wobble = Math.sin(now * 12) * 800;
+      baseFreq = Math.max(150, baseFreq + wobble);
+    }
+
+    const targetFreq = Math.min(7500, baseFreq + force * 2800);
+    this.filter.frequency.setTargetAtTime(targetFreq, now, 0.05);
 
     // Force Touch Sub-Bass swell
     if (this.subBassGain) {
-      this.subBassGain.gain.setTargetAtTime(force * 0.25, now, 0.05);
+      this.subBassGain.gain.setTargetAtTime(force * 0.35, now, 0.04);
     }
   }
 
@@ -154,19 +233,32 @@ class SpatialSoundEngine {
       const osc = this.ctx.createOscillator();
       const noteGain = this.ctx.createGain();
 
-      osc.type = type;
+      // Adapt waveform and envelope based on genre
+      let chosenType = type;
+      let noteDuration = duration;
+      let peakGain = 0.24;
+
+      if (this.genre === 'techno') {
+        chosenType = type === 'sine' ? 'sawtooth' : type;
+        noteDuration = Math.min(0.45, duration * 0.7);
+        peakGain = 0.28;
+      } else if (this.genre === 'dubstep') {
+        chosenType = 'sawtooth';
+        peakGain = 0.32;
+      }
+
+      osc.type = chosenType;
       osc.frequency.setValueAtTime(freq, now);
 
-      noteGain.gain.setValueAtTime(0.2, now);
-      noteGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      noteGain.gain.setValueAtTime(peakGain, now);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, now + noteDuration);
 
-      // Create localized spatial panner for each chime if supported
       if (this.ctx.createPanner) {
         const chimePanner = this.ctx.createPanner();
         chimePanner.panningModel = 'HRTF';
         if (chimePanner.positionX) {
-          chimePanner.positionX.setValueAtTime(posX * 3, now);
-          chimePanner.positionY.setValueAtTime(posY * 2, now);
+          chimePanner.positionX.setValueAtTime(posX * 3.5, now);
+          chimePanner.positionY.setValueAtTime(posY * 2.5, now);
           chimePanner.positionZ.setValueAtTime(1.5, now);
         }
         osc.connect(noteGain);
@@ -178,7 +270,7 @@ class SpatialSoundEngine {
       }
 
       osc.start(now);
-      osc.stop(now + duration);
+      osc.stop(now + noteDuration);
     } catch (err) {
       // Ignored
     }
