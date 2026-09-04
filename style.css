@@ -665,24 +665,40 @@ html, body {
 
 .genre-selector-row {
   display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 1rem;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 
+.genre-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
 .genre-label {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   letter-spacing: 0.12em;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.genre-hint-text {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
   color: var(--text-dim);
+  letter-spacing: 0.04em;
 }
 
 .genre-pills {
   display: flex;
   gap: 0.8rem;
+  flex-wrap: wrap;
   flex-wrap: wrap;
 }
 
