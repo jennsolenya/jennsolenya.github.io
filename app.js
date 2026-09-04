@@ -1000,123 +1000,532 @@ if (arpBtn) {
   arpBtn.addEventListener('click', toggleArpeggiator);
 }
 
-// --- 6B. Generative Beat & Music Track Engine ---
-let isTrackPlaying = false;
-let beatStep = 0;
-let beatTimer = null;
+// --- 6B. Ever-Evolving Cosmic Universe Music Engine & Memories ---
 
-function startBeatTrack() {
-  audio.init();
-  if (audio.isMuted) audio.toggle();
-  isTrackPlaying = true;
+const COSMIC_EPOCHS = [
+  {
+    id: 0,
+    key: 'singularity',
+    name: 'EPOCH 00 // PRIMORDIAL SINGULARITY',
+    time: 'T + 0.00 GYR',
+    bpm: 65,
+    title: 'Primordial Singularity',
+    desc: 'Pure quantum vacuum fluctuations & minimal entropy in the infinite void.',
+    visualScale: 0.45
+  },
+  {
+    id: 1,
+    key: 'ambient',
+    name: 'EPOCH 01 // COSMIC INFLATION',
+    time: 'T + 0.01 GYR',
+    bpm: 85,
+    title: 'Cosmic Inflation & Big Bang',
+    desc: 'Superluminal spacetime expansion & explosive photon decoupling.',
+    visualScale: 1.25
+  },
+  {
+    id: 2,
+    key: 'techno',
+    name: 'EPOCH 02 // STELLAR NUCLEOSYNTHESIS',
+    time: 'T + 4.50 GYR',
+    bpm: 128,
+    title: 'Stellar Nucleosynthesis & Galactic Dawn',
+    desc: 'Gravitational fusion, planetary orbits, and driving Cyber Techno rhythm.',
+    visualScale: 1.0
+  },
+  {
+    id: 3,
+    key: 'dubstep',
+    name: 'EPOCH 03 // COSMIC TURBULENCE',
+    time: 'T + 9.80 GYR',
+    bpm: 140,
+    title: 'Cosmic Turbulence & Black Hole Mergers',
+    desc: 'Dark energy acceleration, gravitational ripples, and heavy wobble bass.',
+    visualScale: 1.15
+  },
+  {
+    id: 4,
+    key: 'bounce',
+    name: 'EPOCH 04 // THE BIG BOUNCE',
+    time: 'T + 13.80 GYR',
+    bpm: 120,
+    title: 'The Big Bounce & Cyclic Rebirth',
+    desc: 'Gravitational contraction glissando rebounding into higher-dimensional rebirth!',
+    visualScale: 1.4
+  }
+];
 
-  const beatBtn = document.getElementById('beat-track-toggle');
-  const beatStatus = document.getElementById('beat-track-status');
-  if (beatBtn) beatBtn.classList.add('active');
-  if (beatStatus) beatStatus.textContent = 'PLAY MUSIC: ON';
+class CosmicUniverseEngine {
+  constructor() {
+    this.epochIndex = 2; // Start in Epoch 2 (Stellar Techno) for immediate musical delight
+    this.entropy = 15.0; // Starts at 15%
+    this.isPaused = false;
+    this.isMusicPlaying = false;
+    this.aeonCycle = 1;
+    this.beatStep = 0;
+    this.beatTimer = null;
+    this.bounceProgress = 0;
+    this.memories = [];
+    this.speechSynth = window.speechSynthesis || null;
 
-  const getStepInterval = () => {
-    if (audio.genre === 'techno') return 115; // ~130 BPM
-    if (audio.genre === 'dubstep') return 107; // ~140 BPM
-    return 175; // ~85 BPM Ambient
-  };
+    this.loadSavedState();
+  }
 
-  const stepRoutine = () => {
-    if (!isTrackPlaying) return;
-    const s = beatStep % 16;
-    const now = audio.ctx.currentTime;
+  getCurrentEpoch() {
+    return COSMIC_EPOCHS[this.epochIndex];
+  }
 
-    if (audio.genre === 'techno') {
-      // 4-on-the-floor warehouse techno kick
-      if (s === 0 || s === 4 || s === 8 || s === 12) {
-        audio.playKick(now);
-      }
-      // Offbeat open hat
-      if (s === 2 || s === 6 || s === 10 || s === 14) {
-        audio.playHiHat(true, now);
-      } else {
-        audio.playHiHat(false, now);
-      }
-      // Rolling 16th-note acid bass
-      const technoNotes = [55, 55, 110, 55, 82.4, 55, 110, 73.4];
-      audio.triggerChime(technoNotes[s % 8], 'sawtooth', 0.12, (s % 4 - 1.5) * 0.5, 0);
-    } else if (audio.genre === 'dubstep') {
-      // Half-time Skrillex-style Dubstep
-      if (s === 0 || s === 10) audio.playKick(now);
-      if (s === 8) audio.playSnare(now);
-      if (s % 2 === 0) audio.playHiHat(s === 4 || s === 12, now);
-      // Aggressive wobble bass on syncopated steps
-      if (s === 2 || s === 4 || s === 6 || s === 12 || s === 14) {
-        const wobbleFreqs = [55, 73.4, 82.4, 55, 65.4];
-        audio.playWobble(wobbleFreqs[(s / 2) % wobbleFreqs.length], now);
-      }
+  getVisualScale() {
+    const ep = this.getCurrentEpoch();
+    if (this.epochIndex === 4) {
+      // Big bounce pulsating oscillation
+      return 0.2 + Math.abs(Math.sin(Date.now() * 0.003)) * 1.3;
+    }
+    if (this.epochIndex === 3) {
+      // Turbulent wobble jitter
+      return ep.visualScale + Math.sin(Date.now() * 0.015) * 0.12;
+    }
+    return ep.visualScale;
+  }
+
+  addEntropy(amount, source) {
+    if (this.isPaused) return;
+
+    // Modulate entropy increment
+    this.entropy += amount;
+
+    if (this.entropy >= 100) {
+      this.entropy = 0;
+      this.advanceEpoch();
     } else {
-      // Ambient atmospheric pulse
-      if (s === 0 || s === 8) audio.playKick(now);
-      if (s % 4 === 0) audio.playHiHat(true, now);
-      const ambNotes = [130.81, 164.81, 196.0, 261.63];
-      if (s % 4 === 2) {
-        audio.triggerChime(ambNotes[(s / 4) % ambNotes.length], 'sine', 0.8, (s - 8) / 8, 0);
+      this.updateTelemetryHUD();
+    }
+  }
+
+  advanceEpoch() {
+    const prevEpoch = this.epochIndex;
+    this.epochIndex = (this.epochIndex + 1) % COSMIC_EPOCHS.length;
+
+    if (this.epochIndex === 0) {
+      this.aeonCycle++;
+      // The Big Bounce complete: Reborn in higher octave
+      audio.playBigBounceChord();
+      if (typeof morphGeometry === 'function') morphGeometry();
+    } else if (this.epochIndex === 1) {
+      audio.playSubDrop();
+    }
+
+    const newEpoch = this.getCurrentEpoch();
+    audio.setGenre(newEpoch.key);
+    this.syncGenrePills(newEpoch.key);
+    this.announceEpoch(newEpoch);
+    this.updateTelemetryHUD();
+
+    // Trigger visual matrix shockwave
+    ripples.push(new Ripple(width / 2, height / 2, 2.4));
+  }
+
+  setEpoch(index, announce = true) {
+    this.epochIndex = Math.max(0, Math.min(COSMIC_EPOCHS.length - 1, index));
+    this.entropy = 0;
+    const epoch = this.getCurrentEpoch();
+    audio.setGenre(epoch.key);
+    this.syncGenrePills(epoch.key);
+    if (announce) this.announceEpoch(epoch);
+    this.updateTelemetryHUD();
+  }
+
+  announceEpoch(epoch) {
+    // 1. Play musical epoch transition chord
+    if (!audio.isMuted) {
+      const chords = [
+        [55, 110, 220],
+        [130.81, 196.0, 261.63],
+        [220, 277.18, 329.63, 440],
+        [73.4, 110, 146.8],
+        [261.63, 329.63, 392.00, 523.25]
+      ];
+      const chord = chords[epoch.id] || chords[0];
+      chord.forEach((f, i) => {
+        setTimeout(() => audio.triggerChime(f, 'sine', 0.65, (i - 1) * 0.4, 0), i * 60);
+      });
+    }
+
+    // 2. Synthetic voice announcement (subtle futuristic computer voice)
+    if (this.speechSynth && !audio.isMuted) {
+      try {
+        this.speechSynth.cancel();
+        const utterance = new SpeechSynthesisUtterance(`${epoch.title} initialized`);
+        utterance.rate = 1.05;
+        utterance.pitch = 0.85;
+        utterance.volume = 0.35;
+        this.speechSynth.speak(utterance);
+      } catch (e) {}
+    }
+  }
+
+  togglePause() {
+    this.isPaused = !this.isPaused;
+    this.updateTelemetryHUD();
+
+    const pauseLabel = document.getElementById('cosmic-pause-label');
+    const freezeStatus = document.getElementById('freeze-evolution-status');
+    const heroSoundBtn = document.getElementById('hero-pause-toggle');
+
+    if (this.isPaused) {
+      if (pauseLabel) pauseLabel.textContent = 'RESUME EVOLUTION';
+      if (freezeStatus) freezeStatus.textContent = 'RESUME TIME';
+      audio.triggerChime(329.63, 'triangle', 0.4, 0, 0);
+    } else {
+      if (pauseLabel) pauseLabel.textContent = 'FREEZE EVOLUTION';
+      if (freezeStatus) freezeStatus.textContent = 'FREEZE TIME';
+      audio.triggerChime(554.37, 'sine', 0.4, 0, 0);
+    }
+  }
+
+  updateTelemetryHUD() {
+    const epoch = this.getCurrentEpoch();
+
+    const epochBadge = document.getElementById('epoch-name-badge');
+    if (epochBadge) {
+      epochBadge.textContent = `${epoch.name} [AEON ${this.aeonCycle}]`;
+    }
+
+    const timeBadge = document.getElementById('cosmic-time-badge');
+    if (timeBadge) {
+      timeBadge.textContent = epoch.time;
+    }
+
+    const statusBadge = document.getElementById('cosmic-status-badge');
+    if (statusBadge) {
+      if (this.isPaused) {
+        statusBadge.textContent = 'TIME FROZEN';
+        statusBadge.className = 'stat-pill status-frozen';
+      } else {
+        statusBadge.textContent = this.isMusicPlaying ? 'EVOLVING ACTIVE' : 'OBSERVING';
+        statusBadge.className = 'stat-pill status-active';
       }
     }
 
-    beatStep++;
-    beatTimer = setTimeout(stepRoutine, getStepInterval());
-  };
+    const entropyVal = document.getElementById('entropy-text-val');
+    if (entropyVal) {
+      entropyVal.textContent = `${this.entropy.toFixed(1)}%`;
+    }
 
-  stepRoutine();
-}
+    const entropyFill = document.getElementById('entropy-bar-fill');
+    if (entropyFill) {
+      entropyFill.style.width = `${Math.min(100, Math.max(0, this.entropy))}%`;
+    }
+  }
 
-function stopBeatTrack() {
-  isTrackPlaying = false;
-  if (beatTimer) clearTimeout(beatTimer);
-  beatTimer = null;
+  syncGenrePills(genreKey) {
+    document.querySelectorAll('.genre-pill').forEach((pill) => {
+      const pGenre = pill.getAttribute('data-genre');
+      if (pGenre === genreKey || (pGenre === 'techno' && genreKey === 'stellar') || (pGenre === 'ambient' && genreKey === 'inflation') || (pGenre === 'dubstep' && genreKey === 'turbulence')) {
+        pill.classList.add('active');
+      } else {
+        pill.classList.remove('active');
+      }
+    });
+  }
 
-  const beatBtn = document.getElementById('beat-track-toggle');
-  const beatStatus = document.getElementById('beat-track-status');
-  if (beatBtn) beatBtn.classList.remove('active');
-  if (beatStatus) beatStatus.textContent = 'PLAY MUSIC: OFF';
-}
+  // --- Cosmic Memories Bank ---
+  loadSavedState() {
+    const saved = localStorage.getItem('void_cosmic_memories');
+    if (saved) {
+      try {
+        this.memories = JSON.parse(saved);
+      } catch (e) {
+        this.memories = [];
+      }
+    }
 
-function toggleBeatTrack() {
-  if (isTrackPlaying) {
-    stopBeatTrack();
-  } else {
-    startBeatTrack();
+    // Seed default baseline memories if empty
+    if (!this.memories || this.memories.length === 0) {
+      this.memories = [
+        { id: 'mem-1', name: 'Memory α: The Primordial Singularity', epochIndex: 0, entropy: 10, time: '0.00 GYR', date: 'Genesis' },
+        { id: 'mem-2', name: 'Memory β: Inflation Shockwave', epochIndex: 1, entropy: 45, time: '0.01 GYR', date: 'Inflation' },
+        { id: 'mem-3', name: 'Memory γ: Galactic Cyber Techno', epochIndex: 2, entropy: 68, time: '4.50 GYR', date: 'Galactic Dawn' }
+      ];
+      this.saveMemoriesToStorage();
+    }
+
+    this.renderMemoryShelf();
+  }
+
+  saveMemory(customName) {
+    const epoch = this.getCurrentEpoch();
+    const count = this.memories.length + 1;
+    const name = customName || `Memory ${count}: ${epoch.title.split('&')[0].trim()}`;
+
+    const memoryItem = {
+      id: `mem-${Date.now()}`,
+      name: name,
+      epochIndex: this.epochIndex,
+      entropy: Math.round(this.entropy),
+      time: epoch.time,
+      date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    this.memories.unshift(memoryItem);
+    if (this.memories.length > 8) this.memories.pop(); // Keep top 8 memories
+    this.saveMemoriesToStorage();
+    this.renderMemoryShelf();
+
+    // Confirmation chime
+    audio.triggerChime(880, 'sine', 0.5, 0, 0);
+
+    const lastKeyHud = document.getElementById('last-key-hud');
+    if (lastKeyHud) {
+      lastKeyHud.textContent = `MEMORY SAVED: [ ${name.slice(0, 18)}... ]`;
+      lastKeyHud.classList.add('flash');
+      setTimeout(() => lastKeyHud.classList.remove('flash'), 300);
+    }
+  }
+
+  restoreMemory(id) {
+    const mem = this.memories.find((m) => m.id === id);
+    if (!mem) return;
+
+    this.epochIndex = mem.epochIndex;
+    this.entropy = mem.entropy || 0;
+    const epoch = this.getCurrentEpoch();
+
+    audio.init();
+    if (audio.isMuted) audio.toggle();
+    audio.setGenre(epoch.key);
+    this.syncGenrePills(epoch.key);
+    this.updateTelemetryHUD();
+
+    // Warp frequency glissando
+    audio.triggerChime(329.63, 'sawtooth', 0.4, -0.5, 0);
+    setTimeout(() => audio.triggerChime(659.25, 'sine', 0.5, 0.5, 0), 100);
+
+    this.renderMemoryShelf(id);
+    ripples.push(new Ripple(width / 2, height / 2, 2.0));
+  }
+
+  deleteMemory(id, e) {
+    if (e) e.stopPropagation();
+    this.memories = this.memories.filter((m) => m.id !== id);
+    this.saveMemoriesToStorage();
+    this.renderMemoryShelf();
+    audio.triggerChime(220, 'sine', 0.2, 0, 0);
+  }
+
+  saveMemoriesToStorage() {
+    try {
+      localStorage.setItem('void_cosmic_memories', JSON.stringify(this.memories));
+    } catch (e) {}
+  }
+
+  renderMemoryShelf(activeId) {
+    const shelf = document.getElementById('memory-shelf');
+    const badge = document.getElementById('memory-count-badge');
+    if (!shelf) return;
+
+    if (badge) badge.textContent = `${this.memories.length} MEMORIES`;
+    shelf.innerHTML = '';
+
+    this.memories.forEach((mem) => {
+      const chip = document.createElement('button');
+      chip.className = `memory-chip ${mem.id === activeId ? 'active' : ''}`;
+      chip.setAttribute('aria-label', `Restore ${mem.name}`);
+      chip.innerHTML = `
+        <span>✦</span>
+        <span>${mem.name} [${mem.time}]</span>
+        <span class="memory-delete-btn" title="Delete memory">&times;</span>
+      `;
+
+      chip.addEventListener('click', () => this.restoreMemory(mem.id));
+      const delBtn = chip.querySelector('.memory-delete-btn');
+      if (delBtn) {
+        delBtn.addEventListener('click', (ev) => this.deleteMemory(mem.id, ev));
+      }
+
+      shelf.appendChild(chip);
+    });
+  }
+
+  // --- Step Routine & Playback Engine ---
+  startPlayback() {
+    audio.init();
+    if (audio.isMuted) audio.toggle();
+    if (audio.ctx && audio.ctx.state === 'suspended') {
+      audio.ctx.resume();
+    }
+
+    this.isMusicPlaying = true;
+    this.syncTransportButtons(true);
+
+    const getStepInterval = () => {
+      const ep = this.getCurrentEpoch();
+      if (ep.bpm === 140) return 107; // Dubstep
+      if (ep.bpm === 128) return 117; // Techno
+      if (ep.bpm === 85) return 175;  // Inflation
+      if (ep.bpm === 65) return 230;  // Singularity
+      return 125;
+    };
+
+    const stepRoutine = () => {
+      if (!this.isMusicPlaying) return;
+      const s = this.beatStep % 16;
+      const now = audio.ctx.currentTime;
+      const ep = this.getCurrentEpoch();
+
+      // Subtle interaction-free baseline cosmic drift (+0.02 entropy per beat)
+      if (!this.isPaused) {
+        this.addEntropy(0.04, 'auto-drift');
+      }
+
+      if (ep.key === 'techno' || ep.key === 'stellar') {
+        // 4-on-the-floor warehouse techno kick
+        if (s === 0 || s === 4 || s === 8 || s === 12) audio.playKick(now);
+        // Offbeat open hat & rolling 16ths
+        if (s === 2 || s === 6 || s === 10 || s === 14) {
+          audio.playHiHat(true, now);
+        } else {
+          audio.playHiHat(false, now);
+        }
+        // Rolling acid bass sequence
+        const technoNotes = [55, 55, 110, 55, 82.4, 55, 110, 73.4];
+        audio.triggerChime(technoNotes[s % 8], 'sawtooth', 0.14, (s % 4 - 1.5) * 0.45, 0);
+      } else if (ep.key === 'dubstep' || ep.key === 'turbulence') {
+        // Half-time Skrillex dubstep break
+        if (s === 0 || s === 10) audio.playKick(now);
+        if (s === 8) audio.playSnare(now);
+        if (s % 2 === 0) audio.playHiHat(s === 4 || s === 12, now);
+        // Syncopated heavy wobble bass
+        if (s === 2 || s === 4 || s === 6 || s === 12 || s === 14) {
+          const wobbleFreqs = [55, 73.4, 82.4, 55, 65.4];
+          audio.playWobble(wobbleFreqs[(s / 2) % wobbleFreqs.length], now);
+        }
+      } else if (ep.key === 'singularity') {
+        // Epoch 0: Primordial Singularity (quiet 36Hz pulse and dark chimes)
+        if (s === 0) audio.playKick(now);
+        if (s === 8) audio.triggerChime(73.42, 'sine', 0.4, 0, 0);
+      } else if (ep.key === 'bounce') {
+        // Epoch 4: The Big Bounce (crunch into rebirth)
+        if (s < 8) {
+          // Acoustic crunch downsweep
+          const crunchFreqs = [440, 392, 329.63, 261.63, 196, 164.8, 130.8, 82.4];
+          audio.triggerChime(crunchFreqs[s], 'sawtooth', 0.15, 0, 0);
+          if (s % 2 === 0) audio.playKick(now);
+        } else if (s === 8 || s === 9 || s === 10 || s === 11) {
+          // Silence vacuum (Zero gravity crunch)
+        } else if (s === 12) {
+          // Celestial Rebirth chord explosion
+          audio.playBigBounceChord();
+          audio.playKick(now);
+        }
+      } else {
+        // Epoch 1: Cosmic Inflation / Ambient
+        if (s === 0 || s === 8) audio.playKick(now);
+        if (s % 4 === 0) audio.playHiHat(true, now);
+        const ambNotes = [130.81, 164.81, 196.0, 261.63];
+        if (s % 4 === 2) {
+          audio.triggerChime(ambNotes[(s / 4) % ambNotes.length], 'sine', 0.7, (s - 8) / 8, 0);
+        }
+      }
+
+      this.beatStep++;
+      this.beatTimer = setTimeout(stepRoutine, getStepInterval());
+    };
+
+    stepRoutine();
+  }
+
+  stopPlayback() {
+    this.isMusicPlaying = false;
+    if (this.beatTimer) clearTimeout(this.beatTimer);
+    this.beatTimer = null;
+    this.syncTransportButtons(false);
+  }
+
+  togglePlayback() {
+    if (this.isMusicPlaying) {
+      this.stopPlayback();
+    } else {
+      this.startPlayback();
+    }
+  }
+
+  syncTransportButtons(isPlaying) {
+    // 1. Hero Deck Music Button
+    const heroBtn = document.getElementById('cosmic-music-btn');
+    const heroLabel = document.getElementById('cosmic-music-label');
+    if (heroBtn) {
+      if (isPlaying) {
+        heroBtn.classList.add('active');
+        if (heroLabel) heroLabel.textContent = 'STOP COSMIC MUSIC';
+      } else {
+        heroBtn.classList.remove('active');
+        if (heroLabel) heroLabel.textContent = 'START COSMIC MUSIC';
+      }
+    }
+
+    // 2. Header Music Button
+    const headerBtn = document.getElementById('header-music-toggle');
+    const headerStatus = document.getElementById('header-music-status');
+    if (headerBtn) {
+      if (isPlaying) {
+        headerBtn.classList.add('active');
+        if (headerStatus) headerStatus.textContent = 'MUSIC: ON';
+      } else {
+        headerBtn.classList.remove('active');
+        if (headerStatus) headerStatus.textContent = 'MUSIC: OFF';
+      }
+    }
+
+    // 3. Act II Beat Track Button
+    const beatBtn = document.getElementById('beat-track-toggle');
+    const beatStatus = document.getElementById('beat-track-status');
+    const beatIcon = document.getElementById('beat-track-icon');
+    if (beatBtn) {
+      if (isPlaying) {
+        beatBtn.classList.add('active');
+        if (beatStatus) beatStatus.textContent = 'PLAY MUSIC: ON';
+        if (beatIcon) beatIcon.innerHTML = '&#9632;';
+      } else {
+        beatBtn.classList.remove('active');
+        if (beatStatus) beatStatus.textContent = 'PLAY MUSIC: OFF';
+        if (beatIcon) beatIcon.innerHTML = '&#9654;';
+      }
+    }
+
+    this.updateTelemetryHUD();
   }
 }
+
+const cosmicEngine = new CosmicUniverseEngine();
+
+// Connect Transport & Deck Buttons
+const cosmicMusicBtn = document.getElementById('cosmic-music-btn');
+if (cosmicMusicBtn) cosmicMusicBtn.addEventListener('click', () => cosmicEngine.togglePlayback());
+
+const cosmicPauseBtn = document.getElementById('cosmic-pause-btn');
+if (cosmicPauseBtn) cosmicPauseBtn.addEventListener('click', () => cosmicEngine.togglePause());
+
+const freezeEvolutionToggle = document.getElementById('freeze-evolution-toggle');
+if (freezeEvolutionToggle) freezeEvolutionToggle.addEventListener('click', () => cosmicEngine.togglePause());
+
+const cosmicMemoryBtn = document.getElementById('cosmic-memory-btn');
+if (cosmicMemoryBtn) cosmicMemoryBtn.addEventListener('click', () => cosmicEngine.saveMemory());
+
+const saveMemorySecondaryBtn = document.getElementById('save-memory-secondary-btn');
+if (saveMemorySecondaryBtn) saveMemorySecondaryBtn.addEventListener('click', () => cosmicEngine.saveMemory());
+
+const headerMusicToggle = document.getElementById('header-music-toggle');
+if (headerMusicToggle) headerMusicToggle.addEventListener('click', () => cosmicEngine.togglePlayback());
 
 const beatTrackBtn = document.getElementById('beat-track-toggle');
-if (beatTrackBtn) {
-  beatTrackBtn.addEventListener('click', toggleBeatTrack);
-}
+if (beatTrackBtn) beatTrackBtn.addEventListener('click', () => cosmicEngine.togglePlayback());
 
-// --- 7. Full Keyboard Synthesis (AZERTY & QWERTY Universal Layout) ---
+// --- 7. Full Keyboard Synthesis (AZERTY & QWERTY Universal Layout Hub) ---
 let currentLayout = localStorage.getItem('void_keyboard_layout') || 'AZERTY';
 
-function applyLayout(layout) {
-  currentLayout = layout;
-  localStorage.setItem('void_keyboard_layout', layout);
-  const layoutBadge = document.getElementById('detected-layout-badge');
-  if (layoutBadge) {
-    layoutBadge.textContent = currentLayout;
-  }
-}
-
-const layoutToggleBtn = document.getElementById('layout-toggle-btn');
-if (layoutToggleBtn) {
-  layoutToggleBtn.addEventListener('click', () => {
-    const nextLayout = currentLayout === 'AZERTY' ? 'QWERTY' : 'AZERTY';
-    applyLayout(nextLayout);
-    audio.triggerChime(554.37, 'sine', 0.25, 0, 0);
-  });
-}
-
-applyLayout(currentLayout);
-
-// Full 3-octave musical scale mapping for all alphanumeric keys
-const universalNoteMap = {
-  // Numbers row: High crystalline octaves
+const azertyKeyMap = {
+  // Numbers Row (High Crystalline Octave)
   '1': { freq: 523.25, note: 'C5', type: 'sine' },
   '2': { freq: 587.33, note: 'D5', type: 'sine' },
   '3': { freq: 659.25, note: 'E5', type: 'sine' },
@@ -1128,7 +1537,56 @@ const universalNoteMap = {
   '9': { freq: 1174.66, note: 'D6', type: 'sine' },
   '0': { freq: 1318.51, note: 'E6', type: 'sine' },
 
-  // Lead / Mid register
+  // Top letter row (AZERTY Melodic Core: A Z E R T Y U I O P)
+  'a': { freq: 261.63, note: 'C4', type: 'sawtooth' },
+  'z': { freq: 293.66, note: 'D4', type: 'sawtooth' },
+  'e': { freq: 329.63, note: 'E4', type: 'sawtooth' },
+  'r': { freq: 349.23, note: 'F4', type: 'sawtooth' },
+  't': { freq: 392.00, note: 'G4', type: 'sawtooth' },
+  'y': { freq: 440.00, note: 'A4', type: 'triangle' },
+  'u': { freq: 493.88, note: 'B4', type: 'triangle' },
+  'i': { freq: 523.25, note: 'C5', type: 'sine' },
+  'o': { freq: 587.33, note: 'D5', type: 'sine' },
+  'p': { freq: 659.25, note: 'E5', type: 'sine' },
+
+  // Middle letter row (AZERTY Harmonic Bass: Q S D F G H J K L M)
+  'q': { freq: 174.61, note: 'F3', type: 'triangle' },
+  's': { freq: 196.00, note: 'G3', type: 'triangle' },
+  'd': { freq: 220.00, note: 'A3', type: 'sawtooth' },
+  'f': { freq: 246.94, note: 'B3', type: 'sawtooth' },
+  'g': { freq: 261.63, note: 'C4', type: 'square' },
+  'h': { freq: 293.66, note: 'D4', type: 'square' },
+  'j': { freq: 329.63, note: 'E4', type: 'sawtooth' },
+  'k': { freq: 349.23, note: 'F4', type: 'triangle' },
+  'l': { freq: 392.00, note: 'G4', type: 'sine' },
+  'm': { freq: 440.00, note: 'A4', type: 'sine' },
+
+  // Bottom letter row (AZERTY Sub-Bass: W X C V B N)
+  'w': { freq: 55.00,  note: 'SUB A1', type: 'sine' },
+  'x': { freq: 65.41,  note: 'SUB C2', type: 'sine' },
+  'c': { freq: 73.42,  note: 'SUB D2', type: 'sine' },
+  'v': { freq: 82.41,  note: 'SUB E2', type: 'triangle' },
+  'b': { freq: 98.00,  note: 'BASS G2', type: 'triangle' },
+  'n': { freq: 110.00, note: 'BASS A2', type: 'sawtooth' },
+
+  // Spacebar
+  ' ': { freq: 43.65, note: 'DROP F1', type: 'sine' }
+};
+
+const qwertyKeyMap = {
+  // Numbers Row (High Crystalline Octave)
+  '1': { freq: 523.25, note: 'C5', type: 'sine' },
+  '2': { freq: 587.33, note: 'D5', type: 'sine' },
+  '3': { freq: 659.25, note: 'E5', type: 'sine' },
+  '4': { freq: 698.46, note: 'F5', type: 'sine' },
+  '5': { freq: 783.99, note: 'G5', type: 'sine' },
+  '6': { freq: 880.00, note: 'A5', type: 'sine' },
+  '7': { freq: 987.77, note: 'B5', type: 'sine' },
+  '8': { freq: 1046.50, note: 'C6', type: 'sine' },
+  '9': { freq: 1174.66, note: 'D6', type: 'sine' },
+  '0': { freq: 1318.51, note: 'E6', type: 'sine' },
+
+  // Top letter row (QWERTY Melodic Core: Q W E R T Y U I O P)
   'q': { freq: 261.63, note: 'C4', type: 'sawtooth' },
   'w': { freq: 293.66, note: 'D4', type: 'sawtooth' },
   'e': { freq: 329.63, note: 'E4', type: 'sawtooth' },
@@ -1140,7 +1598,7 @@ const universalNoteMap = {
   'o': { freq: 587.33, note: 'D5', type: 'sine' },
   'p': { freq: 659.25, note: 'E5', type: 'sine' },
 
-  // Harmonic Core / Body chords
+  // Middle letter row (QWERTY Harmonic Bass: A S D F G H J K L)
   'a': { freq: 174.61, note: 'F3', type: 'triangle' },
   's': { freq: 196.00, note: 'G3', type: 'triangle' },
   'd': { freq: 220.00, note: 'A3', type: 'sawtooth' },
@@ -1151,7 +1609,7 @@ const universalNoteMap = {
   'k': { freq: 349.23, note: 'F4', type: 'triangle' },
   'l': { freq: 392.00, note: 'G4', type: 'sine' },
 
-  // Deep Sub-Bass & 808
+  // Bottom letter row (QWERTY Sub-Bass: Z X C V B N M)
   'z': { freq: 55.00,  note: 'SUB A1', type: 'sine' },
   'x': { freq: 65.41,  note: 'SUB C2', type: 'sine' },
   'c': { freq: 73.42,  note: 'SUB D2', type: 'sine' },
@@ -1160,19 +1618,107 @@ const universalNoteMap = {
   'n': { freq: 110.00, note: 'BASS A2', type: 'sawtooth' },
   'm': { freq: 123.47, note: 'BASS B2', type: 'sawtooth' },
 
-  // Spacebar: Massive Sub-Bass Drop & Shockwave
+  // Spacebar
   ' ': { freq: 43.65, note: 'DROP F1', type: 'sine' }
 };
 
-function triggerNoteByKey(keyChar) {
-  const noteData = universalNoteMap[keyChar.toLowerCase()];
+function applyLayout(layout) {
+  currentLayout = layout;
+  try {
+    localStorage.setItem('void_keyboard_layout', layout);
+  } catch (e) {}
+
+  // 1. Update Segmented Control Buttons
+  const azertyBtn = document.getElementById('btn-layout-azerty');
+  const qwertyBtn = document.getElementById('btn-layout-qwerty');
+
+  if (azertyBtn && qwertyBtn) {
+    if (layout === 'AZERTY') {
+      azertyBtn.classList.add('active');
+      azertyBtn.setAttribute('aria-selected', 'true');
+      qwertyBtn.classList.remove('active');
+      qwertyBtn.setAttribute('aria-selected', 'false');
+    } else {
+      qwertyBtn.classList.add('active');
+      qwertyBtn.setAttribute('aria-selected', 'true');
+      azertyBtn.classList.remove('active');
+      azertyBtn.setAttribute('aria-selected', 'false');
+    }
+  }
+
+  // 2. Update Layout Descriptions
+  const activeDesc = document.getElementById('layout-hub-active-desc');
+  if (activeDesc) {
+    activeDesc.textContent = layout === 'AZERTY' ? 'CURRENT: AZERTY (BELGIAN / FRENCH)' : 'CURRENT: QWERTY (US / UNIVERSAL)';
+  }
+
+  const heroIndicator = document.getElementById('hero-layout-indicator');
+  if (heroIndicator) {
+    heroIndicator.textContent = `${layout} MATRIX ACTIVE`;
+  }
+
+  const hintMsg = document.getElementById('layout-hint-message');
+  if (hintMsg) {
+    if (layout === 'AZERTY') {
+      hintMsg.innerHTML = 'Melody row mapped to <strong>[A Z E R T Y]</strong> &bull; Core bass to <strong>[Q S D F G H J K L M]</strong> &bull; Sub-bass to <strong>[W X C V B N]</strong> &bull; Space: Sub-Drop';
+    } else {
+      hintMsg.innerHTML = 'Melody row mapped to <strong>[Q W E R T Y]</strong> &bull; Core bass to <strong>[A S D F G H J K L]</strong> &bull; Sub-bass to <strong>[Z X C V B N M]</strong> &bull; Space: Sub-Drop';
+    }
+  }
+
+  // 3. Dynamically update on-screen Synth Button badges!
+  const keys = layout === 'AZERTY' ? ['A', 'Z', 'E', 'R', 'T', 'Y'] : ['Q', 'W', 'E', 'R', 'T', 'Y'];
+  for (let i = 1; i <= 6; i++) {
+    const badge = document.getElementById(`key-badge-${i}`);
+    if (badge) {
+      badge.textContent = `${i} / ${keys[i - 1]}`;
+    }
+    const btn = document.querySelector(`.synth-key:nth-child(${i})`);
+    if (btn) {
+      btn.setAttribute('data-key', String(i));
+      btn.setAttribute('data-key-alt', keys[i - 1].toLowerCase());
+    }
+  }
+
+  // Play audio confirmation
+  audio.triggerChime(554.37, 'sine', 0.2, 0, 0);
+}
+
+// Layout Switcher Event Listeners
+const btnLayoutAzerty = document.getElementById('btn-layout-azerty');
+if (btnLayoutAzerty) {
+  btnLayoutAzerty.addEventListener('click', () => applyLayout('AZERTY'));
+}
+
+const btnLayoutQwerty = document.getElementById('btn-layout-qwerty');
+if (btnLayoutQwerty) {
+  btnLayoutQwerty.addEventListener('click', () => applyLayout('QWERTY'));
+}
+
+applyLayout(currentLayout);
+
+function triggerNoteByKey(keyChar, physicalCode) {
+  const activeMap = currentLayout === 'AZERTY' ? azertyKeyMap : qwertyKeyMap;
+  let noteData = activeMap[keyChar.toLowerCase()];
+
+  // If not found directly, check physical keycode mappings for AZERTY/QWERTY cross-compatibility
+  if (!noteData && physicalCode) {
+    if (physicalCode === 'KeyQ') noteData = activeMap['q'] || activeMap['a'];
+    if (physicalCode === 'KeyW') noteData = activeMap['w'] || activeMap['z'];
+    if (physicalCode === 'KeyA') noteData = activeMap['a'] || activeMap['q'];
+    if (physicalCode === 'KeyZ') noteData = activeMap['z'] || activeMap['w'];
+  }
+
   if (!noteData) return;
 
   audio.init();
   if (audio.isMuted) audio.toggle();
 
   const panX = (Math.random() - 0.5) * 2;
-  audio.triggerChime(noteData.freq, noteData.type, 0.7, panX, 0);
+  audio.triggerChime(noteData.freq, noteData.type, 0.75, panX, 0);
+
+  // Interaction accelerates cosmic evolution
+  cosmicEngine.addEntropy(0.45, 'key');
 
   // Update HUD Display with note details
   const lastKeyHud = document.getElementById('last-key-hud');
@@ -1212,10 +1758,11 @@ window.addEventListener('keydown', (e) => {
     applyLayout('QWERTY');
   }
 
-  // Escape closes open modals
+  // Escape closes all open modals
   if (key === 'escape') {
     closeControlsModal();
     closeTimelineModal();
+    closeUniverseModal();
     return;
   }
 
@@ -1231,20 +1778,39 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
+  // 'u' toggles Universe Story
+  if (key === 'u') {
+    toggleUniverseModal();
+    return;
+  }
+
   // 'm' toggles global sound
   if (key === 'm') {
     audio.toggle();
     return;
   }
 
-  // 'b' toggles beat track
+  // 'b' toggles beat / cosmic music track
   if (key === 'b') {
-    toggleBeatTrack();
+    cosmicEngine.togglePlayback();
     return;
   }
 
-  if (universalNoteMap[key]) {
-    triggerNoteByKey(key);
+  // 'p' freezes / pauses cosmic evolution
+  if (key === 'p') {
+    cosmicEngine.togglePause();
+    return;
+  }
+
+  // 's' captures a cosmic memory state
+  if (key === 's') {
+    cosmicEngine.saveMemory();
+    return;
+  }
+
+  const activeMap = currentLayout === 'AZERTY' ? azertyKeyMap : qwertyKeyMap;
+  if (activeMap[key] || ['keyq', 'keyw', 'keya', 'keyz'].includes(e.code.toLowerCase())) {
+    triggerNoteByKey(key, e.code);
   }
 });
 
