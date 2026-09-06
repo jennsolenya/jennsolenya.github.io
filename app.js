@@ -1269,14 +1269,23 @@ function setupOrbitControls(canvas) {
 }
 
 let scrollY = 0;
+let coordTracker = null;
+
+function getCoordTracker() {
+  if (!coordTracker) {
+    coordTracker = document.getElementById('coords');
+  }
+  return coordTracker;
+}
+
 window.addEventListener('scroll', () => {
   scrollY = window.scrollY;
   const maxScroll = document.body.scrollHeight - window.innerHeight;
   const progress = Math.min(1, Math.max(0, scrollY / (maxScroll || 1)));
 
-  const coordTracker = document.getElementById('coords');
-  if (coordTracker) {
-    coordTracker.textContent = `X: ${Math.round(mouse.targetX)} | Y: ${Math.round(mouse.targetY)} | DEPTH: ${(progress * 100).toFixed(0)}%`;
+  const tracker = getCoordTracker();
+  if (tracker) {
+    tracker.textContent = `X: ${Math.round(mouse.targetX)} | Y: ${Math.round(mouse.targetY)} | DEPTH: ${(progress * 100).toFixed(0)}%`;
   }
 
   if (typeof cosmicEngine !== 'undefined') {
@@ -1502,9 +1511,9 @@ window.addEventListener('mousemove', (e) => {
     cursorRing.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
   }
 
-  const coordTracker = document.getElementById('coords');
-  if (coordTracker) {
-    coordTracker.textContent = `X: ${e.clientX} | Y: ${e.clientY}`;
+  const tracker = getCoordTracker();
+  if (tracker) {
+    tracker.textContent = `X: ${e.clientX} | Y: ${e.clientY}`;
   }
 
   audio.modulateWithCursor(e.clientX / width, e.clientY / height, trackpadForce);
