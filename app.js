@@ -1866,7 +1866,13 @@ class CosmicUniverseEngine {
   syncGenrePills(genreKey) {
     document.querySelectorAll('.genre-pill').forEach((pill) => {
       const pGenre = pill.getAttribute('data-genre');
-      if (pGenre === genreKey || (pGenre === 'techno' && genreKey === 'stellar') || (pGenre === 'ambient' && genreKey === 'inflation') || (pGenre === 'dubstep' && genreKey === 'turbulence')) {
+      const isActiveGenre =
+        pGenre === genreKey ||
+        (pGenre === 'techno' && genreKey === 'stellar') ||
+        (pGenre === 'ambient' && genreKey === 'inflation') ||
+        (pGenre === 'dubstep' && genreKey === 'turbulence');
+
+      if (isActiveGenre) {
         pill.classList.add('active');
       } else {
         pill.classList.remove('active');
