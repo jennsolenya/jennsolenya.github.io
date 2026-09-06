@@ -1,0 +1,27 @@
+# OS Metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editor & IDE Directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs & Temporary Artifacts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node / Deno Dependency Caches
+node_modules/
+.deno/
+deno.lock
+
+# Test artifacts & scratch dumps
+scratch/
+test_cdp.js
+tmp/
