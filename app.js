@@ -1053,7 +1053,25 @@ for (let i = 0; i < dustCount; i++) {
   });
 }
 
+let isDocumentVisible = typeof document !== 'undefined' ? !document.hidden : true;
+document.addEventListener('visibilitychange', () => {
+  const wasVisible = isDocumentVisible;
+  isDocumentVisible = !document.hidden;
+  if (!wasVisible && isDocumentVisible) {
+    requestAnimationFrame(drawGrid);
+    if (typeof animateThreeJS === 'function') {
+      requestAnimationFrame(animateThreeJS);
+    }
+    if (typeof colliderLab !== 'undefined' && colliderLab && !colliderLab.isOffscreen) {
+      requestAnimationFrame(colliderLab.animate);
+    }
+  }
+});
+
 function drawGrid() {
+  if (!isDocumentVisible) return;
+  requestAnimationFrame(drawGrid);
+
   gCtx.fillStyle = '#000000';
   gCtx.fillRect(0, 0, width, height);
 
@@ -1120,8 +1138,6 @@ function drawGrid() {
       gCtx.fill();
     }
   });
-
-  requestAnimationFrame(drawGrid);
 }
 drawGrid();
 
@@ -1269,10 +1285,16 @@ function setupOrbitControls(canvas) {
 }
 
 let scrollY = 0;
+let cachedMaxScroll = 1;
+function updateScrollGeometry() {
+  cachedMaxScroll = Math.max(1, (document.body ? document.body.scrollHeight : window.innerHeight) - window.innerHeight);
+}
+window.addEventListener('resize', updateScrollGeometry, { passive: true });
+window.addEventListener('DOMContentLoaded', updateScrollGeometry);
+
 window.addEventListener('scroll', () => {
   scrollY = window.scrollY;
-  const maxScroll = document.body.scrollHeight - window.innerHeight;
-  const progress = Math.min(1, Math.max(0, scrollY / (maxScroll || 1)));
+  const progress = Math.min(1, Math.max(0, scrollY / (cachedMaxScroll || 1)));
 
   if (coordTracker) {
     coordTracker.textContent = `X: ${Math.round(mouse.targetX)} | Y: ${Math.round(mouse.targetY)} | DEPTH: ${(progress * 100).toFixed(0)}%`;
@@ -1281,19 +1303,19 @@ window.addEventListener('scroll', () => {
   if (typeof cosmicEngine !== 'undefined') {
     cosmicEngine.addEntropy(0.03, 'scroll');
   }
-});
+}, { passive: true });
 
 const freqBuffer = new Uint8Array(32);
 
 function animateThreeJS() {
+  if (!isDocumentVisible) return;
   requestAnimationFrame(animateThreeJS);
 
   const normX = (mouse.x / width) * 2 - 1;
   const normY = -(mouse.y / height) * 2 + 1;
 
   // --- Scrollytelling 3D Camera Voyage ---
-  const maxScroll = Math.max(1, document.body.scrollHeight - window.innerHeight);
-  const scrollProg = Math.min(1, Math.max(0, scrollY / maxScroll));
+  const scrollProg = Math.min(1, Math.max(0, scrollY / (cachedMaxScroll || 1)));
 
   // Multi-chapter camera depth journey through deep space:
   // Chapter 00 (Hero: 0.0 -> 0.22): Observational distance (Z = 7.0 -> 3.8, plunging toward singularity)
@@ -2738,7 +2760,8 @@ class ParticleColliderLab {
 
     this.ctx = this.canvas.getContext('2d');
     this.particles = [];
-    this.numParticles = 2500;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    this.numParticles = isMobile ? 800 : 2000;
     this.mode = 'inflation'; // 'inflation' | 'vortex' | 'accretion' | 'quantum'
     this.isDragging = false;
     this.attractor = { x: 0, y: 0, active: false };
@@ -2747,6 +2770,7 @@ class ParticleColliderLab {
     this.collapseTimer = 0;
     this.gravityMult = 1.0;
     this.time = 0;
+    this.isOffscreen = false;
 
     // Badges
     this.modeBadge = document.getElementById('sandbox-mode-badge');
@@ -2757,8 +2781,24 @@ class ParticleColliderLab {
     this.initCanvas();
     this.initParticles();
     this.bindEvents();
+    this.setupObserver();
     this.animate = this.animate.bind(this);
     requestAnimationFrame(this.animate);
+  }
+
+  setupObserver() {
+    if (typeof IntersectionObserver !== 'undefined' && this.canvas) {
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const wasOffscreen = this.isOffscreen;
+          this.isOffscreen = !entry.isIntersecting;
+          if (wasOffscreen && !this.isOffscreen && isDocumentVisible) {
+            requestAnimationFrame(this.animate);
+          }
+        });
+      }, { threshold: 0.05 });
+      this.observer.observe(this.canvas);
+    }
   }
 
   initCanvas() {
@@ -2949,6 +2989,7 @@ class ParticleColliderLab {
   }
 
   animate() {
+    if (!isDocumentVisible || this.isOffscreen) return;
     requestAnimationFrame(this.animate);
     this.time += 0.016;
 
