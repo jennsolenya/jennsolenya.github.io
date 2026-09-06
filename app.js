@@ -1976,17 +1976,27 @@ class CosmicUniverseEngine {
       const chip = document.createElement('button');
       chip.className = `memory-chip ${mem.id === activeId ? 'active' : ''}`;
       chip.setAttribute('aria-label', `Restore ${mem.name}`);
-      chip.innerHTML = `
-        <span class="chip-index">//</span>
-        <span>${mem.name} [${mem.time}]</span>
-        <span class="memory-delete-btn" title="Delete memory">&times;</span>
-      `;
+
+      const indexSpan = document.createElement('span');
+      indexSpan.className = 'chip-index';
+      indexSpan.textContent = '//';
+
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = `${mem.name} [${mem.time}]`;
+
+      const delBtn = document.createElement('span');
+      delBtn.className = 'memory-delete-btn';
+      delBtn.title = 'Delete memory';
+      delBtn.textContent = '×';
+
+      chip.appendChild(indexSpan);
+      chip.appendChild(document.createTextNode(' '));
+      chip.appendChild(labelSpan);
+      chip.appendChild(document.createTextNode(' '));
+      chip.appendChild(delBtn);
 
       chip.addEventListener('click', () => this.restoreMemory(mem.id));
-      const delBtn = chip.querySelector('.memory-delete-btn');
-      if (delBtn) {
-        delBtn.addEventListener('click', (ev) => this.deleteMemory(mem.id, ev));
-      }
+      delBtn.addEventListener('click', (ev) => this.deleteMemory(mem.id, ev));
 
       shelf.appendChild(chip);
     });
