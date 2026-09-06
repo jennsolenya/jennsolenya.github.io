@@ -2196,7 +2196,8 @@ class CosmicUniverseEngine {
         }
 
         // Bass design varies by 32-bar section
-        if (s === 2 || s === 4 || s === 6 || s === 12 || s === 14) {
+        const isGrowlStep = s === 2 || s === 4 || s === 6 || s === 12 || s === 14;
+        if (isGrowlStep) {
           const growlNotes = [55, 73.4, 82.4, 55, 65.4, 49.0, 73.4, 82.4];
           const growlFreq = growlNotes[(s / 2 + measure) % growlNotes.length];
 
