@@ -1274,7 +1274,6 @@ window.addEventListener('scroll', () => {
   const maxScroll = document.body.scrollHeight - window.innerHeight;
   const progress = Math.min(1, Math.max(0, scrollY / (maxScroll || 1)));
 
-  const coordTracker = document.getElementById('coords');
   if (coordTracker) {
     coordTracker.textContent = `X: ${Math.round(mouse.targetX)} | Y: ${Math.round(mouse.targetY)} | DEPTH: ${(progress * 100).toFixed(0)}%`;
   }
@@ -1490,6 +1489,7 @@ window.addEventListener('pointerup', () => {
 
 // --- 5. Custom Cursor & Spotlight Tracking ---
 const cursorDot = document.getElementById('cursor-dot');
+const coordTracker = document.getElementById('coords');
 
 window.addEventListener('mousemove', (e) => {
   mouse.targetX = e.clientX;
@@ -1502,7 +1502,6 @@ window.addEventListener('mousemove', (e) => {
     cursorRing.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
   }
 
-  const coordTracker = document.getElementById('coords');
   if (coordTracker) {
     coordTracker.textContent = `X: ${e.clientX} | Y: ${e.clientY}`;
   }
