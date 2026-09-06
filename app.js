@@ -2232,11 +2232,12 @@ class CosmicUniverseEngine {
 
       } else if (ep.key === 'bounce') {
         // The Big Bounce crunch into celestial rebirth
+        const isSilenceVacuum = s >= 8 && s <= 11;
         if (s < 8) {
           const crunchFreqs = [440, 392, 329.63, 261.63, 196, 164.8, 130.8, 82.4];
           audio.triggerChime(crunchFreqs[s], 'sawtooth', 0.15, 0, 0);
           if (s % 2 === 0) audio.playKick(now);
-        } else if (s === 8 || s === 9 || s === 10 || s === 11) {
+        } else if (isSilenceVacuum) {
           // Silence vacuum
         } else if (s === 12) {
           audio.playBigBounceChord();
