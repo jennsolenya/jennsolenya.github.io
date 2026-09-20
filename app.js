@@ -4,6 +4,8 @@
  * Features: Three.js 3D Orbit, HRTF Spatial Audio, Mac Force Touch, Keyboard Synth & Auto-Arpeggiator
  */
 
+const MAX_RENDER_DPR = 1.5;
+
 // --- 1. Sound Engine with Binaural HRTF Spatial Audio ---
 class SpatialSoundEngine {
   constructor() {
@@ -1173,7 +1175,7 @@ function initThreeJS() {
       antialias: true,
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_RENDER_DPR));
 
     // 1,500 Starfield for Scrollytelling Cosmic Depth
     const starGeo = new THREE.BufferGeometry();
@@ -2804,7 +2806,7 @@ class ParticleColliderLab {
   initCanvas() {
     const parent = this.canvas.parentElement;
     if (!parent) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, MAX_RENDER_DPR);
     this.width = parent.clientWidth || 800;
     this.height = parent.clientHeight || 450;
 
