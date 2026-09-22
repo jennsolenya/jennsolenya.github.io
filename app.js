@@ -165,8 +165,9 @@ class SpatialSoundEngine {
   }
 
   makeDistortionCurve(amount = 20) {
-    const k = typeof amount === 'number' ? amount : 20;
-    const cacheKey = Number.isFinite(k) ? k.toFixed(2) : '20.00';
+    const requestedAmount = typeof amount === 'number' ? amount : 20;
+    const k = Number.isFinite(requestedAmount) ? requestedAmount : 20;
+    const cacheKey = String(k);
     const cachedCurve = distortionCurveCache.get(cacheKey);
     if (cachedCurve) return cachedCurve;
 
