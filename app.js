@@ -1292,17 +1292,23 @@ function updateScrollGeometry() {
 window.addEventListener('resize', updateScrollGeometry, { passive: true });
 window.addEventListener('DOMContentLoaded', updateScrollGeometry);
 
+let scrollUiFrame = null;
 window.addEventListener('scroll', () => {
   scrollY = window.scrollY;
-  const progress = Math.min(1, Math.max(0, scrollY / (cachedMaxScroll || 1)));
 
-  if (coordTracker) {
-    coordTracker.textContent = `X: ${Math.round(mouse.targetX)} | Y: ${Math.round(mouse.targetY)} | DEPTH: ${(progress * 100).toFixed(0)}%`;
-  }
+  if (scrollUiFrame) return;
+  scrollUiFrame = requestAnimationFrame(() => {
+    scrollUiFrame = null;
+    const progress = Math.min(1, Math.max(0, scrollY / (cachedMaxScroll || 1)));
 
-  if (typeof cosmicEngine !== 'undefined') {
-    cosmicEngine.addEntropy(0.03, 'scroll');
-  }
+    if (coordTracker) {
+      coordTracker.textContent = `X: ${Math.round(mouse.targetX)} | Y: ${Math.round(mouse.targetY)} | DEPTH: ${(progress * 100).toFixed(0)}%`;
+    }
+
+    if (typeof cosmicEngine !== 'undefined') {
+      cosmicEngine.addEntropy(0.03, 'scroll');
+    }
+  });
 }, { passive: true });
 
 const freqBuffer = new Uint8Array(32);
