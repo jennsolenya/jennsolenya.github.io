@@ -5,6 +5,8 @@
  */
 
 // --- 1. Sound Engine with Binaural HRTF Spatial Audio ---
+const distortionCurveCache = new Map();
+
 class SpatialSoundEngine {
   constructor() {
     this.ctx = null;
@@ -163,7 +165,12 @@ class SpatialSoundEngine {
   }
 
   makeDistortionCurve(amount = 20) {
-    const k = typeof amount === 'number' ? amount : 20;
+    const requestedAmount = typeof amount === 'number' ? amount : 20;
+    const k = Number.isFinite(requestedAmount) ? requestedAmount : 20;
+    const cacheKey = String(k);
+    const cachedCurve = distortionCurveCache.get(cacheKey);
+    if (cachedCurve) return cachedCurve;
+
     const n_samples = 44100;
     const curve = new Float32Array(n_samples);
     const deg = Math.PI / 180;
@@ -171,6 +178,8 @@ class SpatialSoundEngine {
       const x = (i * 2) / n_samples - 1;
       curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
     }
+
+    distortionCurveCache.set(cacheKey, curve);
     return curve;
   }
 
