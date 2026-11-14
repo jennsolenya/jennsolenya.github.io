@@ -3198,9 +3198,15 @@ if (visCanvas) {
   window.addEventListener('resize', resizeVis);
 
   const freqData = new Uint8Array(32);
+  let isVisualizerVisible = false;
+  let visualizerFramePending = false;
 
   function drawVisualizer() {
+    visualizerFramePending = false;
+    if (!isDocumentVisible || !isVisualizerVisible) return;
+    visualizerFramePending = true;
     requestAnimationFrame(drawVisualizer);
+
     vCtx.fillStyle = 'rgba(0, 0, 0, 0.25)';
     vCtx.fillRect(0, 0, visCanvas.width, visCanvas.height);
 
@@ -3224,7 +3230,30 @@ if (visCanvas) {
       vCtx.fillRect(x + 1, y, barWidth - 2, barHeight);
     }
   }
-  drawVisualizer();
+
+  const visualizerObserver = typeof IntersectionObserver !== 'undefined'
+    ? new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        isVisualizerVisible = entry.isIntersecting;
+        if (isVisualizerVisible && isDocumentVisible && !visualizerFramePending) {
+          requestAnimationFrame(drawVisualizer);
+        }
+      });
+    }, { threshold: 0.05 })
+    : null;
+
+  if (visualizerObserver) {
+    visualizerObserver.observe(visCanvas);
+  } else {
+    isVisualizerVisible = true;
+    drawVisualizer();
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (isDocumentVisible && isVisualizerVisible && !visualizerFramePending) {
+      requestAnimationFrame(drawVisualizer);
+    }
+  });
 }
 
 // --- 10. Mechanics & Controls Modal Logic ---
