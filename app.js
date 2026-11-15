@@ -1182,7 +1182,7 @@ function initThreeJS() {
       antialias: true,
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
     // 1,500 Starfield for Scrollytelling Cosmic Depth
     const starGeo = new THREE.BufferGeometry();
