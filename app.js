@@ -19,8 +19,26 @@ class SpatialSoundEngine {
     this.subBassGain = null;
     this.spatialPanner = null;
     this.analyser = null;
+    this.noiseBufferCache = new Map();
     this.isMuted = true;
     this.initialized = false;
+  }
+
+  getNoiseBuffer(duration, decay = false) {
+    if (!this.ctx) return null;
+    const key = `${this.ctx.sampleRate}:${duration}:${decay ? 'decay' : 'plain'}`;
+    if (this.noiseBufferCache.has(key)) return this.noiseBufferCache.get(key);
+
+    const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      const envelope = decay ? Math.exp(-i / (bufferSize * 0.25)) : 1;
+      data[i] = (Math.random() * 2 - 1) * envelope;
+    }
+
+    this.noiseBufferCache.set(key, buffer);
+    return buffer;
   }
 
   init() {
@@ -485,12 +503,7 @@ class SpatialSoundEngine {
     try {
       // Noise burst
       const duration = snappy ? 0.08 : 0.14;
-      const bufferSize = Math.floor(this.ctx.sampleRate * duration);
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
+      const buffer = this.getNoiseBuffer(duration);
       const noise = this.ctx.createBufferSource();
       noise.buffer = buffer;
 
@@ -530,12 +543,7 @@ class SpatialSoundEngine {
     const t = time || this.ctx.currentTime;
     try {
       const duration = open ? 0.22 : 0.038;
-      const bufferSize = Math.floor(this.ctx.sampleRate * duration);
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
+      const buffer = this.getNoiseBuffer(duration);
       const noise = this.ctx.createBufferSource();
       noise.buffer = buffer;
 
@@ -680,14 +688,7 @@ class SpatialSoundEngine {
 
       // Rumble tail: filtered noise with exponential decay
       const tailDuration = 0.35;
-      const bufferSize = Math.floor(this.ctx.sampleRate * tailDuration);
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        // Exponentially decaying noise shaped as sub-rumble
-        const decay = Math.exp(-i / (bufferSize * 0.25));
-        data[i] = (Math.random() * 2 - 1) * decay;
-      }
+      const buffer = this.getNoiseBuffer(tailDuration, true);
       const rumbleNoise = this.ctx.createBufferSource();
       rumbleNoise.buffer = buffer;
 
@@ -772,12 +773,7 @@ class SpatialSoundEngine {
     const t = time || this.ctx.currentTime;
     try {
       const duration = 0.15;
-      const bufferSize = Math.floor(this.ctx.sampleRate * duration);
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
+      const buffer = this.getNoiseBuffer(duration);
       const noise = this.ctx.createBufferSource();
       noise.buffer = buffer;
 
@@ -976,12 +972,7 @@ class SpatialSoundEngine {
     const t = time || this.ctx.currentTime;
     try {
       const duration = 0.04;
-      const bufferSize = Math.floor(this.ctx.sampleRate * duration);
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
+      const buffer = this.getNoiseBuffer(duration);
       const noise = this.ctx.createBufferSource();
       noise.buffer = buffer;
 
@@ -1066,22 +1057,33 @@ let isDocumentVisible = typeof document !== 'undefined' ? !document.hidden : tru
 const prefersReducedMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
   ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
   : false;
+let gridAnimationRunning = false;
+let threeAnimationRunning = false;
 document.addEventListener('visibilitychange', () => {
   const wasVisible = isDocumentVisible;
   isDocumentVisible = !document.hidden;
   if (!wasVisible && isDocumentVisible) {
-    if (!prefersReducedMotion) requestAnimationFrame(drawGrid);
-    if (!prefersReducedMotion && typeof animateThreeJS === 'function') {
-      requestAnimationFrame(animateThreeJS);
+    startGridAnimation();
+    if (typeof animateThreeJS === 'function') {
+      startThreeAnimation();
     }
-    if (!prefersReducedMotion && typeof colliderLab !== 'undefined' && colliderLab && !colliderLab.isOffscreen) {
-      requestAnimationFrame(colliderLab.animate);
+    if (typeof colliderLab !== 'undefined' && colliderLab && !colliderLab.isOffscreen) {
+      colliderLab.startAnimation();
     }
   }
 });
 
+function startGridAnimation() {
+  if (prefersReducedMotion || gridAnimationRunning) return;
+  gridAnimationRunning = true;
+  requestAnimationFrame(drawGrid);
+}
+
 function drawGrid() {
-  if (!isDocumentVisible) return;
+  if (!isDocumentVisible) {
+    gridAnimationRunning = false;
+    return;
+  }
   if (!prefersReducedMotion) requestAnimationFrame(drawGrid);
 
   gCtx.fillStyle = '#000000';
@@ -1151,7 +1153,7 @@ function drawGrid() {
     }
   });
 }
-drawGrid();
+startGridAnimation();
 
 // --- 3. Three.js 3D Wireframe with Orbit Drag & Zoom ---
 let scene, camera, renderer, wireframeMesh, outerRing, innerCore, starField;
@@ -1170,6 +1172,12 @@ let previousPointerPos = { x: 0, y: 0 };
 const rotationVelocity = { x: 0, y: 0 };
 let targetCameraZ = 7.0;
 
+function getThreePixelRatio() {
+  const deviceRatio = window.devicePixelRatio || 1;
+  const maxRatio = window.innerWidth < 768 ? 1.25 : 1.5;
+  return Math.min(deviceRatio, maxRatio);
+}
+
 function initThreeJS() {
   try {
     const container = document.getElementById('webgl-canvas');
@@ -1185,8 +1193,7 @@ function initThreeJS() {
       antialias: true,
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    const maxPixelRatio = window.innerWidth < 768 ? 1.25 : 1.5;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
+    renderer.setPixelRatio(getThreePixelRatio());
 
     // 1,500 Starfield for Scrollytelling Cosmic Depth
     const starGeo = new THREE.BufferGeometry();
@@ -1246,7 +1253,8 @@ function initThreeJS() {
     scene.add(outerRing);
 
     setupOrbitControls(container);
-    animateThreeJS();
+    if (prefersReducedMotion) animateThreeJS();
+    else startThreeAnimation();
   } catch (err) {
     console.warn('Three.js WebGL initialization skipped:', err);
     const fallback = document.getElementById('webgl-fallback');
@@ -1327,7 +1335,10 @@ window.addEventListener('scroll', () => {
 const freqBuffer = new Uint8Array(32);
 
 function animateThreeJS() {
-  if (!isDocumentVisible) return;
+  if (!isDocumentVisible) {
+    threeAnimationRunning = false;
+    return;
+  }
   if (!prefersReducedMotion) requestAnimationFrame(animateThreeJS);
 
   const normX = (mouse.x / width) * 2 - 1;
@@ -1426,6 +1437,12 @@ function animateThreeJS() {
   }
 
   renderer.render(scene, camera);
+}
+
+function startThreeAnimation() {
+  if (prefersReducedMotion || threeAnimationRunning) return;
+  threeAnimationRunning = true;
+  requestAnimationFrame(animateThreeJS);
 }
 
 // Morph to next 3D geometry and update HUD badges
@@ -1531,25 +1548,38 @@ window.addEventListener('pointerup', () => {
 // --- 5. Custom Cursor & Spotlight Tracking ---
 const cursorDot = document.getElementById('cursor-dot');
 const coordTracker = document.getElementById('coords');
+let pointerMoveFramePending = false;
+let pendingPointerX = mouse.targetX;
+let pendingPointerY = mouse.targetY;
 
-window.addEventListener('mousemove', (e) => {
-  mouse.targetX = e.clientX;
-  mouse.targetY = e.clientY;
+function flushPointerMove() {
+  pointerMoveFramePending = false;
+  mouse.targetX = pendingPointerX;
+  mouse.targetY = pendingPointerY;
 
   if (cursorDot) {
-    cursorDot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    cursorDot.style.transform = `translate(${pendingPointerX}px, ${pendingPointerY}px)`;
   }
   if (cursorRing && !isDragging) {
-    cursorRing.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    cursorRing.style.transform = `translate(${pendingPointerX}px, ${pendingPointerY}px)`;
   }
 
   if (coordTracker) {
-    coordTracker.textContent = `X: ${e.clientX} | Y: ${e.clientY}`;
+    coordTracker.textContent = `X: ${pendingPointerX} | Y: ${pendingPointerY}`;
   }
 
-  audio.modulateWithCursor(e.clientX / width, e.clientY / height, trackpadForce);
+  audio.modulateWithCursor(pendingPointerX / width, pendingPointerY / height, trackpadForce);
   if (typeof cosmicEngine !== 'undefined') {
     cosmicEngine.addEntropy(0.025, 'move');
+  }
+}
+
+window.addEventListener('mousemove', (e) => {
+  pendingPointerX = e.clientX;
+  pendingPointerY = e.clientY;
+  if (!pointerMoveFramePending) {
+    pointerMoveFramePending = true;
+    requestAnimationFrame(flushPointerMove);
   }
 });
 
@@ -1921,18 +1951,39 @@ class CosmicUniverseEngine {
   }
 
   // --- Cosmic Memories Bank ---
+  normalizeSavedMemories(value) {
+    if (!Array.isArray(value)) return [];
+
+    return value
+      .slice(0, 8)
+      .filter((mem) => mem && typeof mem === 'object' && !Array.isArray(mem))
+      .map((mem, index) => {
+        const id = typeof mem.id === 'string' ? mem.id.slice(0, 80) : `mem-restored-${index}`;
+        const name = typeof mem.name === 'string' ? mem.name.slice(0, 160) : 'Unnamed memory';
+        const time = typeof mem.time === 'string' ? mem.time.slice(0, 80) : 'UNKNOWN TIME';
+        const date = typeof mem.date === 'string' ? mem.date.slice(0, 80) : '';
+        const epochIndex = Number.isInteger(mem.epochIndex) && mem.epochIndex >= 0 && mem.epochIndex < COSMIC_EPOCHS.length
+          ? mem.epochIndex
+          : 0;
+        const entropy = typeof mem.entropy === 'number' && Number.isFinite(mem.entropy)
+          ? Math.min(100, Math.max(0, mem.entropy))
+          : 0;
+
+        return { id, name, epochIndex, entropy, time, date };
+      });
+  }
+
   loadSavedState() {
-    const saved = localStorage.getItem('void_cosmic_memories');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        this.memories = Array.isArray(parsed)
-          ? parsed.filter((memory) => memory && typeof memory === 'object' && typeof memory.id === 'string')
-          : [];
-      } catch (e) {
-        this.memories = [];
+    try {
+      const saved = localStorage.getItem('void_cosmic_memories');
+      if (saved) {
+        this.memories = JSON.parse(saved);
       }
+    } catch (e) {
+      this.memories = [];
     }
+
+    this.memories = this.normalizeSavedMemories(this.memories);
 
     // Seed default baseline memories if empty
     if (!this.memories || this.memories.length === 0) {
@@ -2733,20 +2784,32 @@ document.querySelectorAll('.synth-key').forEach((keyEl) => {
 
 // --- 8. 3D Perspective Card Tilt ---
 document.querySelectorAll('.tilt-card').forEach((card) => {
+  let pendingPointerEvent = null;
+  let pointerFrame = 0;
+
   card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    pendingPointerEvent = e;
+    if (pointerFrame) return;
 
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    pointerFrame = requestAnimationFrame(() => {
+      pointerFrame = 0;
+      if (!pendingPointerEvent) return;
 
-    const rotateX = -((y - centerY) / centerY) * 10;
-    const rotateY = ((x - centerX) / centerX) * 10;
+      const rect = card.getBoundingClientRect();
+      const x = pendingPointerEvent.clientX - rect.left;
+      const y = pendingPointerEvent.clientY - rect.top;
+      pendingPointerEvent = null;
 
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = -((y - centerY) / centerY) * 10;
+      const rotateY = ((x - centerX) / centerX) * 10;
+
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+    });
   });
 
   card.addEventListener('mouseenter', () => {
@@ -2793,6 +2856,9 @@ class ParticleColliderLab {
     this.gravityMult = 1.0;
     this.time = 0;
     this.isOffscreen = false;
+    this.animationRunning = false;
+    this.pendingPointer = null;
+    this.pointerFrame = 0;
 
     // Badges
     this.modeBadge = document.getElementById('sandbox-mode-badge');
@@ -2806,7 +2872,13 @@ class ParticleColliderLab {
     this.setupObserver();
     this.animate = this.animate.bind(this);
     if (prefersReducedMotion) this.animate();
-    else requestAnimationFrame(this.animate);
+    else this.startAnimation();
+  }
+
+  startAnimation() {
+    if (prefersReducedMotion || this.animationRunning || !isDocumentVisible || this.isOffscreen) return;
+    this.animationRunning = true;
+    requestAnimationFrame(this.animate);
   }
 
   setupObserver() {
@@ -2815,8 +2887,8 @@ class ParticleColliderLab {
         entries.forEach((entry) => {
           const wasOffscreen = this.isOffscreen;
           this.isOffscreen = !entry.isIntersecting;
-          if (wasOffscreen && !this.isOffscreen && isDocumentVisible && !prefersReducedMotion) {
-            requestAnimationFrame(this.animate);
+          if (wasOffscreen && !this.isOffscreen && isDocumentVisible) {
+            this.startAnimation();
           }
         });
       }, { threshold: 0.05 });
@@ -2836,7 +2908,8 @@ class ParticleColliderLab {
     this.canvas.style.width = `${this.width}px`;
     this.canvas.style.height = `${this.height}px`;
 
-    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.scale(dpr, dpr);
     this.centerX = this.width / 2;
     this.centerY = this.height / 2;
     this.attractor.x = this.centerX;
@@ -2963,10 +3036,19 @@ class ParticleColliderLab {
     });
 
     this.canvas.addEventListener('pointermove', (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      this.attractor.x = e.clientX - rect.left;
-      this.attractor.y = e.clientY - rect.top;
-      this.attractor.active = true;
+      this.pendingPointer = e;
+      if (this.pointerFrame) return;
+
+      this.pointerFrame = requestAnimationFrame(() => {
+        this.pointerFrame = 0;
+        if (!this.pendingPointer) return;
+
+        const rect = this.canvas.getBoundingClientRect();
+        this.attractor.x = this.pendingPointer.clientX - rect.left;
+        this.attractor.y = this.pendingPointer.clientY - rect.top;
+        this.attractor.active = true;
+        this.pendingPointer = null;
+      });
     });
 
     this.canvas.addEventListener('pointerup', (e) => {
@@ -3016,7 +3098,10 @@ class ParticleColliderLab {
   }
 
   animate() {
-    if (!isDocumentVisible || this.isOffscreen) return;
+    if (!isDocumentVisible || this.isOffscreen) {
+      this.animationRunning = false;
+      return;
+    }
     if (!prefersReducedMotion) requestAnimationFrame(this.animate);
     this.time += 0.016;
 
@@ -3223,6 +3308,7 @@ if (visCanvas) {
     visualizerFramePending = false;
     if (!isDocumentVisible || !isVisualizerVisible) return;
     visualizerFramePending = true;
+    if (prefersReducedMotion) return;
     requestAnimationFrame(drawVisualizer);
 
     vCtx.fillStyle = 'rgba(0, 0, 0, 0.25)';
@@ -3473,6 +3559,7 @@ window.addEventListener('resize', () => {
   if (camera && renderer) {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    renderer.setPixelRatio(getThreePixelRatio());
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
 });
