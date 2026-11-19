@@ -1541,25 +1541,38 @@ window.addEventListener('pointerup', () => {
 // --- 5. Custom Cursor & Spotlight Tracking ---
 const cursorDot = document.getElementById('cursor-dot');
 const coordTracker = document.getElementById('coords');
+let pointerMoveFramePending = false;
+let pendingPointerX = mouse.targetX;
+let pendingPointerY = mouse.targetY;
 
-window.addEventListener('mousemove', (e) => {
-  mouse.targetX = e.clientX;
-  mouse.targetY = e.clientY;
+function flushPointerMove() {
+  pointerMoveFramePending = false;
+  mouse.targetX = pendingPointerX;
+  mouse.targetY = pendingPointerY;
 
   if (cursorDot) {
-    cursorDot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    cursorDot.style.transform = `translate(${pendingPointerX}px, ${pendingPointerY}px)`;
   }
   if (cursorRing && !isDragging) {
-    cursorRing.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    cursorRing.style.transform = `translate(${pendingPointerX}px, ${pendingPointerY}px)`;
   }
 
   if (coordTracker) {
-    coordTracker.textContent = `X: ${e.clientX} | Y: ${e.clientY}`;
+    coordTracker.textContent = `X: ${pendingPointerX} | Y: ${pendingPointerY}`;
   }
 
-  audio.modulateWithCursor(e.clientX / width, e.clientY / height, trackpadForce);
+  audio.modulateWithCursor(pendingPointerX / width, pendingPointerY / height, trackpadForce);
   if (typeof cosmicEngine !== 'undefined') {
     cosmicEngine.addEntropy(0.025, 'move');
+  }
+}
+
+window.addEventListener('mousemove', (e) => {
+  pendingPointerX = e.clientX;
+  pendingPointerY = e.clientY;
+  if (!pointerMoveFramePending) {
+    pointerMoveFramePending = true;
+    requestAnimationFrame(flushPointerMove);
   }
 });
 
