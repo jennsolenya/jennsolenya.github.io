@@ -1246,7 +1246,7 @@ function initThreeJS() {
     scene.add(outerRing);
 
     setupOrbitControls(container);
-    if (!prefersReducedMotion) animateThreeJS();
+    animateThreeJS();
   } catch (err) {
     console.warn('Three.js WebGL initialization skipped:', err);
     const fallback = document.getElementById('webgl-fallback');
