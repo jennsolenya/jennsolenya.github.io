@@ -300,7 +300,7 @@ class SpatialSoundEngine {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
 
       osc.connect(gain);
-      gain.connect(this.bassBoost || this.masterGain);
+      gain.connect(this.sidechainGain || this.bassBoost || this.masterGain);
       osc.start(now);
       osc.stop(now + 0.7);
     } catch (e) {}
@@ -471,7 +471,7 @@ class SpatialSoundEngine {
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
 
       osc.connect(gain);
-      gain.connect(this.bassBoost || this.masterGain);
+      gain.connect(this.sidechainGain || this.bassBoost || this.masterGain);
       osc.start(t);
       osc.stop(t + 0.32);
 
@@ -709,7 +709,7 @@ class SpatialSoundEngine {
       rumbleNoise.connect(rumbleFilter);
       rumbleFilter.connect(rumbleDistortion);
       rumbleDistortion.connect(rumbleGain);
-      rumbleGain.connect(this.bassBoost || this.masterGain);
+      rumbleGain.connect(this.sidechainGain || this.bassBoost || this.masterGain);
 
       rumbleNoise.start(t + 0.015); // Slight delay after transient
     } catch (e) {}
@@ -960,7 +960,7 @@ class SpatialSoundEngine {
       gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
 
       osc.connect(gain);
-      gain.connect(this.bassBoost || this.masterGain);
+      gain.connect(this.sidechainGain || this.bassBoost || this.masterGain);
       osc.start(t);
       osc.stop(t + duration);
     } catch (e) {}
@@ -1084,7 +1084,7 @@ function drawGrid() {
     gridAnimationRunning = false;
     return;
   }
-  requestAnimationFrame(drawGrid);
+  if (!prefersReducedMotion) requestAnimationFrame(drawGrid);
 
   gCtx.fillStyle = '#000000';
   gCtx.fillRect(0, 0, width, height);
@@ -1253,9 +1253,12 @@ function initThreeJS() {
     scene.add(outerRing);
 
     setupOrbitControls(container);
-    startThreeAnimation();
+    if (prefersReducedMotion) animateThreeJS();
+    else startThreeAnimation();
   } catch (err) {
     console.warn('Three.js WebGL initialization skipped:', err);
+    const fallback = document.getElementById('webgl-fallback');
+    if (fallback) fallback.hidden = false;
   }
 }
 
@@ -1263,6 +1266,7 @@ function initThreeJS() {
 function setupOrbitControls(canvas) {
   canvas.addEventListener('pointerdown', (e) => {
     isDragging = true;
+    if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
     canvas.classList.add('grabbing');
     previousPointerPos = { x: e.clientX, y: e.clientY };
   });
@@ -1282,9 +1286,12 @@ function setupOrbitControls(canvas) {
     }
   });
 
-  window.addEventListener('pointerup', () => {
+  window.addEventListener('pointerup', (e) => {
     isDragging = false;
     canvas.classList.remove('grabbing');
+    if (canvas.releasePointerCapture && canvas.hasPointerCapture && canvas.hasPointerCapture(e.pointerId)) {
+      canvas.releasePointerCapture(e.pointerId);
+    }
   });
 
   // Trackpad 2-finger gestures & Pinch zoom
@@ -1332,7 +1339,7 @@ function animateThreeJS() {
     threeAnimationRunning = false;
     return;
   }
-  requestAnimationFrame(animateThreeJS);
+  if (!prefersReducedMotion) requestAnimationFrame(animateThreeJS);
 
   const normX = (mouse.x / width) * 2 - 1;
   const normY = -(mouse.y / height) * 2 + 1;
@@ -2864,7 +2871,8 @@ class ParticleColliderLab {
     this.bindEvents();
     this.setupObserver();
     this.animate = this.animate.bind(this);
-    this.startAnimation();
+    if (prefersReducedMotion) this.animate();
+    else this.startAnimation();
   }
 
   startAnimation() {
@@ -3013,6 +3021,7 @@ class ParticleColliderLab {
       const clickX = e.clientX - rect.left;
       const clickY = e.clientY - rect.top;
       this.isDragging = true;
+      if (this.canvas.setPointerCapture) this.canvas.setPointerCapture(e.pointerId);
       this.attractor.x = clickX;
       this.attractor.y = clickY;
       this.attractor.active = true;
@@ -3042,8 +3051,11 @@ class ParticleColliderLab {
       });
     });
 
-    this.canvas.addEventListener('pointerup', () => {
+    this.canvas.addEventListener('pointerup', (e) => {
       this.isDragging = false;
+      if (this.canvas.releasePointerCapture && this.canvas.hasPointerCapture && this.canvas.hasPointerCapture(e.pointerId)) {
+        this.canvas.releasePointerCapture(e.pointerId);
+      }
     });
 
     this.canvas.addEventListener('pointerleave', () => {
@@ -3090,7 +3102,7 @@ class ParticleColliderLab {
       this.animationRunning = false;
       return;
     }
-    requestAnimationFrame(this.animate);
+    if (!prefersReducedMotion) requestAnimationFrame(this.animate);
     this.time += 0.016;
 
     // Semi-transparent void fade for motion trails
@@ -3289,10 +3301,16 @@ if (visCanvas) {
   window.addEventListener('resize', resizeVis);
 
   const freqData = new Uint8Array(32);
+  let isVisualizerVisible = false;
+  let visualizerFramePending = false;
 
   function drawVisualizer() {
+    visualizerFramePending = false;
+    if (!isDocumentVisible || !isVisualizerVisible) return;
+    visualizerFramePending = true;
     if (prefersReducedMotion) return;
     requestAnimationFrame(drawVisualizer);
+
     vCtx.fillStyle = 'rgba(0, 0, 0, 0.25)';
     vCtx.fillRect(0, 0, visCanvas.width, visCanvas.height);
 
@@ -3316,27 +3334,68 @@ if (visCanvas) {
       vCtx.fillRect(x + 1, y, barWidth - 2, barHeight);
     }
   }
-  drawVisualizer();
+
+  const visualizerObserver = typeof IntersectionObserver !== 'undefined'
+    ? new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        isVisualizerVisible = entry.isIntersecting;
+        if (isVisualizerVisible && isDocumentVisible && !visualizerFramePending) {
+          requestAnimationFrame(drawVisualizer);
+        }
+      });
+    }, { threshold: 0.05 })
+    : null;
+
+  if (visualizerObserver) {
+    visualizerObserver.observe(visCanvas);
+  } else {
+    isVisualizerVisible = true;
+    drawVisualizer();
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (isDocumentVisible && isVisualizerVisible && !visualizerFramePending) {
+      requestAnimationFrame(drawVisualizer);
+    }
+  });
 }
 
-// --- 10. Mechanics & Controls Modal Logic ---
 // --- 10. Mechanics & Controls Modal Logic ---
 const controlsModal = document.getElementById('controls-modal');
 const controlsToggle = document.getElementById('controls-toggle');
 const closeControls = document.getElementById('close-controls');
 const controlsBackdrop = document.getElementById('controls-backdrop');
+let activeModalTrigger = null;
+
+function setModalState(modal, isOpen, trigger = null) {
+  if (!modal) return;
+  if (isOpen) {
+    activeModalTrigger = trigger || document.activeElement;
+    modal.hidden = false;
+    modal.classList.add('open');
+    const closeButton = modal.querySelector('.close-btn');
+    if (closeButton) closeButton.focus();
+  } else {
+    modal.classList.remove('open');
+    modal.hidden = true;
+    if (activeModalTrigger && typeof activeModalTrigger.focus === 'function') {
+      activeModalTrigger.focus();
+    }
+    activeModalTrigger = null;
+  }
+}
 
 function openControlsModal() {
   closeTimelineModal();
   closeUniverseModal();
-  if (controlsModal) controlsModal.classList.add('open');
+  setModalState(controlsModal, true);
   if (audio && audio.ctx && !audio.isMuted) {
     audio.triggerChime(554.37, 'sine', 0.3, 0, 0);
   }
 }
 
 function closeControlsModal() {
-  if (controlsModal) controlsModal.classList.remove('open');
+  setModalState(controlsModal, false);
 }
 
 function toggleControlsModal() {
@@ -3375,14 +3434,14 @@ const timelineBackdrop = document.getElementById('timeline-backdrop');
 function openTimelineModal() {
   closeControlsModal();
   closeUniverseModal();
-  if (timelineModal) timelineModal.classList.add('open');
+  setModalState(timelineModal, true);
   if (audio && audio.ctx && !audio.isMuted) {
     audio.triggerChime(659.25, 'triangle', 0.4, 0, 0); // E5
   }
 }
 
 function closeTimelineModal() {
-  if (timelineModal) timelineModal.classList.remove('open');
+  setModalState(timelineModal, false);
 }
 
 function toggleTimelineModal() {
@@ -3422,14 +3481,14 @@ const universeBackdrop = document.getElementById('universe-backdrop');
 function openUniverseModal() {
   closeControlsModal();
   closeTimelineModal();
-  if (universeModal) universeModal.classList.add('open');
+  setModalState(universeModal, true);
   if (audio && audio.ctx && !audio.isMuted) {
     audio.triggerChime(783.99, 'sine', 0.45, 0, 0); // G5
   }
 }
 
 function closeUniverseModal() {
-  if (universeModal) universeModal.classList.remove('open');
+  setModalState(universeModal, false);
 }
 
 function toggleUniverseModal() {
@@ -3473,6 +3532,25 @@ document.querySelectorAll('.timeline-node').forEach((node, i) => {
   });
 });
 
+// --- 13. Navigation & onboarding actions ---
+const heroSoundScroll = document.getElementById('hero-sound-scroll');
+const heroColliderScroll = document.getElementById('hero-collider-scroll');
+const backToTop = document.getElementById('back-to-top');
+
+function scrollToSection(id) {
+  const section = document.getElementById(id);
+  if (section) section.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+}
+
+if (heroSoundScroll) heroSoundScroll.addEventListener('click', () => scrollToSection('sound-architect'));
+if (heroColliderScroll) heroColliderScroll.addEventListener('click', () => scrollToSection('collider-lab'));
+if (backToTop) {
+  backToTop.addEventListener('click', (event) => {
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  });
+}
+
 // Window resize
 window.addEventListener('resize', () => {
   width = gridCanvas.width = window.innerWidth;
@@ -3490,5 +3568,8 @@ window.addEventListener('resize', () => {
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof THREE !== 'undefined') {
     initThreeJS();
+  } else {
+    const fallback = document.getElementById('webgl-fallback');
+    if (fallback) fallback.hidden = false;
   }
 });
