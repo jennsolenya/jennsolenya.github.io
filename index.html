@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none';">
   <title>VOID // Creative Playground &amp; Sound Lab</title>
-  <meta name="description" content="A minimalist, pitch-black interactive studio exploring 3D wireframe geometry, Force Touch trackpad dynamics, particle kinetics, and evolving electronic sound design.">
+  <meta name="description" content="VOID is a pitch-black audio-kinetic laboratory for generative sound, wireframe geometry, and particle physics.">
+  <meta name="theme-color" content="#000000">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22black%22 stroke=%22white%22 stroke-width=%228%22/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,8 +21,11 @@
   <div id="cursor-ring" class="cursor-ring"></div>
 
   <!-- Background Canvas Layers -->
-  <canvas id="grid-canvas"></canvas>
-  <canvas id="webgl-canvas"></canvas>
+  <canvas id="grid-canvas" aria-hidden="true"></canvas>
+  <canvas id="webgl-canvas" aria-label="Interactive 3D wireframe manifold. Drag to orbit and scroll to change depth." tabindex="0"></canvas>
+  <div id="webgl-fallback" class="webgl-fallback" role="status" hidden>
+    3D MANIFOLD UNAVAILABLE // AUDIO AND 2D LABS REMAIN ACTIVE
+  </div>
 
   <!-- Top Minimalist HUD Navigation -->
   <header class="hud-header">
@@ -58,12 +62,12 @@
   </header>
 
   <!-- Sliding Controls & Mechanics Drawer -->
-  <div id="controls-modal" class="controls-modal" role="dialog" aria-modal="true">
+  <div id="controls-modal" class="controls-modal" role="dialog" aria-modal="true" aria-labelledby="controls-modal-title" hidden>
     <div id="controls-backdrop" class="controls-backdrop"></div>
     <div class="controls-drawer">
       <div class="controls-header">
         <div class="controls-header-text">
-          <h2>STUDIO CONTROLS // MANUAL</h2>
+          <h2 id="controls-modal-title">STUDIO CONTROLS // MANUAL</h2>
           <span>INTERACTION SPECIFICATIONS</span>
         </div>
         <button id="close-controls" class="close-btn" aria-label="Close Guide">&times;</button>
@@ -152,7 +156,7 @@
       </p>
 
       <div class="hero-actions">
-        <button class="action-btn" onclick="document.getElementById('sound-architect').scrollIntoView({ behavior: 'smooth' });">
+        <button id="hero-sound-scroll" class="action-btn">
           <span>[ 01 // SOUND ARCHITECT ]</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -160,7 +164,7 @@
           </svg>
         </button>
 
-        <button class="action-btn-ghost" onclick="document.getElementById('collider-lab').scrollIntoView({ behavior: 'smooth' });">
+        <button id="hero-collider-scroll" class="action-btn-ghost">
           <span>[ 02 // PARTICLE COLLIDER ]</span>
         </button>
 
@@ -172,6 +176,12 @@
       <div class="scroll-hint">
         <div class="scroll-line"></div>
         <span>DRAG TO ORBIT 3D // SCROLL TO NAVIGATE STUDIO</span>
+      </div>
+      <div class="hero-guide" aria-label="Quick start guide">
+        <span class="hero-guide-label">QUICK START</span>
+        <span>01 INITIALIZE AUDIO</span>
+        <span>02 DRAG THE MANIFOLD</span>
+        <span>03 PRESS OR TYPE TO ALTER THE FIELD</span>
       </div>
     </section>
 
@@ -458,18 +468,18 @@
           <span>SYSTEM LOG // CHRONICLES</span>
         </button>
         <a href="https://github.com/jennsolenya/jennsolenya.github.io" target="_blank" rel="noopener noreferrer">GITHUB REPO</a>
-        <a href="#top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">BACK TO TOP &uarr;</a>
+        <a id="back-to-top" href="#top">BACK TO TOP &uarr;</a>
       </div>
     </footer>
   </main>
 
   <!-- Sliding Chronicles // Timeline Modal -->
-  <div id="timeline-modal" class="timeline-modal" role="dialog" aria-modal="true">
+  <div id="timeline-modal" class="timeline-modal" role="dialog" aria-modal="true" aria-labelledby="timeline-modal-title" hidden>
     <div id="timeline-backdrop" class="timeline-backdrop"></div>
     <div class="timeline-drawer">
       <div class="timeline-header">
         <div class="timeline-header-title">
-          <h2>SYSTEM LOG // CHRONICLES</h2>
+          <h2 id="timeline-modal-title">SYSTEM LOG // CHRONICLES</h2>
           <span>EVOLUTION MATRIX</span>
         </div>
         <button id="close-timeline" class="close-btn" aria-label="Close Chronicles">&times;</button>
@@ -601,12 +611,12 @@
   </div>
 
   <!-- Sliding Universe Story & Theories Modal -->
-  <div id="universe-modal" class="universe-modal" role="dialog" aria-modal="true">
+  <div id="universe-modal" class="universe-modal" role="dialog" aria-modal="true" aria-labelledby="universe-modal-title" hidden>
     <div id="universe-backdrop" class="universe-backdrop"></div>
     <div class="universe-drawer">
       <div class="universe-header">
         <div class="universe-header-title">
-          <h2>COSMIC CREATION &amp; THE BIG BOUNCE</h2>
+          <h2 id="universe-modal-title">COSMIC CREATION &amp; THE BIG BOUNCE</h2>
           <span>AUDIOPHONIC ESSAY // PARALLEL COSMOLOGY</span>
         </div>
         <button id="close-universe" class="close-btn" aria-label="Close Universe Story">&times;</button>
