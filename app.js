@@ -2892,6 +2892,10 @@ class ParticleColliderLab {
     this.animationRunning = false;
     this.pendingPointer = null;
     this.pointerFrame = 0;
+    this.particleRenderBuckets = Array.from({ length: 16 }, () => []);
+    this.particleRenderStyles = this.particleRenderBuckets.map((_, index) =>
+      `rgba(255, 255, 255, ${(index + 0.5) / this.particleRenderBuckets.length})`
+    );
 
     // Badges
     this.modeBadge = document.getElementById('sandbox-mode-badge');
@@ -3191,6 +3195,10 @@ class ParticleColliderLab {
 
     let sumVelocitySq = 0;
     const len = this.particles.length;
+    const renderBucketCount = this.particleRenderBuckets.length;
+    this.particleRenderBuckets.forEach((bucket) => {
+      bucket.length = 0;
+    });
 
     // Update & Render Particles
     for (let i = 0; i < len; i++) {
@@ -3291,8 +3299,20 @@ class ParticleColliderLab {
         sumVelocitySq += (p.vx * p.vx + p.vy * p.vy);
       }
 
-      this.ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
-      this.ctx.fillRect(p.x, p.y, p.size, p.size);
+      const renderBucket = Math.min(renderBucketCount - 1, Math.floor(p.alpha * renderBucketCount));
+      this.particleRenderBuckets[renderBucket].push(p.x, p.y, p.size);
+    }
+
+    for (let bucketIndex = 0; bucketIndex < renderBucketCount; bucketIndex++) {
+      const bucket = this.particleRenderBuckets[bucketIndex];
+      if (bucket.length === 0) continue;
+
+      this.ctx.beginPath();
+      for (let i = 0; i < bucket.length; i += 3) {
+        this.ctx.rect(bucket[i], bucket[i + 1], bucket[i + 2], bucket[i + 2]);
+      }
+      this.ctx.fillStyle = this.particleRenderStyles[bucketIndex];
+      this.ctx.fill();
     }
 
     // Update Telemetry Badges
