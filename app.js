@@ -1781,6 +1781,7 @@ class CosmicUniverseEngine {
     this.bounceProgress = 0;
     this.memories = [];
     this.speechSynth = window.speechSynthesis || null;
+    this.telemetryFramePending = false;
 
     this.loadSavedState();
   }
@@ -1812,8 +1813,17 @@ class CosmicUniverseEngine {
       this.entropy = 0;
       this.advanceEpoch();
     } else {
-      this.updateTelemetryHUD();
+      this.scheduleTelemetryHUD();
     }
+  }
+
+  scheduleTelemetryHUD() {
+    if (this.telemetryFramePending) return;
+    this.telemetryFramePending = true;
+    requestAnimationFrame(() => {
+      this.telemetryFramePending = false;
+      this.updateTelemetryHUD();
+    });
   }
 
   advanceEpoch() {
