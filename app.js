@@ -2783,7 +2783,11 @@ document.querySelectorAll('.synth-key').forEach((keyEl) => {
 });
 
 // --- 8. 3D Perspective Card Tilt ---
-document.querySelectorAll('.tilt-card').forEach((card) => {
+const supportsFinePointer = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+  ? window.matchMedia('(pointer: fine)').matches
+  : false;
+
+if (!prefersReducedMotion && supportsFinePointer) document.querySelectorAll('.tilt-card').forEach((card) => {
   let pendingPointerEvent = null;
   let pointerFrame = 0;
 

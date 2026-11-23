@@ -9,6 +9,7 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 The current development branch combines the latest animation/runtime performance work with the experience professionalisation pass. The site now includes:
 
 - Visibility-aware animation loops, pointer-update coalescing, capped high-DPI rendering, cached audio resources, and reduced-motion handling.
+- A performance-oriented spatial clarity system: opaque surfaces, restrained borders, reduced glow/blur, calmer state transitions, and Apple-inspired hierarchy around the experiments.
 - Keyboard-accessible drawers with labelled dialog semantics, focus restoration, visible focus states, and centralized navigation handlers.
 - Pointer capture for orbiting and collider dragging, safer canvas resizing, resilient saved-memory parsing, and a visible WebGL fallback.
 - Sidechain routing for kick, rumble, bass, sub, and 808 paths while preserving the master dynamics compressor.
