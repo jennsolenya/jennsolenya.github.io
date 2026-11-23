@@ -1782,7 +1782,9 @@ class CosmicUniverseEngine {
     this.memories = [];
     this.speechSynth = window.speechSynthesis || null;
     this.telemetryFramePending = false;
-    this.genrePills = Array.from(document.querySelectorAll('.genre-pill'));
+    this.genrePills = typeof document.querySelectorAll === 'function'
+      ? Array.from(document.querySelectorAll('.genre-pill'))
+      : [];
     this.telemetryElements = {
       epochBadge: document.getElementById('epoch-name-badge'),
       timeBadge: document.getElementById('cosmic-time-badge'),
