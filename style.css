@@ -2571,4 +2571,9 @@ body {
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
   }
+
+  .hero-guide,
+  .scroll-hint {
+    opacity: 0.8;
+  }
 }
