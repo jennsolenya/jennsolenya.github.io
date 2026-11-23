@@ -1781,6 +1781,19 @@ class CosmicUniverseEngine {
     this.bounceProgress = 0;
     this.memories = [];
     this.speechSynth = window.speechSynthesis || null;
+    this.telemetryFramePending = false;
+    this.genrePills = typeof document.querySelectorAll === 'function'
+      ? Array.from(document.querySelectorAll('.genre-pill'))
+      : [];
+    this.telemetryElements = {
+      epochBadge: document.getElementById('epoch-name-badge'),
+      timeBadge: document.getElementById('cosmic-time-badge'),
+      statusBadge: document.getElementById('cosmic-status-badge'),
+      entropyVal: document.getElementById('entropy-text-val'),
+      entropyFill: document.getElementById('entropy-bar-fill'),
+    };
+    this.lastGenreKey = null;
+    this.lastTelemetry = {};
 
     this.loadSavedState();
   }
@@ -1812,8 +1825,17 @@ class CosmicUniverseEngine {
       this.entropy = 0;
       this.advanceEpoch();
     } else {
-      this.updateTelemetryHUD();
+      this.scheduleTelemetryHUD();
     }
+  }
+
+  scheduleTelemetryHUD() {
+    if (this.telemetryFramePending) return;
+    this.telemetryFramePending = true;
+    requestAnimationFrame(() => {
+      this.telemetryFramePending = false;
+      this.updateTelemetryHUD();
+    });
   }
 
   advanceEpoch() {
@@ -1901,40 +1923,47 @@ class CosmicUniverseEngine {
     const epoch = this.getCurrentEpoch();
     this.syncGenrePills(epoch.key);
 
-    const epochBadge = document.getElementById('epoch-name-badge');
-    if (epochBadge) {
-      epochBadge.textContent = `${epoch.name} [AEON ${this.aeonCycle}]`;
+    const epochText = `${epoch.name} [AEON ${this.aeonCycle}]`;
+    if (this.telemetryElements.epochBadge && this.lastTelemetry.epochText !== epochText) {
+      this.telemetryElements.epochBadge.textContent = epochText;
+      this.lastTelemetry.epochText = epochText;
     }
 
-    const timeBadge = document.getElementById('cosmic-time-badge');
-    if (timeBadge) {
-      timeBadge.textContent = epoch.time;
+    if (this.telemetryElements.timeBadge && this.lastTelemetry.time !== epoch.time) {
+      this.telemetryElements.timeBadge.textContent = epoch.time;
+      this.lastTelemetry.time = epoch.time;
     }
 
-    const statusBadge = document.getElementById('cosmic-status-badge');
-    if (statusBadge) {
-      if (this.isPaused) {
-        statusBadge.textContent = 'TIME FROZEN';
-        statusBadge.className = 'stat-pill status-frozen';
-      } else {
-        statusBadge.textContent = this.isMusicPlaying ? 'EVOLVING ACTIVE' : 'OBSERVING';
-        statusBadge.className = 'stat-pill status-active';
-      }
+    const statusText = this.isPaused
+      ? 'TIME FROZEN'
+      : (this.isMusicPlaying ? 'EVOLVING ACTIVE' : 'OBSERVING');
+    const statusClass = this.isPaused ? 'stat-pill status-frozen' : 'stat-pill status-active';
+    if (this.telemetryElements.statusBadge && this.lastTelemetry.statusText !== statusText) {
+      this.telemetryElements.statusBadge.textContent = statusText;
+      this.lastTelemetry.statusText = statusText;
+    }
+    if (this.telemetryElements.statusBadge && this.lastTelemetry.statusClass !== statusClass) {
+      this.telemetryElements.statusBadge.className = statusClass;
+      this.lastTelemetry.statusClass = statusClass;
     }
 
-    const entropyVal = document.getElementById('entropy-text-val');
-    if (entropyVal) {
-      entropyVal.textContent = `${this.entropy.toFixed(1)}%`;
+    const entropyText = `${this.entropy.toFixed(1)}%`;
+    if (this.telemetryElements.entropyVal && this.lastTelemetry.entropyText !== entropyText) {
+      this.telemetryElements.entropyVal.textContent = entropyText;
+      this.lastTelemetry.entropyText = entropyText;
     }
 
-    const entropyFill = document.getElementById('entropy-bar-fill');
-    if (entropyFill) {
-      entropyFill.style.width = `${Math.min(100, Math.max(0, this.entropy))}%`;
+    const entropyWidth = `${Math.min(100, Math.max(0, this.entropy))}%`;
+    if (this.telemetryElements.entropyFill && this.lastTelemetry.entropyWidth !== entropyWidth) {
+      this.telemetryElements.entropyFill.style.width = entropyWidth;
+      this.lastTelemetry.entropyWidth = entropyWidth;
     }
   }
 
   syncGenrePills(genreKey) {
-    document.querySelectorAll('.genre-pill').forEach((pill) => {
+    if (this.lastGenreKey === genreKey) return;
+    this.lastGenreKey = genreKey;
+    this.genrePills.forEach((pill) => {
       const pGenre = pill.getAttribute('data-genre');
       const isActiveGenre =
         pGenre === genreKey ||
