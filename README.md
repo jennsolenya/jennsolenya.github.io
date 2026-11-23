@@ -4,6 +4,19 @@
 
 Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 
+## Current Status
+
+The current development branch combines the latest animation/runtime performance work with the experience professionalisation pass. The site now includes:
+
+- Visibility-aware animation loops, pointer-update coalescing, capped high-DPI rendering, cached audio resources, and reduced-motion handling.
+- Keyboard-accessible drawers with labelled dialog semantics, focus restoration, visible focus states, and centralized navigation handlers.
+- Pointer capture for orbiting and collider dragging, safer canvas resizing, resilient saved-memory parsing, and a visible WebGL fallback.
+- Sidechain routing for kick, rumble, bass, sub, and 808 paths while preserving the master dynamics compressor.
+
+Phase 7 remains planned. Audio recording/export, radar scanning, and Web MIDI are not implemented yet.
+
+The README describes the intended experience and architecture; browser compatibility and audio behavior should still be checked on the deployed site before treating a milestone as production-verified.
+
 ---
 
 ## Project Evolution Timeline
@@ -120,6 +133,7 @@ Clicking any profile pill immediately activates the audio engine, sets the tempo
 - **3D Graphics**: [Three.js](https://threejs.org/) (r128).
 - **Sound Synthesis**: Native Browser [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) (HRTF Spatial Panner, BiquadFilter, AnalyserNode, Oscillators).
 - **Hardware Integrations**: Apple WebKit Force Touch API (`webkitmouseforcechanged`), W3C Pointer Events.
+- **Resilience & Accessibility**: reduced-motion support, WebGL fallback messaging, pointer capture, keyboard focus states, labelled modal drawers, and safe localStorage normalization.
 - **Typography**: [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk) & [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono).
 - **Hosting**: GitHub Pages (Zero build step, 100% static & blazing fast).
 
@@ -135,6 +149,17 @@ python3 -m http.server 8080
 ```
 
 Then visit [`http://localhost:8080`](http://localhost:8080) in Safari or Chrome.
+
+## Verification
+
+The repository CI workflow runs the required JavaScript syntax and security regression checks:
+
+```bash
+deno check app.js
+node test_xss.js
+```
+
+Before merging a release, also smoke-test audio initialization, genre switching, keyboard layouts, WebGL fallback, collider dragging, memory restore/delete, modal focus behavior, visibility changes, and reduced-motion behavior in a browser.
 
 ---
 
