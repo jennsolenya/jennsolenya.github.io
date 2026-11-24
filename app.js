@@ -1475,8 +1475,10 @@ function morphGeometry() {
 // --- 4. Mac Force Touch Trackpad Integration ---
 const forceMeter = document.getElementById('force-meter');
 const cursorRing = document.getElementById('cursor-ring');
+let forceFramePending = false;
+let pendingForce = 0;
 
-function updateForce(rawForce) {
+function applyForce(rawForce) {
   // Calibrate analog pressure curve:
   // Pre-click / touch: 0% to 49%
   // Standard click threshold: 50%
@@ -1517,6 +1519,17 @@ function updateForce(rawForce) {
   if (typeof cosmicEngine !== 'undefined' && trackpadForce > 0.05) {
     cosmicEngine.addEntropy(trackpadForce * 0.15, 'force');
   }
+}
+
+function updateForce(rawForce) {
+  pendingForce = rawForce;
+  if (forceFramePending) return;
+
+  forceFramePending = true;
+  requestAnimationFrame(() => {
+    forceFramePending = false;
+    applyForce(pendingForce);
+  });
 }
 
 // Safari / WebKit Apple Force Touch Events
