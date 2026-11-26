@@ -34,3 +34,6 @@ jobs:
 
       - name: Run Audio-Visual Telemetry Contract Test
         run: node test_telemetry.js
+
+      - name: Run Audio Safety Gate
+        run: node test_audio_safety.js

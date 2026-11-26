@@ -682,6 +682,114 @@ class SpatialSoundEngine {
     } catch (e) {}
   }
 
+  // Short layered clap for backbeat definition in louder arrangements.
+  playClap(time, velocity = 0.2) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const duration = 0.085;
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1900, t);
+      filter.Q.setValueAtTime(0.8, t);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(velocity, t + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      filter.connect(gain);
+      gain.connect(this.masterGain);
+
+      [0, 0.012, 0.024].forEach((offset, index) => {
+        const burst = this.ctx.createBufferSource();
+        burst.buffer = this.getNoiseBuffer(duration);
+        burst.connect(filter);
+        burst.start(t + offset);
+        burst.stop(t + offset + duration * (index === 0 ? 0.7 : 0.45));
+      });
+    } catch (e) {}
+  }
+
+  // Rising noise transition used to make chapter changes audible before a drop.
+  playRiser(time, duration = 0.75) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const source = this.ctx.createBufferSource();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      source.buffer = this.getNoiseBuffer(duration);
+      filter.type = 'bandpass';
+      filter.Q.setValueAtTime(2.5, t);
+      filter.frequency.setValueAtTime(180, t);
+      filter.frequency.exponentialRampToValueAtTime(7200, t + duration);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + duration * 0.65);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.masterGain);
+      source.start(t);
+      source.stop(t + duration);
+    } catch (e) {}
+  }
+
+  // Detuned saw stack for the 128 BPM trance/rebirth chapter.
+  playTranceChord(rootFreq, time, duration = 0.9, bright = false) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    try {
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      filter.type = 'lowpass';
+      filter.Q.setValueAtTime(bright ? 2.8 : 1.8, t);
+      filter.frequency.setValueAtTime(bright ? 900 : 420, t);
+      filter.frequency.exponentialRampToValueAtTime(bright ? 5200 : 1800, t + duration * 0.45);
+      filter.frequency.exponentialRampToValueAtTime(260, t + duration);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(bright ? 0.14 : 0.09, t + 0.035);
+      gain.gain.setValueAtTime(bright ? 0.11 : 0.07, t + duration * 0.55);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      filter.connect(gain);
+      gain.connect(this.sidechainGain || this.masterGain);
+
+      const intervals = [1, 1.1892, 1.4983, 1.7818];
+      intervals.forEach((interval, index) => {
+        const osc = this.ctx.createOscillator();
+        osc.type = index === 0 ? 'sawtooth' : 'triangle';
+        osc.frequency.setValueAtTime(rootFreq * interval, t);
+        osc.detune.setValueAtTime((index - 1.5) * 7, t);
+        osc.connect(filter);
+        osc.start(t);
+        osc.stop(t + duration);
+      });
+    } catch (e) {}
+  }
+
+  // Bright, short trance arpeggio voice with its own bounded envelope.
+  playTranceArp(freq, time, accent = false) {
+    if (this.isMuted || !this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    const duration = 0.22;
+    try {
+      const osc = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, t);
+      filter.type = 'lowpass';
+      filter.Q.setValueAtTime(3.5, t);
+      filter.frequency.setValueAtTime(accent ? 4200 : 2400, t);
+      filter.frequency.exponentialRampToValueAtTime(320, t + duration);
+      gain.gain.setValueAtTime(accent ? 0.13 : 0.08, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.sidechainGain || this.masterGain);
+      osc.start(t);
+      osc.stop(t + duration);
+    } catch (e) {}
+  }
+
   // Roland TB-303 Acid Bassline Synthesizer (Amelie Lens / 999999999 / Charlotte de Witte)
   play303Acid(freq, time, accent = false, slide = false, targetFreq = null) {
     if (this.isMuted || !this.ctx) return;
@@ -994,7 +1102,7 @@ class SpatialSoundEngine {
   }
 
   // --- Enhanced Skrillex Growl with LFO Chop (Virtual Riot / Must Die!) ---
-  playSkrillexGrowlAdvanced(freq, time, duration = 0.32) {
+  playSkrillexGrowlAdvanced(freq, time, duration = 0.32, variation = 0) {
     if (this.isMuted || !this.ctx) return;
     const t = time || this.ctx.currentTime;
     try {
@@ -1007,6 +1115,9 @@ class SpatialSoundEngine {
       osc2.type = 'square';
       osc1.frequency.setValueAtTime(freq, t);
       osc2.frequency.setValueAtTime(freq * 0.5, t); // Sub-octave
+      const movement = [1.0, 1.19, 0.84, 1.33][Math.abs(variation) % 4];
+      osc1.frequency.exponentialRampToValueAtTime(freq * movement, t + duration * 0.45);
+      osc1.frequency.exponentialRampToValueAtTime(freq * 0.92, t + duration);
 
       // Stage 2: Ring modulation metallic layer
       osc3.type = 'square';
@@ -1017,7 +1128,9 @@ class SpatialSoundEngine {
       formant1.type = 'bandpass';
       formant1.Q.setValueAtTime(8.0, t);
       formant1.frequency.setValueAtTime(450, t);
-      formant1.frequency.exponentialRampToValueAtTime(2800, t + duration * 0.35);
+      const vowelPeaks = [2800, 1500, 3600, 900];
+      const vowelPeak = vowelPeaks[Math.abs(variation) % vowelPeaks.length];
+      formant1.frequency.exponentialRampToValueAtTime(vowelPeak, t + duration * 0.35);
 
       // Formant filter 2: Secondary vowel sweep (EE -> OW) for "OW-EE-AH" compound
       const formant2 = this.ctx.createBiquadFilter();
@@ -1031,7 +1144,8 @@ class SpatialSoundEngine {
       const lfoGain = this.ctx.createGain();
       const chopGain = this.ctx.createGain();
       lfo.type = 'square';
-      lfo.frequency.setValueAtTime(16, t); // 16th note rate stutter
+      const chopRates = [8, 16, 24, 12];
+      lfo.frequency.setValueAtTime(chopRates[Math.abs(variation) % chopRates.length], t);
       lfoGain.gain.setValueAtTime(0.4, t); // Depth: chops between 0.6 and 1.0
       chopGain.gain.setValueAtTime(0.6, t); // Baseline
       lfo.connect(lfoGain);
@@ -1889,6 +2003,26 @@ const COSMIC_EPOCHS = [
   }
 ];
 
+// Fixed musical variations keep the transport coherent while avoiding a flat loop.
+const ACID_NOTE_VARIATIONS = [
+  [55, 55, 110, 55, 73.4, 55, 110, 82.4, 55, 55, 130.8, 110, 55, 82.4, 110, 55],
+  [55, 65.4, 110, 82.4, 73.4, 98, 110, 130.8, 55, 73.4, 130.8, 110, 65.4, 82.4, 110, 55],
+  [55, 55, 73.4, 110, 55, 82.4, 110, 130.8, 65.4, 55, 82.4, 110, 73.4, 55, 110, 146.8],
+  [55, 82.4, 55, 110, 73.4, 55, 130.8, 110, 55, 65.4, 110, 82.4, 55, 98, 130.8, 73.4],
+];
+
+const DUBSTEP_GROWL_PATTERNS = [
+  [2, 4, 6, 12, 14],
+  [2, 5, 7, 10, 14],
+  [1, 4, 8, 11, 14],
+  [3, 6, 9, 12, 15],
+];
+
+const TRANCE_ARP_NOTES = [
+  261.63, 329.63, 392.0, 523.25,
+  659.25, 523.25, 392.0, 329.63,
+];
+
 class CosmicUniverseEngine {
   constructor() {
     this.epochIndex = 2; // Start in Epoch 2 (Stellar Techno) for immediate musical delight
@@ -2300,8 +2434,15 @@ class CosmicUniverseEngine {
         energy: sectionEnergy,
       });
       if (this.lastDirectorSection !== sectionName) {
+        const previousSection = this.lastDirectorSection;
         this.lastDirectorSection = sectionName;
         audioVisualDirector.emit('section-change', { section: sectionName });
+        if (previousSection && section !== 3) {
+          audio.playRiser(now, section === 2 ? 0.95 : 0.7);
+        }
+        if (previousSection && section === 2) {
+          audioVisualDirector.emit('drop', { section: sectionName });
+        }
       }
       audioVisualDirector.emit('beat', { step: s, bar: measure + 1 });
 
@@ -2357,19 +2498,19 @@ class CosmicUniverseEngine {
           audio.playMetalClank(now);
         }
 
+        // Backbeat claps arrive in the build and peak, then disappear in the breakdown.
+        if (section >= 1 && section !== 3 && (s === 4 || s === 12)) {
+          audio.playClap(now, section === 2 ? 0.24 : 0.16);
+        }
+
         // Ghost snares on random steps during Build and Peak (Paula Temple chaos)
         if (section >= 1 && Math.random() < 0.15 && s % 2 === 1) {
           audio.playGhostSnare(now);
         }
 
         // TB-303 Acid Bassline: dual stacking on Peak section (999999999)
-        const acidNotes = [55, 55, 110, 55, 73.4, 55, 110, 82.4, 55, 55, 130.8, 110, 55, 82.4, 110, 55];
-        let noteFreq = acidNotes[s];
-        // FJAAK melodic variation: wider note range on Build section
-        if (section === 1) {
-          const buildNotes = [55, 65.4, 110, 82.4, 73.4, 98, 110, 130.8, 55, 73.4, 130.8, 110, 65.4, 82.4, 110, 55];
-          noteFreq = buildNotes[s];
-        }
+        const acidVariation = ACID_NOTE_VARIATIONS[(measure + section) % ACID_NOTE_VARIATIONS.length];
+        let noteFreq = acidVariation[s];
         // Harmonic shift on bars 4 and 8 of each section
         if (localBar === 3 || localBar === 7) {
           noteFreq *= 1.5; // Perfect 5th
@@ -2479,6 +2620,7 @@ class CosmicUniverseEngine {
         if (s === 8) {
           audioVisualDirector.emit('snare', { step: s });
           audio.playSnare(now, false);
+          audio.playClap(now, section === 2 ? 0.26 : 0.18);
         }
 
         // Ghost hats with velocity variation
@@ -2486,19 +2628,25 @@ class CosmicUniverseEngine {
           audio.playHiHat(s === 4 || s === 12, now);
         }
 
-        // Bass design varies by 32-bar section
-        const isGrowlStep = s === 2 || s === 4 || s === 6 || s === 12 || s === 14;
+        // Bass design varies by bar as well as by the four macro sections.
+        const growlPattern = DUBSTEP_GROWL_PATTERNS[(measure + section) % DUBSTEP_GROWL_PATTERNS.length];
+        const isGrowlStep = growlPattern.includes(s) && (section !== 0 || localBar % 2 === 1);
         if (isGrowlStep) {
           const growlNotes = [55, 73.4, 82.4, 55, 65.4, 49.0, 73.4, 82.4];
-          const growlFreq = growlNotes[(s / 2 + measure) % growlNotes.length];
+          const growlFreq = growlNotes[(Math.floor(s / 2) + measure) % growlNotes.length];
 
           if (section === 2) {
             // PEAK: Advanced growl with LFO chop + ring mod (Virtual Riot / Must Die!)
-            audio.playSkrillexGrowlAdvanced(growlFreq, now, 0.28);
+            audio.playSkrillexGrowlAdvanced(growlFreq, now, 0.28, measure + s);
           } else {
             // Standard Skrillex formant growl
             audio.playSkrillexGrowl(growlFreq, now, 0.25);
           }
+        }
+
+        // A short fill on the last bar creates phrased tension before the next section.
+        if (section >= 1 && localBar === 7 && (s === 4 || s === 6 || s === 12 || s === 14)) {
+          audio.playSkrillexGrowlAdvanced(49 + (s * 2), now, 0.18, s);
         }
 
         // 808 sub layer underneath growls on all sections (Trampa devastating sub)
@@ -2524,17 +2672,33 @@ class CosmicUniverseEngine {
         }
 
       } else if (ep.key === 'bounce') {
-        // The Big Bounce crunch into celestial rebirth
-        const isSilenceVacuum = s >= 8 && s <= 11;
-        if (s < 8) {
-          const crunchFreqs = [440, 392, 329.63, 261.63, 196, 164.8, 130.8, 82.4];
-          audio.triggerChime(crunchFreqs[s], 'sawtooth', 0.15, 0, 0);
-          if (s % 2 === 0) audio.playKick(now);
-        } else if (isSilenceVacuum) {
-          // Silence vacuum
-        } else if (s === 12) {
-          audio.playBigBounceChord();
+        // 128 BPM trance/rebirth: four-to-the-floor propulsion, arpeggio lift,
+        // then a deliberate breakdown before the cosmic chord returns.
+        const tranceRoots = [130.81, 146.83, 164.81, 196.0];
+        const root = tranceRoots[(measure + section) % tranceRoots.length];
+        const isVacuum = section === 3 && localBar >= 4;
+
+        if (!isVacuum && (s === 0 || s === 4 || s === 8 || s === 12)) {
+          audioVisualDirector.emit('kick', { step: s });
           audio.playKick(now);
+          audio.triggerSidechain(now);
+        }
+        if (!isVacuum && (s === 2 || s === 6 || s === 10 || s === 14)) {
+          audio.playHiHat(s === 6 || s === 14, now);
+        }
+        if (!isVacuum && s % 2 === 0) {
+          audio.playTranceArp(TRANCE_ARP_NOTES[(s / 2 + measure) % TRANCE_ARP_NOTES.length], now, s % 4 === 0);
+        }
+        if (!isVacuum && s === 0 && localBar % 2 === 0) {
+          audio.playTranceChord(root, now, section === 2 ? 1.1 : 0.85, section >= 1);
+        }
+        if (isVacuum && localBar === 4 && s === 0) {
+          audioVisualDirector.emit('riser', { section: sectionName });
+          audio.playRiser(now, 1.4);
+        }
+        if (section === 3 && localBar === 7 && s === 12) {
+          audio.playBigBounceChord();
+          audioVisualDirector.emit('beat', { type: 'rebirth' });
         }
       } else {
         // Ambient Void (70 BPM)
