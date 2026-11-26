@@ -20,5 +20,7 @@ assert(app.slice(growlStart, growlEnd).includes('this.sidechainGain || this.mast
 assert(app.includes('this.analyser.connect(this.compressor)'), 'analyser must remain upstream of compressor');
 assert(app.includes('this.compressor.connect(this.ctx.destination)'), 'compressor must remain the final protection stage');
 assert(app.includes('clearTimeout(this.beatTimer)'), 'sequencer timer must be cleared on stop');
+assert(app.includes('clearInterval(arpTimer)'), 'arpeggiator interval must be cleared on stop');
+assert(app.includes('arpTimer = null'), 'arpeggiator interval handle must be released');
 
 console.log('Audio safety gate passed.');
