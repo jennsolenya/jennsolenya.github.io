@@ -1793,6 +1793,7 @@ class CosmicUniverseEngine {
     this.entropy = 15.0; // Starts at 15%
     this.isPaused = false;
     this.isMusicPlaying = false;
+    this.isStarting = false;
     this.aeonCycle = 1;
     this.beatStep = 0;
     this.beatTimer = null;
@@ -2151,13 +2152,21 @@ class CosmicUniverseEngine {
 
   // --- Step Routine & Playback Engine ---
   startPlayback() {
+    if (this.isMusicPlaying || this.isStarting) return;
+    this.isStarting = true;
+
     audio.init();
     if (audio.isMuted) audio.toggle();
+    if (!audio.ctx || audio.isMuted) {
+      this.isStarting = false;
+      return;
+    }
     if (audio.ctx && audio.ctx.state === 'suspended') {
       audio.ctx.resume();
     }
 
     this.isMusicPlaying = true;
+    this.isStarting = false;
     this.syncTransportButtons(true);
 
     const getStepInterval = () => {
