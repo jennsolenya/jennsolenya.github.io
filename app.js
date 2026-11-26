@@ -2502,7 +2502,15 @@ document.querySelectorAll('.genre-pill').forEach((pill) => {
 });
 
 // --- 7. Full Keyboard Synthesis (AZERTY & QWERTY Universal Layout Hub) ---
-let currentLayout = localStorage.getItem('void_keyboard_layout') || 'AZERTY';
+function getSavedKeyboardLayout() {
+  try {
+    return localStorage.getItem('void_keyboard_layout') === 'QWERTY' ? 'QWERTY' : 'AZERTY';
+  } catch (error) {
+    return 'AZERTY';
+  }
+}
+
+let currentLayout = getSavedKeyboardLayout();
 
 const azertyKeyMap = {
   // Numbers Row (High Crystalline Octave)
