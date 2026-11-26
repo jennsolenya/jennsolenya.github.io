@@ -6,7 +6,7 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 
 ## Current Status
 
-The current development line is the **v0.6.1 Runtime Hardening** phase, following the v0.6.0 Sound Architect Pro milestone. The site now includes:
+The completed **v0.6.1 Runtime Hardening** phase now supports the active **v0.7.0 Dynamic Audiovisual Foundation**. The site now includes:
 
 - Visibility-aware animation loops, pointer-update coalescing, capped high-DPI rendering, cached audio resources, and reduced-motion handling.
 - A performance-oriented spatial clarity system: opaque surfaces, restrained borders, reduced glow/blur, calmer state transitions, and Apple-inspired hierarchy around the experiments.
@@ -16,8 +16,13 @@ The current development line is the **v0.6.1 Runtime Hardening** phase, followin
 - Focused hardening work for spatial-audio automation, third-party asset integrity, explicit visual transitions, advanced-growl sidechain routing, and sequencer startup safety.
 - Local browser smoke coverage for audio initialization, genre switching, transport controls, modal Escape handling, collider modes, shockwaves, and WebGL fallback behavior.
 - The collider currently allocates up to 2,000 particles on desktop and 800 on mobile; the HUD reports the active count at runtime.
+- A shared audio-visual director carrying RMS, frequency bands, energy, beat phase, chapter, genre, and beat/riser/drop/silence events to the geometry and collider.
+- Structured 32-bar chapter arrangements for acid/techno, neurofunk, modern bass, ambient, and trance-inspired rebirth sections, with bounded voices and protected sidechain/limiter routing.
+- A narrative collider response: expansion, orbiting tension, drop vortex collapse, and breakdown foam are driven by the same musical state as the audio.
+- An opt-in runtime diagnostics surface (`?diagnostics=1`) measuring frame times, particle work, shockwave high-water, audio voice high-water, heap support, resize/visibility changes, and uncaught errors.
+- A public-repository security gate covering CSP/SRI, storage normalization, XSS regressions, common credential formats, immutable CI actions, read-only workflow permissions, and timer cleanup.
 
-Phase 7 remains planned. Audio recording/export, radar scanning, and Web MIDI are not implemented yet.
+The v0.7 foundation is active. Audio recording/export, radar scanning, and Web MIDI remain separate future feature slices rather than being bundled into the hardening work.
 
 The README describes the intended experience and architecture; browser compatibility and audio behavior should still be checked on the deployed site before treating a milestone as production-verified.
 
@@ -51,16 +56,16 @@ The README describes the intended experience and architecture; browser compatibi
 | **Phase 2: Tactile & Spatial Leap** | [`v0.2.0-spatial-orbit`](https://github.com/jennsolenya.github.io/releases/tag/v0.2.0-spatial-orbit) | 2026-09-04 | Completed | • **Mac Force Touch Trackpad**: pressure sensitivity expands spotlight, triggers sub-bass (`36.7Hz D1`), and grows 3D shape.<br>• **Direct 3D Orbit & Zoom**: click-and-drag rotation with momentum + pinch/wheel zoom.<br>• **Active Geometry HUD**: real-time `[ 1/4: ICOSAHEDRON ]` badge.<br>• **Binaural HRTF Spatial Audio**: calibrated for AirPods Pro 3 & stereo headphones; sound rotates in 3D around head.<br>• **Audio-Reactive Mesh**: wireframe pulses to live audio frequencies.<br>• **Physical Keyboard Synthesis**: play keys `1-5` or `A-G` directly.<br>• **Auto-Arpeggiator**: generative ambient loop.<br>• **Mechanics Guide**: accessible `[ ? CONTROLS ]` drawer overlay. |
 | **Phase 2.3: Generative Beat Engine** | [`v0.2.3-beat-engine`](https://github.com/jennsolenya.github.io/releases/tag/v0.2.3-beat-engine) | 2026-09-04 | Completed | • **Generative Electronic Beat Sequencer**: procedural 16-step drum machine with Kick, Snare, Hi-Hats, and Wobble Bass.<br>• **Sound Profiles**: Industrial Techno, Wobble Dubstep, and Ambient modes.<br>• **Calibrated Force Touch**: smooth analog pressure curve (0-50% touch/click, 50-100% deep force).<br>• **Trackpad 2-Finger Orbit**: two-finger swipe spins 3D models with momentum. |
 | **Phase 3: Cosmic Evolution Engine** | [`v0.3.0-cosmic-evolution`](https://github.com/jennsolenya.github.io/releases/tag/v0.3.0-cosmic-evolution) | 2026-09-04 | Completed | • **Ever-Evolving Universe Engine**: every browser interaction (cursor movements, trackpad pressure, drag rotation, scroll, key taps) injects entropy, accelerating cosmic time across 5 cosmological epochs.<br>• **5 Cosmological Epochs**: Singularity (36Hz drone) &rarr; Cosmic Inflation (Sub drop) &rarr; Stellar Nucleosynthesis (128 BPM Techno) &rarr; Cosmic Turbulence (140 BPM Dubstep wobble) &rarr; The Big Bounce (Acoustic crunch glissando into celestial rebirth chord).<br>• **Pause / Freeze Evolution**: freeze the cosmic clock at any state (`Shift + P`).<br>• **Cosmic Memories Bank**: save custom universe snapshots to `localStorage` and warp back through time (`Shift + S`).<br>• **Dedicated Keyboard Matrix Hub**: interactive AZERTY (BE/FR) vs QWERTY segmented toggle with dynamic on-screen key re-labeling (`A Z E R T Y` vs `Q W E R T Y`).<br>• **Universe Creation Modal**: comprehensive slide-out guide documenting cosmological models, entropy physics, and acoustic mapping (`Shift + U`). |
-| **Phase 4: Cosmic Odyssey & Particle Collider** | [`v0.4.0-cosmic-odyssey`](https://github.com/jennsolenya.github.io/releases/tag/v0.4.0-cosmic-odyssey) | 2026-09-04 | Completed | • **Live Cosmic Particle Collider & Quantum Foam Sandbox**: real hands-on playable experiment in Act I with 2,500 particles, touch/drag gravity wells, and Big Bang kinetic shockwaves.<br>• **4 Kinetic Field Modes**: Inflation (radial expansion), Gravitational Vortex (spiral galactic pull), Keplerian Accretion Disks, and Quantum Foam fluctuations.<br>• **Black Hole Singularity Collapse**: Mac Force Touch pressure increases gravitational constant $G$ up to 12.0x, compressing field into a supermassive singularity with sub-bass drop.<br>• **Scrollytelling 3D Camera Voyage**: page scroll guides an uninterrupted 3D camera flight through space.<br>• **1,500-Starfield Parallax Depth**: Three.js points cloud providing deep spatial motion parallax during scrolling.<br>• **Stellar Manifold Forge**: Chapter 02 dynamic 3D manifold morphing with real-time HUD telemetry. |
+| **Phase 4: Cosmic Odyssey & Particle Collider** | [`v0.4.0-cosmic-odyssey`](https://github.com/jennsolenya.github.io/releases/tag/v0.4.0-cosmic-odyssey) | 2026-09-04 | Completed | • **Live Cosmic Particle Collider & Quantum Foam Sandbox**: real hands-on playable experiment in Act I with up to 2,000 desktop or 800 mobile particles, touch/drag gravity wells, and Big Bang kinetic shockwaves.<br>• **4 Kinetic Field Modes**: Inflation (radial expansion), Gravitational Vortex (spiral galactic pull), Keplerian Accretion Disks, and Quantum Foam fluctuations.<br>• **Black Hole Singularity Collapse**: Mac Force Touch pressure increases gravitational constant $G$ up to 12.0x, compressing field into a supermassive singularity with sub-bass drop.<br>• **Scrollytelling 3D Camera Voyage**: page scroll guides an uninterrupted 3D camera flight through space.<br>• **1,500-Starfield Parallax Depth**: Three.js points cloud providing deep spatial motion parallax during scrolling.<br>• **Stellar Manifold Forge**: Chapter 02 dynamic 3D manifold morphing with real-time HUD telemetry. |
 | **Phase 5: Sound Architect & Club Electronic Audio** | [`v0.5.0-sound-architect`](https://github.com/jennsolenya.github.io/releases/tag/v0.5.0-sound-architect) | 2026-09-04 | Completed | See Phase 6 for active upgrades. |
 | **Phase 6: Sound Architect Pro // Volume & Complexity** | `v0.6.0-sound-architect-pro` | 2026-09-04 | **Active** | • **32-Bar Macro Cycle** with 4 sections (Intro Groove -> Build Tension -> Peak Energy -> Breakdown) creating genuine musical journeys instead of short loops.<br>• **Rumble Kick with Reverb Tail** (Ben Klock / Charlotte de Witte): synthesized sub-rumble noise buffer with exponential decay, lowpass filtered at 120Hz, driven through WaveShaper distortion.<br>• **Sidechain Ducking** (Amelie Lens): GainNode pump effect -- rapid 8ms duck to 0.05 on kick, smooth 80ms release back to 1.0 on all bass elements.<br>• **Dual 303 Acid Stacking** (999999999): second detuned voice (+7 cents sharp) with screaming resonance Q up to 18.0 on accents during Peak section.<br>• **FM Synthesis Bass** (Mefjus / Noisia): carrier + modulator oscillator pair with sweeping modulation depth for evolving metallic wobble timbres on DnB Build/Peak sections.<br>• **Enhanced Growl with LFO Chop** (Virtual Riot / Must Die!): triple-oscillator with ring-mod metallic layer, dual-stage formant sweep (AH->EE->OW), tempo-synced square-wave amplitude stutter.<br>• **808 Sub Layer** (Trampa): pure sine sub with gentle pitch bend and long sustain underneath dubstep growls.<br>• **Ride Cymbal** (Amelie Lens): metallic bandpass-filtered noise at 4.5kHz for rolling techno energy.<br>• **Metallic Percussion Clank** (Kobosil): ring-modulated inharmonic oscillator stabs for industrial texture.<br>• **Ghost Snares** (Paula Temple): probabilistic low-velocity bandpass noise hits on random offbeats.<br>• **Atmospheric Noise Texture**: continuous genre-specific filtered noise wash (techno: LP 200Hz rumble, DnB: BP 3kHz hiss, dubstep: LP 80Hz sub-feel).<br>• **DynamicsCompressor Limiter**: prevents clipping at louder master volume (threshold -6dB, ratio 12:1).<br>• **Enhanced Signal Chain**: +11dB bass boost, +4dB high-shelf presence at 8kHz, 4x oversampled distortion (curve: 35). |
-| **Phase 7: Sensory Expansions** | `v0.7.0` | Upcoming | Planned | • **360° Radar Scan Matrix**: sweep-line pulse revealing deep spatial coordinates across the void.<br>• **Audio Recording & Export**: record live generative jam sessions and download as uncompressed WAV stems.<br>• **Web MIDI Support**: plug-and-play external hardware synthesizers, drum pads, and MIDI keyboards. |
+| **Phase 7: Dynamic Audiovisual Foundation** | `v0.7.0` | 2026-11-26 | **Active** | • **Shared Audio-Visual Director**: one telemetry contract synchronizes chapter, genre, energy, beat phase, RMS, frequency bands, and musical events across audio, geometry, and particles.<br>• **Chapter Arrangements**: structured intro, build, peak, breakdown, and rebirth phrasing across acid/techno, neurofunk, modern bass, ambient, and trance-inspired sections.<br>• **Narrative Particle Collider**: music-driven expansion, orbit, accretion, drop collapse, shockwaves, and quantum foam behavior.<br>• **Runtime Diagnostics**: opt-in frame, particle, audio-voice, memory, resize, visibility, and error measurements for browser QA.<br>• **Next feature slices**: radar scanning, recording/export, and Web MIDI remain planned. |
 
 ---
 
 ### v0.6.1 Runtime Hardening Checkpoint
 
-The current stabilization checkpoint is delivered as focused pull requests covering spatial-audio throttling, Three.js Subresource Integrity, explicit visual transitions, advanced-growl sidechain routing, and re-entrant-safe sequencer startup. Phase 7 remains planned until these runtime changes and browser smoke checks are complete.
+The stabilization checkpoint is complete on `main` through focused pull requests covering spatial-audio throttling, Three.js Subresource Integrity, explicit visual transitions, advanced-growl sidechain routing, re-entrant-safe sequencer startup, storage/navigation hardening, and the public-repository security/runtime gate. Browser smoke testing and GitHub Pages deployment verification completed successfully for the merged foundation. The remaining v0.7 work is intentionally separated into creative feature PRs.
 
 ## Interactive Mechanics & Controls
 
@@ -160,14 +165,19 @@ Then visit [`http://localhost:8080`](http://localhost:8080) in Safari or Chrome.
 
 ## Verification
 
-The repository CI workflow runs the required JavaScript syntax and security regression checks:
+The repository CI workflow runs the JavaScript syntax, security, audio, telemetry, visual-story, and runtime-diagnostics gates:
 
 ```bash
 deno check app.js
 node test_xss.js
+node test_security.js
+node test_telemetry.js
+node test_audio_safety.js
+node test_visual_story.js
+node test_runtime_diagnostics.js
 ```
 
-Before merging a release, also smoke-test audio initialization, genre switching, keyboard layouts, WebGL fallback, collider dragging, memory restore/delete, modal focus behavior, visibility changes, and reduced-motion behavior in a browser.
+For quantitative browser diagnostics, serve the site locally and open it with `?diagnostics=1`; the hidden-by-default panel reports frame timing and bounded-resource counters, while `window.__VOID_RUNTIME_DIAGNOSTICS__` exposes the complete snapshot for inspection. Before merging a release, also smoke-test audio initialization, genre switching, keyboard layouts, WebGL fallback, collider dragging, memory restore/delete, modal focus behavior, visibility changes, and reduced-motion behavior in a browser.
 
 ---
 
