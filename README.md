@@ -6,13 +6,16 @@ Live site: [jennsolenya.github.io](https://jennsolenya.github.io)
 
 ## Current Status
 
-The current development branch combines the latest animation/runtime performance work with the experience professionalisation pass. The site now includes:
+The current development line is the **v0.6.1 Runtime Hardening** phase, following the v0.6.0 Sound Architect Pro milestone. The site now includes:
 
 - Visibility-aware animation loops, pointer-update coalescing, capped high-DPI rendering, cached audio resources, and reduced-motion handling.
 - A performance-oriented spatial clarity system: opaque surfaces, restrained borders, reduced glow/blur, calmer state transitions, and Apple-inspired hierarchy around the experiments.
 - Keyboard-accessible drawers with labelled dialog semantics, focus restoration, visible focus states, and centralized navigation handlers.
 - Pointer capture for orbiting and collider dragging, safer canvas resizing, resilient saved-memory parsing, and a visible WebGL fallback.
 - Sidechain routing for kick, rumble, bass, sub, and 808 paths while preserving the master dynamics compressor.
+- Focused hardening work for spatial-audio automation, third-party asset integrity, explicit visual transitions, advanced-growl sidechain routing, and sequencer startup safety.
+- Local browser smoke coverage for audio initialization, genre switching, transport controls, modal Escape handling, collider modes, shockwaves, and WebGL fallback behavior.
+- The collider currently allocates up to 2,000 particles on desktop and 800 on mobile; the HUD reports the active count at runtime.
 
 Phase 7 remains planned. Audio recording/export, radar scanning, and Web MIDI are not implemented yet.
 
@@ -28,7 +31,7 @@ The README describes the intended experience and architecture; browser compatibi
         |                              |                                           |                                   |                                    |                                   |                                 |                                  |
   [2026-09-04]                   [2026-09-04]                                [2026-09-04]                        [2026-09-04]                         [2026-09-04]                        [2026-09-04]                      [2026-09-04]                       [2026-09-04]
         +------------------------------+-------------------------------------------+-----------------------------------+------------------------------------+-----------------------------------+---------------------------------+----------------------------------+
-   * Repo created                * Pure #000000 void palette                * Apple Force Touch trackpad pressure * 16-step drum sequencer (Kick/Snr/Hat) * 5 Cosmological Epochs             * 2,500-Particle Collider Lab       * Human-logic studio layout        * 32-bar macro cycle (Intro/Build/Peak/Breakdown)
+   * Repo created                * Pure #000000 void palette                * Apple Force Touch trackpad pressure * 16-step drum sequencer (Kick/Snr/Hat) * 5 Cosmological Epochs             * Up to 2,000 desktop / 800 mobile collider vectors       * Human-logic studio layout        * 32-bar macro cycle (Intro/Build/Peak/Breakdown)
    * GitHub Pages initialized    * Canvas cursor spotlight grid             * Direct 3D orbit drag & zoom inertia * Procedural wobble bass synth        * Browser interaction entropy engine   * Scrollytelling 3D Camera Voyage   * Zero-emoji clean line aesthetic   * Rumble kick w/ reverb tail (Ben Klock)
                                  * Three.js wireframe sculpture             * Binaural HRTF Spatial Audio         * 3 Genre sound profiles              * Pause / Freeze time (Shift + P)   * 1,500-Starfield parallax depth    * 135 BPM Acid Techno (303/909)    * Sidechain ducking pump (Amelie Lens)
                                  * Web Audio ambient drone synth            * Audio-reactive wireframe pulsing    * Calibrated force curves             * Cosmic Memories Bank (Shift + S)  * Force Singularity Collapse        * 174 BPM Neurofunk & Reese bass    * Dual 303 acid stacking (999999999)
@@ -55,6 +58,10 @@ The README describes the intended experience and architecture; browser compatibi
 
 ---
 
+### v0.6.1 Runtime Hardening Checkpoint
+
+The current stabilization checkpoint is delivered as focused pull requests covering spatial-audio throttling, Three.js Subresource Integrity, explicit visual transitions, advanced-growl sidechain routing, and re-entrant-safe sequencer startup. Phase 7 remains planned until these runtime changes and browser smoke checks are complete.
+
 ## Interactive Mechanics & Controls
 
 | Input | Target | Action |
@@ -63,7 +70,7 @@ The README describes the intended experience and architecture; browser compatibi
 | **Click & Drag / 2-Finger Swipe** | 3D WebGL Canvas | Rotates the 3D wireframe manifold freely in 3D space with fluid inertia (+0.08 entropy). |
 | **Pinch / Scroll** | 3D WebGL Canvas | Zooms camera closer (`z: 3.8`) or further into the deep void (`z: 11.5`) (+0.03 entropy). |
 | **Trackpad Force** | Mac Trackpad | Calibrated analog pressure: light touch (0-49%), click (50%), deep press (50-100%). Surges spotlight radius, sub-bass, and wireframe scale. |
-| **Click / Drag** | Particle Collider Canvas | Shapes the gravitational attractor well; sends kinetic shockwaves across 2,500 particles (+0.12 entropy). |
+| **Click / Drag** | Particle Collider Canvas | Shapes the gravitational attractor well; sends kinetic shockwaves across up to 2,000 desktop or 800 mobile particles (+0.12 entropy). |
 | **Trackpad Deep Force** | Particle Collider Lab | Escalates gravity up to 12.0x, collapsing the cosmic field into a black hole singularity with sub-bass drop. |
 | **Pills & Action Buttons** | Collider Lab Controls | Switches between Inflation, Vortex, Accretion, and Quantum Foam modes; triggers Big Bang pulses or field resets. |
 | **Cutoff & Res Sliders** | Sound Studio Console | Dynamically modulates master lowpass filter cutoff ($200\text{Hz}-12\text{kHz}$) and resonance $Q$ ($0.1-18.0$) in real time. |
@@ -130,7 +137,7 @@ Clicking any profile pill immediately activates the audio engine, sets the tempo
 
 ## Technology Stack
 
-- **Core**: Vanilla HTML5, Vanilla JavaScript (ES6+), Vanilla CSS3 (Custom properties, 3D transforms, Glassmorphism).
+- **Core**: Vanilla HTML5, Vanilla JavaScript (ES6+), Vanilla CSS3 (Custom properties, 3D transforms, restrained monochrome surfaces).
 - **3D Graphics**: [Three.js](https://threejs.org/) (r128).
 - **Sound Synthesis**: Native Browser [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) (HRTF Spatial Panner, BiquadFilter, AnalyserNode, Oscillators).
 - **Hardware Integrations**: Apple WebKit Force Touch API (`webkitmouseforcechanged`), W3C Pointer Events.
