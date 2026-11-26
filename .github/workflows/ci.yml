@@ -28,3 +28,6 @@ jobs:
 
       - name: Run Security Regression Tests
         run: node test_xss.js
+
+      - name: Run Static Security Gate
+        run: node test_security.js
