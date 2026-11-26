@@ -18,6 +18,7 @@ class SpatialSoundEngine {
     this.subBassOsc = null;
     this.subBassGain = null;
     this.spatialPanner = null;
+    this.lastSpatialPosition = null;
     this.analyser = null;
     this.noiseBufferCache = new Map();
     this.isMuted = true;
@@ -376,6 +377,14 @@ class SpatialSoundEngine {
   updateSpatialPosition(x, y, z) {
     if (!this.spatialPanner || !this.ctx) return;
     const now = this.ctx.currentTime;
+    const previous = this.lastSpatialPosition;
+    if (previous && (now - previous.time < 1 / 30 ||
+        (Math.abs(previous.x - x) < 0.01 &&
+         Math.abs(previous.y - y) < 0.01 &&
+         Math.abs(previous.z - z) < 0.01))) {
+      return;
+    }
+
     if (this.spatialPanner.positionX) {
       this.spatialPanner.positionX.setTargetAtTime(x, now, 0.05);
       this.spatialPanner.positionY.setTargetAtTime(y, now, 0.05);
@@ -383,6 +392,7 @@ class SpatialSoundEngine {
     } else if (this.spatialPanner.setPosition) {
       this.spatialPanner.setPosition(x, y, z);
     }
+    this.lastSpatialPosition = { x, y, z, time: now };
   }
 
   modulateWithCursor(normX, normY, force = 0) {
