@@ -1,0 +1,23 @@
+{
+  "name": "jennsolenya-github-io",
+  "version": "1.0.0",
+  "description": "VOID // A minimalist, 100% pitch-black interactive art experiment in pure darkness, dimensional 3D wireframe geometry, Apple Force Touch trackpad dynamics, and binaural HRTF spatial audio synthesis.",
+  "main": "app.js",
+  "scripts": {
+    "test": "node test_xss.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jennsolenya/jennsolenya.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jennsolenya/jennsolenya.github.io/issues"
+  },
+  "homepage": "https://github.com/jennsolenya/jennsolenya.github.io#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
