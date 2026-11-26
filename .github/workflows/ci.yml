@@ -37,3 +37,6 @@ jobs:
 
       - name: Run Audio Safety Gate
         run: node test_audio_safety.js
+
+      - name: Run Visual Story Gate
+        run: node test_visual_story.js
