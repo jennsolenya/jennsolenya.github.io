@@ -7,6 +7,118 @@
 // --- 1. Sound Engine with Binaural HRTF Spatial Audio ---
 const distortionCurveCache = new Map();
 
+// Opt-in runtime measurements for browser QA. The normal experience does not
+// collect or render diagnostics; append ?diagnostics=1 during local testing.
+const voidDiagnostics = (() => {
+  const enabled = typeof window !== 'undefined'
+    && new URLSearchParams(window.location.search).get('diagnostics') === '1';
+  const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  const state = {
+    enabled,
+    startedAt: now(),
+    frames: {
+      three: { count: 0, totalMs: 0, maxMs: 0 },
+      collider: { count: 0, totalMs: 0, maxMs: 0 },
+      visualizer: { count: 0, totalMs: 0, maxMs: 0 },
+    },
+    particles: { frames: 0, updates: 0, rendered: 0, maxShockwaves: 0 },
+    audio: { created: 0, started: 0, stopped: 0, active: 0, highWater: 0 },
+    memory: { supported: false, samples: 0, startBytes: 0, endBytes: 0, maxBytes: 0 },
+    errors: 0,
+    unhandledRejections: 0,
+    visibilityChanges: 0,
+    resizes: 0,
+  };
+  let lastMemorySample = -Infinity;
+
+  const averageFrameMs = (frame) => frame.count ? frame.totalMs / frame.count : 0;
+
+  const render = () => {
+    if (!enabled) return;
+    const panel = document.getElementById('runtime-diagnostics');
+    if (!panel) return;
+    const three = state.frames.three;
+    const collider = state.frames.collider;
+    panel.hidden = false;
+    const heap = state.memory.supported
+      ? `${Math.round(state.memory.endBytes / 1024 / 1024)}MB HEAP`
+      : 'HEAP UNSUPPORTED';
+    panel.textContent = `RUNTIME // THREE ${averageFrameMs(three).toFixed(2)}MS AVG / ${three.maxMs.toFixed(2)}MS MAX // COLLIDER ${averageFrameMs(collider).toFixed(2)}MS AVG / ${collider.maxMs.toFixed(2)}MS MAX // PARTICLES ${state.particles.updates.toLocaleString()} UPDATED / ${state.particles.maxShockwaves} SHOCK MAX // AUDIO ${state.audio.active} ACTIVE / ${state.audio.highWater} HIGH // ${heap} // RESIZE ${state.resizes} / VIS ${state.visibilityChanges} // ERRORS ${state.errors + state.unhandledRejections}`;
+  };
+
+  const sampleMemory = () => {
+    if (!enabled || typeof performance === 'undefined' || !performance.memory) return;
+    const usedBytes = Number(performance.memory.usedJSHeapSize);
+    if (!Number.isFinite(usedBytes)) return;
+    state.memory.supported = true;
+    state.memory.samples++;
+    if (!state.memory.startBytes) state.memory.startBytes = usedBytes;
+    state.memory.endBytes = usedBytes;
+    state.memory.maxBytes = Math.max(state.memory.maxBytes, usedBytes);
+  };
+
+  const recordFrame = (kind, startedAt, details = {}) => {
+    if (!enabled) return;
+    const elapsed = Math.max(0, now() - startedAt);
+    const frame = state.frames[kind];
+    if (frame) {
+      frame.count++;
+      frame.totalMs += elapsed;
+      frame.maxMs = Math.max(frame.maxMs, elapsed);
+    }
+    if (kind === 'collider') {
+      state.particles.frames++;
+      state.particles.updates += Number.isFinite(details.particles) ? details.particles : 0;
+      state.particles.rendered += Number.isFinite(details.rendered) ? details.rendered : 0;
+      state.particles.maxShockwaves = Math.max(state.particles.maxShockwaves, details.shockwaves || 0);
+    }
+    const currentTime = now();
+    if (currentTime - lastMemorySample >= 1000) {
+      lastMemorySample = currentTime;
+      sampleMemory();
+    }
+    render();
+  };
+
+  const recordError = () => {
+    state.errors++;
+    render();
+  };
+
+  const recordUnhandledRejection = () => {
+    state.unhandledRejections++;
+    render();
+  };
+
+  const attachAudioStats = (stats) => {
+    if (enabled) state.audio = stats;
+    render();
+  };
+
+  if (typeof window !== 'undefined') {
+    window.__VOID_RUNTIME_DIAGNOSTICS__ = state;
+    window.addEventListener('error', recordError);
+    window.addEventListener('unhandledrejection', recordUnhandledRejection);
+    window.addEventListener('resize', () => {
+      if (enabled) state.resizes++;
+    }, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (enabled) state.visibilityChanges++;
+    });
+  }
+
+  render();
+
+  return {
+    enabled,
+    state,
+    startFrame: () => enabled ? now() : 0,
+    recordFrame,
+    attachAudioStats,
+    render,
+  };
+})();
+
 // Shared audio-visual state. Audio owns the signal; every visual system reads
 // this director so bass, rhythm, sections, and transitions tell one story.
 class AudioVisualDirector {
@@ -137,6 +249,60 @@ class SpatialSoundEngine {
     this.noiseBufferCache = new Map();
     this.isMuted = true;
     this.initialized = false;
+    this.voiceStats = { created: 0, started: 0, stopped: 0, active: 0, highWater: 0 };
+  }
+
+  installAudioDiagnostics() {
+    if (!voidDiagnostics.enabled || !this.ctx) return;
+    const stats = this.voiceStats;
+    ['createOscillator', 'createBufferSource'].forEach((factoryName) => {
+      try {
+        const originalFactory = this.ctx[factoryName].bind(this.ctx);
+        this.ctx[factoryName] = (...args) => {
+          const source = originalFactory(...args);
+          stats.created++;
+          let active = false;
+          let released = false;
+          let releaseTimer = null;
+          const release = () => {
+            if (released) return;
+            released = true;
+            if (releaseTimer) clearTimeout(releaseTimer);
+            if (active) {
+              active = false;
+              stats.active = Math.max(0, stats.active - 1);
+            }
+            stats.stopped++;
+          };
+          const originalStart = source.start.bind(source);
+          const originalStop = source.stop.bind(source);
+          source.start = (...startArgs) => {
+            if (!active) {
+              active = true;
+              stats.started++;
+              stats.active++;
+              stats.highWater = Math.max(stats.highWater, stats.active);
+              const bufferDuration = source.buffer && Number(source.buffer.duration);
+              if (!source.loop && Number.isFinite(bufferDuration)) {
+                releaseTimer = setTimeout(release, (bufferDuration + 0.15) * 1000);
+              }
+            }
+            return originalStart(...startArgs);
+          };
+          source.stop = (...stopArgs) => {
+            try {
+              return originalStop(...stopArgs);
+            } finally {
+              release();
+            }
+          };
+          return source;
+        };
+      } catch (error) {
+        // Diagnostics must never change the audio engine's behavior.
+      }
+    });
+    voidDiagnostics.attachAudioStats(stats);
   }
 
   getNoiseBuffer(duration, decay = false) {
@@ -161,6 +327,7 @@ class SpatialSoundEngine {
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AudioCtx();
+      this.installAudioDiagnostics();
 
       // Master Gain (increased from 0.42 to 0.62 for club-volume feel)
       this.masterGain = this.ctx.createGain();
@@ -1586,6 +1753,7 @@ function animateThreeJS() {
     threeAnimationRunning = false;
     return;
   }
+  const diagnosticsStart = voidDiagnostics.startFrame();
   if (!prefersReducedMotion) requestAnimationFrame(animateThreeJS);
 
   const normX = (mouse.x / width) * 2 - 1;
@@ -1694,6 +1862,7 @@ function animateThreeJS() {
   }
 
   renderer.render(scene, camera);
+  voidDiagnostics.recordFrame('three', diagnosticsStart);
 }
 
 function startThreeAnimation() {
@@ -3514,6 +3683,7 @@ class ParticleColliderLab {
       this.animationRunning = false;
       return;
     }
+    const diagnosticsStart = voidDiagnostics.startFrame();
     if (!prefersReducedMotion) requestAnimationFrame(this.animate);
     this.time += 0.016;
 
@@ -3711,6 +3881,11 @@ class ParticleColliderLab {
       const cFrac = Math.min(0.99, (rms / 8.0)).toFixed(2);
       this.velocityBadge.textContent = `RMS VELOCITY: ${cFrac} c`;
     }
+    voidDiagnostics.recordFrame('collider', diagnosticsStart, {
+      particles: len,
+      rendered: len,
+      shockwaves: this.shockwaves.length,
+    });
   }
 }
 
@@ -3739,8 +3914,12 @@ if (visCanvas) {
   function drawVisualizer() {
     visualizerFramePending = false;
     if (!isDocumentVisible || !isVisualizerVisible) return;
+    const diagnosticsStart = voidDiagnostics.startFrame();
     visualizerFramePending = true;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      voidDiagnostics.recordFrame('visualizer', diagnosticsStart);
+      return;
+    }
     requestAnimationFrame(drawVisualizer);
 
     vCtx.fillStyle = 'rgba(0, 0, 0, 0.25)';
@@ -3759,6 +3938,7 @@ if (visCanvas) {
       vCtx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
       vCtx.fillRect(x + 1, y, barWidth - 2, barHeight);
     }
+    voidDiagnostics.recordFrame('visualizer', diagnosticsStart);
   }
 
   const visualizerObserver = typeof IntersectionObserver !== 'undefined'
