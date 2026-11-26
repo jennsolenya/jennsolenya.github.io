@@ -24,6 +24,7 @@ class AudioVisualDirector {
     };
     this.spectrum = new Uint8Array(32);
     this.listeners = new Set();
+    this.events = new Map();
     this.lastSampleAt = -Infinity;
     this.eventId = 0;
   }
@@ -73,14 +74,19 @@ class AudioVisualDirector {
       at: typeof performance !== 'undefined' ? performance.now() : Date.now(),
       ...detail,
     };
+    this.events.set(type, this.state.lastEvent);
     this.notify();
   }
 
   eventStrength(type, duration = 250) {
-    const event = this.state.lastEvent;
-    if (!event || event.type !== type) return 0;
+    const event = this.events.get(type);
+    if (!event) return 0;
     const age = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - event.at;
     return age >= duration ? 0 : Math.max(0, 1 - age / duration);
+  }
+
+  getEvent(type) {
+    return this.events.get(type) || null;
   }
 
   sampleAnalyser(analyser, muted = false) {
@@ -1573,6 +1579,8 @@ window.addEventListener('scroll', () => {
   }
 }, { passive: true });
 
+let lastVisualDropId = 0;
+
 function animateThreeJS() {
   if (!isDocumentVisible) {
     threeAnimationRunning = false;
@@ -1611,17 +1619,27 @@ function animateThreeJS() {
   const effectiveCameraZ = scrollyTargetZ + userZoomOffset;
   camera.position.z += (effectiveCameraZ - camera.position.z) * 0.08;
 
-  // Starfield gentle drift and dynamic parallax depth
-  if (starField) {
-    starField.rotation.y += 0.0003;
-    starField.rotation.x += 0.00015;
-    starField.position.y = scrollY * 0.002;
-    starField.position.z = (scrollY * 0.008) % 30;
-  }
-
   // Sample once, then let every visual system consume the shared state.
   const audioTelemetry = audioVisualDirector.sampleAnalyser(audio.analyser, audio.isMuted);
   const bassFactor = audioTelemetry.bass;
+  const kickPulse = audioVisualDirector.eventStrength('kick', 180);
+  const dropPulse = audioVisualDirector.eventStrength('drop', 900);
+  const dropEvent = audioVisualDirector.getEvent('drop');
+  if (dropEvent && dropEvent.id !== lastVisualDropId) {
+    lastVisualDropId = dropEvent.id;
+    morphGeometry();
+  }
+
+  // Starfield gentle drift and dynamic parallax depth
+  if (starField) {
+    starField.rotation.y += 0.0003 + audioTelemetry.high * 0.0008 + dropPulse * 0.002;
+    starField.rotation.x += 0.00015 + audioTelemetry.mid * 0.00035;
+    starField.position.y = scrollY * 0.002;
+    starField.position.z = (scrollY * 0.008) % 30;
+    if (starField.material) {
+      starField.material.opacity = Math.min(0.9, 0.34 + audioTelemetry.energy * 0.3 + dropPulse * 0.2);
+    }
+  }
 
   if (wireframeMesh) {
     // Apply inertia and dragging velocity
@@ -1645,21 +1663,26 @@ function animateThreeJS() {
 
     // Audio Reactive Scale + Mac Force Touch Expansion + Cosmological Epoch Scale
     const epochScale = (typeof cosmicEngine !== 'undefined') ? cosmicEngine.getVisualScale() : 1.0;
-    const scale = (1 + bassFactor * 0.22 + trackpadForce * 0.38) * epochScale;
+    const scale = (1 + bassFactor * 0.28 + audioTelemetry.energy * 0.16 + kickPulse * 0.12 + dropPulse * 0.34 + trackpadForce * 0.38) * epochScale;
     wireframeMesh.scale.set(scale, scale, scale);
+    if (wireframeMesh.material) {
+      wireframeMesh.material.opacity = Math.min(0.92, 0.52 + audioTelemetry.high * 0.2 + dropPulse * 0.18);
+    }
 
     // Outer orbital ring rotation & pulse
     if (outerRing) {
-      outerRing.rotation.z += 0.004;
+      outerRing.rotation.z += 0.004 + audioTelemetry.high * 0.003 + dropPulse * 0.012;
       outerRing.rotation.y = normX * 0.3 + scrollProg * 1.5;
-      const ringScale = 1 + bassFactor * 0.15 + trackpadForce * 0.25;
+      const ringScale = 1 + bassFactor * 0.2 + audioTelemetry.energy * 0.18 + kickPulse * 0.28 + dropPulse * 0.65 + trackpadForce * 0.25;
       outerRing.scale.set(ringScale, ringScale, ringScale);
+      if (outerRing.material) outerRing.material.opacity = Math.min(0.7, 0.16 + audioTelemetry.high * 0.18 + kickPulse * 0.28 + dropPulse * 0.2);
     }
 
     if (innerCore) {
-      innerCore.rotation.y -= 0.006;
-      const coreScale = 1 + bassFactor * 0.4;
+      innerCore.rotation.y -= 0.006 + audioTelemetry.mid * 0.006;
+      const coreScale = 1 + bassFactor * 0.45 + kickPulse * 0.32 + dropPulse * 0.75;
       innerCore.scale.set(coreScale, coreScale, coreScale);
+      if (innerCore.material) innerCore.material.opacity = Math.min(0.62, 0.12 + audioTelemetry.mid * 0.2 + dropPulse * 0.28);
     }
 
     // Update 3D Spatial Audio coordinates based on mesh rotation & position
@@ -3239,9 +3262,22 @@ class ParticleColliderLab {
     this.setupObserver();
     this.unsubscribeDirector = audioVisualDirector.subscribe((telemetry) => {
       const event = telemetry.lastEvent;
-      if (!event || event.id === this.lastDirectorEventId || this.isOffscreen || prefersReducedMotion) return;
+      if (!event || event.id === this.lastDirectorEventId) return;
       this.lastDirectorEventId = event.id;
-      if (event.type === 'kick') {
+      if (event.type === 'section-change') {
+        const chapterModes = {
+          'INTRO GROOVE': 'inflation',
+          'BUILD TENSION': 'accretion',
+          'PEAK ENERGY': 'vortex',
+          BREAKDOWN: 'quantum',
+        };
+        const chapterMode = chapterModes[event.section];
+        if (chapterMode && chapterMode !== this.mode) this.setMode(chapterMode);
+      }
+      if (this.isOffscreen || prefersReducedMotion) return;
+      if (event.type === 'drop') {
+        this.triggerCollapse();
+      } else if (event.type === 'kick') {
         this.triggerPulse(this.centerX, this.centerY, 2.5 + telemetry.bass * 5);
       }
     });
@@ -3320,10 +3356,10 @@ class ParticleColliderLab {
   setMode(modeName) {
     this.mode = modeName;
     const modeTitles = {
-      inflation: 'MODE: INFLATION (EXPANSION)',
-      vortex: 'MODE: VORTEX (GRAVITY)',
-      accretion: 'MODE: ACCRETION (ORBITS)',
-      quantum: 'MODE: QUANTUM FOAM',
+      inflation: 'CHAPTER 01: INFLATION // EXPANSION',
+      vortex: 'CHAPTER 03: VORTEX // DROP GRAVITY',
+      accretion: 'CHAPTER 02: ACCRETION // BUILD ORBITS',
+      quantum: 'CHAPTER 04: QUANTUM FOAM // BREAKDOWN',
     };
     if (this.modeBadge) this.modeBadge.textContent = modeTitles[modeName] || modeName.toUpperCase();
 
@@ -3344,6 +3380,7 @@ class ParticleColliderLab {
   }
 
   triggerPulse(originX, originY, force = 9) {
+    if (this.shockwaves.length >= 12) this.shockwaves.shift();
     this.shockwaves.push({
       x: originX,
       y: originY,
@@ -3503,7 +3540,9 @@ class ParticleColliderLab {
       }
     }
     currentGrav += audioVisualDirector.state.bass * 1.6;
+    currentGrav += audioVisualDirector.state.energy * 0.8;
     currentGrav += audioVisualDirector.eventStrength('kick', 180) * 1.5;
+    currentGrav += audioVisualDirector.eventStrength('drop', 900) * 2.2;
     this.gravityMult = currentGrav;
 
     // Default attractor drift if pointer inactive
