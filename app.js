@@ -1174,7 +1174,7 @@ let targetCameraZ = 7.0;
 
 function getThreePixelRatio() {
   const deviceRatio = window.devicePixelRatio || 1;
-  const maxRatio = window.innerWidth < 768 ? 1.25 : 1.5;
+  const maxRatio = 1.25;
   return Math.min(deviceRatio, maxRatio);
 }
 
