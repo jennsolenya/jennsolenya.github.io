@@ -20,7 +20,7 @@ The completed **v0.6.1 Runtime Hardening** phase now supports the active **v0.7.
 - Structured 32-bar chapter arrangements for acid/techno, neurofunk, modern bass, ambient, and trance-inspired rebirth sections, with bounded voices and protected sidechain/limiter routing.
 - A narrative collider response: expansion, orbiting tension, drop vortex collapse, and breakdown foam are driven by the same musical state as the audio.
 - An opt-in runtime diagnostics surface (`?diagnostics=1`) measuring frame times, particle work, shockwave high-water, audio voice high-water, heap support, resize/visibility changes, and uncaught errors.
-- A public-repository security gate covering CSP/SRI, storage normalization, XSS regressions, common credential formats, immutable CI actions, read-only workflow permissions, and timer cleanup.
+- A public-repository security gate covering CSP/SRI, all-tracked-file credential scanning, storage normalization, XSS regressions, immutable CI actions, read-only workflow permissions, and timer cleanup.
 
 The v0.7 foundation is active. Audio recording/export, radar scanning, and Web MIDI remain separate future feature slices rather than being bundled into the hardening work.
 
