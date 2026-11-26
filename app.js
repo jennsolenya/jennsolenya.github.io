@@ -7,6 +7,114 @@
 // --- 1. Sound Engine with Binaural HRTF Spatial Audio ---
 const distortionCurveCache = new Map();
 
+// Shared audio-visual state. Audio owns the signal; every visual system reads
+// this director so bass, rhythm, sections, and transitions tell one story.
+class AudioVisualDirector {
+  constructor() {
+    this.state = {
+      rms: 0,
+      bass: 0,
+      mid: 0,
+      high: 0,
+      energy: 0,
+      beatPhase: 0,
+      section: 'INTRO GROOVE',
+      genre: 'techno',
+      lastEvent: null,
+    };
+    this.spectrum = new Uint8Array(32);
+    this.listeners = new Set();
+    this.lastSampleAt = -Infinity;
+    this.eventId = 0;
+  }
+
+  clamp(value, fallback = 0) {
+    return Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : fallback;
+  }
+
+  subscribe(listener) {
+    if (typeof listener !== 'function') return () => {};
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  notify() {
+    this.listeners.forEach((listener) => {
+      try {
+        listener(this.state);
+      } catch (error) {
+        // A visual fallback must never interrupt audio transport.
+      }
+    });
+  }
+
+  publish(values = {}) {
+    const numericKeys = ['rms', 'bass', 'mid', 'high', 'energy', 'beatPhase'];
+    numericKeys.forEach((key) => {
+      if (values[key] !== undefined) this.state[key] = this.clamp(values[key], this.state[key]);
+    });
+    if (typeof values.section === 'string' && values.section) this.state.section = values.section;
+    if (typeof values.genre === 'string' && values.genre) this.state.genre = values.genre;
+    this.notify();
+  }
+
+  setGenre(genre) {
+    this.publish({ genre });
+  }
+
+  setSection(section) {
+    this.publish({ section });
+  }
+
+  emit(type, detail = {}) {
+    this.state.lastEvent = {
+      id: ++this.eventId,
+      type,
+      at: typeof performance !== 'undefined' ? performance.now() : Date.now(),
+      ...detail,
+    };
+    this.notify();
+  }
+
+  eventStrength(type, duration = 250) {
+    const event = this.state.lastEvent;
+    if (!event || event.type !== type) return 0;
+    const age = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - event.at;
+    return age >= duration ? 0 : Math.max(0, 1 - age / duration);
+  }
+
+  sampleAnalyser(analyser, muted = false) {
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (now - this.lastSampleAt < 12) return this.state;
+    this.lastSampleAt = now;
+
+    if (analyser && !muted) {
+      analyser.getByteFrequencyData(this.spectrum);
+      const average = (start, end) => {
+        let total = 0;
+        for (let i = start; i < end; i++) total += this.spectrum[i] || 0;
+        return total / Math.max(1, end - start) / 255;
+      };
+      const bass = average(0, 4);
+      const mid = average(4, 16);
+      const high = average(16, 32);
+      this.publish({
+        rms: Math.sqrt((bass * bass + mid * mid + high * high) / 3),
+        bass,
+        mid,
+        high,
+        energy: bass * 0.55 + mid * 0.3 + high * 0.15,
+      });
+    } else {
+      this.spectrum.fill(0);
+      this.publish({ rms: 0, bass: 0, mid: 0, high: 0, energy: 0 });
+    }
+    return this.state;
+  }
+}
+
+const audioVisualDirector = new AudioVisualDirector();
+
 class SpatialSoundEngine {
   constructor() {
     this.ctx = null;
@@ -204,6 +312,7 @@ class SpatialSoundEngine {
 
   setGenre(genreName) {
     this.genre = genreName;
+    audioVisualDirector.setGenre(genreName);
     if (this.isMuted || !this.ctx) return;
     const now = this.ctx.currentTime;
 
@@ -1350,8 +1459,6 @@ window.addEventListener('scroll', () => {
   }
 }, { passive: true });
 
-const freqBuffer = new Uint8Array(32);
-
 function animateThreeJS() {
   if (!isDocumentVisible) {
     threeAnimationRunning = false;
@@ -1398,14 +1505,9 @@ function animateThreeJS() {
     starField.position.z = (scrollY * 0.008) % 30;
   }
 
-  // Audio-reactive frequency sampling
-  let bassFactor = 0;
-  if (audio.analyser && !audio.isMuted) {
-    audio.analyser.getByteFrequencyData(freqBuffer);
-    // Average first 4 frequency bins for bass
-    const bass = (freqBuffer[0] + freqBuffer[1] + freqBuffer[2] + freqBuffer[3]) / 4;
-    bassFactor = bass / 255;
-  }
+  // Sample once, then let every visual system consume the shared state.
+  const audioTelemetry = audioVisualDirector.sampleAnalyser(audio.analyser, audio.isMuted);
+  const bassFactor = audioTelemetry.bass;
 
   if (wireframeMesh) {
     // Apply inertia and dragging velocity
@@ -2187,6 +2289,21 @@ class CosmicUniverseEngine {
       const localBar = measure % 8;
       const now = audio.ctx.currentTime;
       const ep = this.getCurrentEpoch();
+      const sectionNames = ['INTRO GROOVE', 'BUILD TENSION', 'PEAK ENERGY', 'BREAKDOWN'];
+      const sectionName = sectionNames[section] || 'EVOLVING';
+      const sectionEnergy = [0.25, 0.55, 1.0, 0.12][section] || 0.25;
+
+      audioVisualDirector.publish({
+        genre: ep.key,
+        section: sectionName,
+        beatPhase: s / 16,
+        energy: sectionEnergy,
+      });
+      if (this.lastDirectorSection !== sectionName) {
+        this.lastDirectorSection = sectionName;
+        audioVisualDirector.emit('section-change', { section: sectionName });
+      }
+      audioVisualDirector.emit('beat', { step: s, bar: measure + 1 });
 
       // Subtle interaction-free baseline cosmic drift (+0.04 entropy per beat)
       if (!this.isPaused) {
@@ -2196,8 +2313,6 @@ class CosmicUniverseEngine {
       // Update live parameter & bar tracker with 32-bar section awareness
       const barTracker = document.getElementById('live-bar-tracker');
       if (barTracker && s === 0) {
-        const sectionNames = ['INTRO GROOVE', 'BUILD TENSION', 'PEAK ENERGY', 'BREAKDOWN'];
-        const sectionName = sectionNames[section] || 'EVOLVING';
         if (localBar === 7) {
           barTracker.textContent = `BAR: ${measure + 1}/32 // ${sectionName} TURNAROUND`;
           barTracker.style.color = '#ffffff';
@@ -2216,6 +2331,7 @@ class CosmicUniverseEngine {
 
         // Kick: rumble kick on peak section, standard on others
         if (s === 0 || s === 4 || s === 8 || s === 12) {
+          audioVisualDirector.emit('kick', { step: s });
           if (section >= 1) {
             audio.playRumbleKick(now); // Ben Klock rumble tail + sidechain duck
           } else {
@@ -2279,11 +2395,13 @@ class CosmicUniverseEngine {
 
         // Climax turnaround snare roll on last bar of each section
         if (localBar === 7 && s >= 12) {
+          audioVisualDirector.emit('snare', { step: s });
           audio.playSnare(now, true);
         }
 
         // Breakdown noise sweep riser on section 3 bars 6-7
         if (section === 3 && localBar >= 6 && s === 0) {
+          audioVisualDirector.emit('riser', { section: sectionName });
           audio.playSubDrop();
         }
 
@@ -2293,10 +2411,12 @@ class CosmicUniverseEngine {
 
         // Syncopated Amen breakbeat
         if (s === 0 || s === 7 || s === 10) {
+          audioVisualDirector.emit('kick', { step: s });
           audio.playKick(now);
           audio.triggerSidechain(now);
         }
         if (s === 4 || s === 12) {
+          audioVisualDirector.emit('snare', { step: s });
           audio.playSnare(now, false);
         }
 
@@ -2342,6 +2462,7 @@ class CosmicUniverseEngine {
 
         // Sub drop on breakdown transition
         if (section === 3 && localBar === 7 && s === 0) {
+          audioVisualDirector.emit('riser', { section: sectionName });
           audio.playSubDrop();
         }
 
@@ -2351,10 +2472,14 @@ class CosmicUniverseEngine {
 
         // Half-time beat
         if (s === 0 || s === 10) {
+          audioVisualDirector.emit('kick', { step: s });
           audio.playKick(now);
           audio.triggerSidechain(now);
         }
-        if (s === 8) audio.playSnare(now, false);
+        if (s === 8) {
+          audioVisualDirector.emit('snare', { step: s });
+          audio.playSnare(now, false);
+        }
 
         // Ghost hats with velocity variation
         if (s % 2 === 0) {
@@ -2389,6 +2514,7 @@ class CosmicUniverseEngine {
 
         // Sub-drop on bar transitions
         if (localBar === 7 && s === 0) {
+          audioVisualDirector.emit('riser', { section: sectionName });
           audio.playSubDrop();
         }
 
@@ -2431,6 +2557,7 @@ class CosmicUniverseEngine {
     this.isMusicPlaying = false;
     if (this.beatTimer) clearTimeout(this.beatTimer);
     this.beatTimer = null;
+    audioVisualDirector.emit('silence');
     this.syncTransportButtons(false);
   }
 
@@ -2927,6 +3054,7 @@ class ParticleColliderLab {
     this.animationRunning = false;
     this.pendingPointer = null;
     this.pointerFrame = 0;
+    this.lastDirectorEventId = 0;
     this.particleRenderBuckets = Array.from({ length: 16 }, () => []);
     this.particleRenderStyles = this.particleRenderBuckets.map((_, index) =>
       `rgba(255, 255, 255, ${(index + 0.5) / this.particleRenderBuckets.length})`
@@ -2945,6 +3073,14 @@ class ParticleColliderLab {
     this.initParticles();
     this.bindEvents();
     this.setupObserver();
+    this.unsubscribeDirector = audioVisualDirector.subscribe((telemetry) => {
+      const event = telemetry.lastEvent;
+      if (!event || event.id === this.lastDirectorEventId || this.isOffscreen || prefersReducedMotion) return;
+      this.lastDirectorEventId = event.id;
+      if (event.type === 'kick') {
+        this.triggerPulse(this.centerX, this.centerY, 2.5 + telemetry.bass * 5);
+      }
+    });
     this.animate = this.animate.bind(this);
     if (prefersReducedMotion) this.animate();
     else this.startAnimation();
@@ -3202,6 +3338,8 @@ class ParticleColliderLab {
         if (typeof audio !== 'undefined') audio.playBigBounceChord();
       }
     }
+    currentGrav += audioVisualDirector.state.bass * 1.6;
+    currentGrav += audioVisualDirector.eventStrength('kick', 180) * 1.5;
     this.gravityMult = currentGrav;
 
     // Default attractor drift if pointer inactive
@@ -3391,7 +3529,7 @@ if (visCanvas) {
   resizeVis();
   window.addEventListener('resize', resizeVis);
 
-  const freqData = new Uint8Array(32);
+  const freqData = audioVisualDirector.spectrum;
   let isVisualizerVisible = false;
   let visualizerFramePending = false;
 
@@ -3405,13 +3543,7 @@ if (visCanvas) {
     vCtx.fillStyle = 'rgba(0, 0, 0, 0.25)';
     vCtx.fillRect(0, 0, visCanvas.width, visCanvas.height);
 
-    if (audio.analyser && !audio.isMuted) {
-      audio.analyser.getByteFrequencyData(freqData);
-    } else {
-      for (let i = 0; i < freqData.length; i++) {
-        freqData[i] = Math.max(0, freqData[i] * 0.9);
-      }
-    }
+    audioVisualDirector.sampleAnalyser(audio.analyser, audio.isMuted);
 
     const barWidth = visCanvas.width / freqData.length;
     for (let i = 0; i < freqData.length; i++) {

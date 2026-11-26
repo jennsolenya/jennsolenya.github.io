@@ -31,3 +31,6 @@ jobs:
 
       - name: Run Static Security Gate
         run: node test_security.js
+
+      - name: Run Audio-Visual Telemetry Contract Test
+        run: node test_telemetry.js
