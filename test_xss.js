@@ -166,6 +166,20 @@ if (labelSpan.children.length > 0) {
   console.log('SUCCESS: Payload rendered purely as text string. No HTML execution path.');
 }
 
+const normalized = engine.normalizeSavedMemories([
+  { id: 'poisoned', name: payloadName.repeat(4), time: payloadTime, epochIndex: 99, entropy: 999 },
+  null,
+  '<invalid-array-entry>',
+  ...Array.from({ length: 10 }, (_, index) => ({ id: `extra-${index}` }))
+]);
+
+if (normalized.length > 8 || normalized[0].epochIndex !== 0 || normalized[0].entropy !== 100 || normalized[0].name.length > 160) {
+  console.error('FAIL: Stored memory normalization did not enforce bounds and safe types.');
+  passed = false;
+} else {
+  console.log('SUCCESS: Poisoned storage payload was bounded and normalized.');
+}
+
 if (!passed) {
   process.exit(1);
 } else {
