@@ -3563,7 +3563,7 @@ class ParticleColliderLab {
   initCanvas() {
     const parent = this.canvas.parentElement;
     if (!parent) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     this.width = parent.clientWidth || 800;
     this.height = parent.clientHeight || 450;
 
