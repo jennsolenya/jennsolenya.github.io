@@ -3391,8 +3391,9 @@ class ParticleColliderLab {
         // Attractor gravitational pull
         const adx = targetAttractorX - p.x;
         const ady = targetAttractorY - p.y;
-        const adist = Math.sqrt(adx * adx + ady * ady) || 1;
-        if (adist < 220) {
+        const adistSq = adx * adx + ady * ady;
+        if (adistSq < 220 * 220) {
+          const adist = Math.sqrt(adistSq) || 1;
           const force = (currentGrav * 15) / (adist * p.mass);
           p.vx += (adx / adist) * force;
           p.vy += (ady / adist) * force;
@@ -3453,8 +3454,9 @@ class ParticleColliderLab {
 
         const adx = targetAttractorX - p.x;
         const ady = targetAttractorY - p.y;
-        const adist = Math.sqrt(adx * adx + ady * ady) || 1;
-        if (adist < 180) {
+        const adistSq = adx * adx + ady * ady;
+        if (adistSq < 180 * 180) {
+          const adist = Math.sqrt(adistSq) || 1;
           p.vx += (adx / adist) * (currentGrav * 0.8);
           p.vy += (ady / adist) * (currentGrav * 0.8);
         }
