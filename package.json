@@ -1,0 +1,13 @@
+{
+  "name": "jennsolenya-github-io",
+  "version": "1.0.0",
+  "description": "VOID // Creative Playground & Sound Lab",
+  "private": true,
+  "scripts": {
+    "build": "echo 'No build step required for static site'",
+    "test": "echo 'No test suite configured'"
+  },
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.0"
+  }
+}
