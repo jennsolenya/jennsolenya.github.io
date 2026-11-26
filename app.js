@@ -252,6 +252,7 @@ class SpatialSoundEngine {
     this.isMuted = true;
     this.initialized = false;
     this.voiceStats = { created: 0, started: 0, stopped: 0, active: 0, highWater: 0 };
+    this.genre = 'techno';
   }
 
   installAudioDiagnostics() {
@@ -305,7 +306,6 @@ class SpatialSoundEngine {
       }
     });
     voidDiagnostics.attachAudioStats(stats);
-    this.genre = 'techno';
   }
 
   getNoiseBuffer(duration, decay = false) {

@@ -24,6 +24,7 @@ assert(app.includes('clearInterval(arpTimer)'), 'arpeggiator interval must be cl
 assert(app.includes('arpTimer = null'), 'arpeggiator interval handle must be released');
 assert(app.includes('this.subBassBus = this.ctx.createGain()'), 'sub-bass layer must have a dedicated bus');
 assert(app.includes('this.midBassBus = this.ctx.createGain()'), 'mid-bass layer must have a dedicated bus');
+assert(/this\.initialized = false;\s*this\.voiceStats = [^;]+;\s*this\.genre = 'techno';/.test(app), 'audio must have a stable default genre before the first gesture');
 assert(app.includes('audio.setGenre(this.getCurrentEpoch().key)'), 'startup must reapply the selected genre after AudioContext creation');
 assert(app.includes('Math.floor(measure / 2) + section'), 'modern bass patterns must vary in memorable two-bar phrases');
 
