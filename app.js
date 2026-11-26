@@ -2902,6 +2902,9 @@ class ParticleColliderLab {
     this.particlesBadge = document.getElementById('sandbox-particles-badge');
     this.gravityBadge = document.getElementById('sandbox-gravity-badge');
     this.velocityBadge = document.getElementById('sandbox-velocity-badge');
+    if (this.particlesBadge) {
+      this.particlesBadge.textContent = `VECTORS: ${this.numParticles.toLocaleString()}`;
+    }
 
     this.initCanvas();
     this.initParticles();
