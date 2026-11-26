@@ -177,7 +177,7 @@ input:focus-visible,
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
   backdrop-filter: blur(8px);
 }
 
@@ -294,7 +294,7 @@ input:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
 @keyframes pulse {
@@ -391,7 +391,7 @@ input:focus-visible,
   letter-spacing: 0.05em;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .action-btn-ghost:hover {
@@ -619,7 +619,7 @@ input:focus-visible,
   padding: 0.6rem 1.1rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -645,7 +645,7 @@ input:focus-visible,
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
@@ -679,7 +679,7 @@ input:focus-visible,
   padding: 0.2rem 0.6rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -705,7 +705,7 @@ input:focus-visible,
   padding: 0.5rem 0.85rem;
   border-radius: 6px;
   color: var(--text-secondary);
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .key-hud-display.flash {
@@ -763,7 +763,7 @@ input:focus-visible,
   padding: 0.45rem 0.9rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .genre-pill:hover {
@@ -795,7 +795,7 @@ input:focus-visible,
   padding: 0.75rem 1.2rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -1072,7 +1072,7 @@ input:focus-visible,
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .close-btn:hover {
@@ -1173,7 +1173,7 @@ input:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   backdrop-filter: blur(8px);
 }
 
@@ -1266,7 +1266,7 @@ input:focus-visible,
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
   padding: 1.5rem;
-  transition: all 0.25s ease;
+  transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
 }
 
 .timeline-node:hover {
@@ -1290,7 +1290,7 @@ input:focus-visible,
   border-radius: 50%;
   background: #000000;
   border: 2px solid rgba(255, 255, 255, 0.4);
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .timeline-node:hover .timeline-bullet,
@@ -1324,7 +1324,7 @@ input:focus-visible,
   border-radius: 4px;
   text-decoration: none;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .timeline-tag:hover {
@@ -1537,7 +1537,7 @@ input:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   position: relative;
   z-index: 25;
 }
@@ -1626,7 +1626,7 @@ input:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .memory-chip:hover {
@@ -1716,7 +1716,7 @@ input:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .layout-seg-btn:hover {
@@ -2009,7 +2009,7 @@ input:focus-visible,
   padding: 0.45rem 0.95rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .sandbox-pill:hover {
@@ -2040,7 +2040,7 @@ input:focus-visible,
   padding: 0.5rem 1rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .sandbox-btn:hover {
@@ -2075,7 +2075,7 @@ input:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: 0.8rem;
-  transition: all 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
