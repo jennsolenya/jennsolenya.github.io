@@ -924,14 +924,22 @@ class SpatialSoundEngine {
       outputGain.gain.setValueAtTime(0.55, t);
       outputGain.gain.exponentialRampToValueAtTime(0.001, t + duration);
 
-      // Routing: oscs -> formant1 -> formant2 -> chopGain -> outputGain -> distortion
+      // Routing: oscs -> formant1 -> formant2 -> chopGain -> outputGain -> local distortion -> sidechain -> master FX
       osc1.connect(formant1);
       osc2.connect(formant1);
       osc3.connect(formant1); // metallic harmonics into formant chain
       formant1.connect(formant2);
       formant2.connect(chopGain);
       chopGain.connect(outputGain);
-      outputGain.connect(this.distortion || this.masterGain);
+
+      // Keep the growl's character while ensuring it responds to kick pumping.
+      const growlDistortion = this.ctx.createWaveShaper();
+      growlDistortion.curve = this.distortion && this.distortion.curve
+        ? this.distortion.curve
+        : this.makeDistortionCurve(35);
+      growlDistortion.oversample = '4x';
+      outputGain.connect(growlDistortion);
+      growlDistortion.connect(this.sidechainGain || this.masterGain);
 
       osc1.start(t);
       osc2.start(t);
